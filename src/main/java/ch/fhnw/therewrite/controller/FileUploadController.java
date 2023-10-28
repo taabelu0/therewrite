@@ -27,7 +27,6 @@ public class FileUploadController {
 
     private final StorageService storageService;
 
-    @Autowired
     public FileUploadController(StorageService storageService) {
         this.storageService = storageService;
     }
@@ -37,7 +36,7 @@ public class FileUploadController {
         model.addAttribute("files", storageService.loadAll().map(
                 path -> MvcUriComponentsBuilder.fromMethodName(FileUploadController.class,
                     "serveFile", path.getFileName().toString()).build().toUri().toString())
-            .collect(Collectors.toList()));
+            .toList());
         return "uploadForm";
     }
 

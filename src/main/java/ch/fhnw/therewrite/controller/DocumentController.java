@@ -20,7 +20,7 @@ import java.util.stream.Stream;
 @Controller
 public class DocumentController {
     private final StorageService storageService;
-    @Autowired
+
     public DocumentController(StorageService storageService) {
         this.storageService = storageService;
     }
@@ -32,7 +32,7 @@ public class DocumentController {
                                 path.getFileName().toString(),
                                 "/viewer/web/viewer.html?file=http://localhost:8080/pdf/get/"
                                 + path.getFileName()))
-                .collect(Collectors.toList()));
+                .toList());
         return "index";
     }
     @GetMapping(
@@ -46,14 +46,7 @@ public class DocumentController {
             return in.readAllBytes();
         } catch (IOException exception) {
             // TODO: log exception
-            return null;
+            return new byte[0];
         }
     }
-
-//    @GetMapping({"/pdf/list"})
-//    @ResponseBody
-//    public String[] GetAllPDF() {
-//        return storageService.loadAll().map(
-//                        path -> path.getFileName().toString()).toArray(String[]::new);
-//    }
 }
