@@ -1,29 +1,39 @@
 package ch.fhnw.therewrite.controller;
-import org.springframework.core.io.ClassPathResource;
+import ch.fhnw.therewrite.storage.StorageService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-@RestController
+@Controller
 public class DocumentController {
-    @GetMapping("/pdf")
-    @ResponseBody
-    public String pdf() throws IOException {
-        Resource resource = new ClassPathResource("static/index.html");
-        Path path = resource.getFile().toPath();
-        return new String(Files.readAllBytes(path));
+    private final StorageService storageService;
+    @Autowired
+    public DocumentController(StorageService storageService) {
+        this.storageService = storageService;
+    }
+    @GetMapping("/")
+    public String index(Model model) {
+        Stream<Path> pdfs = storageService.loadAll();
+        model.addAttribute("pdfs", pdfs.map(
+                        path -> List.of(
+                                path.getFileName().toString(),
+                                "/viewer/web/viewer.html?file=http://localhost:8080/pdf/get/"
+                                + path.getFileName()))
+                .collect(Collectors.toList()));
+        return "index";
     }
     @GetMapping(
             value = "/pdf/get/{pdfName}",
@@ -31,8 +41,7 @@ public class DocumentController {
     )
     public @ResponseBody byte[] getPDF(@PathVariable(value="pdfName") String pdfName) {
         try {
-            System.out.println(pdfName);
-            Resource resource = new ClassPathResource("uploads/pdf/" + pdfName);
+            Resource resource = storageService.loadAsResource(pdfName);
             InputStream in = resource.getInputStream();
             return in.readAllBytes();
         } catch (IOException exception) {
@@ -40,17 +49,11 @@ public class DocumentController {
             return null;
         }
     }
-    @GetMapping({"/pdf/list"})
-    @ResponseBody
-    public String[] GetAllPDF() throws IOException, URISyntaxException {
 
-        ArrayList<String> alPdfNames = new ArrayList<>();
-
-        URL url = getClass().getResource("/uploads/pdf/");
-        Path path = Paths.get(url.toURI());
-        if (path == null) return null; // TODO: fix exception catch -> path cannot be null: RuntimeExc is thrown on Paths.get if null
-
-        Files.walk(path, 1).map(p -> p.getFileName().toString()).filter(s -> !s.equals("pdf")).forEach(alPdfNames::add);
-        return alPdfNames.toArray(new String[alPdfNames.size()]);
-    }
+//    @GetMapping({"/pdf/list"})
+//    @ResponseBody
+//    public String[] GetAllPDF() {
+//        return storageService.loadAll().map(
+//                        path -> path.getFileName().toString()).toArray(String[]::new);
+//    }
 }

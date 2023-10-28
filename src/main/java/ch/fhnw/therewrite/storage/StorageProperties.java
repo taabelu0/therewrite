@@ -8,7 +8,7 @@ public class StorageProperties {
 	/**
 	 * Folder location for storing files
 	 */
-	private String location = "src/main/resources/static/pdf";
+	private String location = "src/main/resources/uploads/pdf";
 
 	public String getLocation() {
 		return location;

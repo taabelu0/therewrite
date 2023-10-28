@@ -1,4 +1,4 @@
-package ch.fhnw.therewrite;
+package ch.fhnw.therewrite.controller;
 
 import ch.fhnw.therewrite.storage.StorageFileNotFoundException;
 import ch.fhnw.therewrite.storage.StorageService;
@@ -32,14 +32,12 @@ public class FileUploadController {
         this.storageService = storageService;
     }
 
-    @GetMapping("/")
+    @GetMapping("/upload")
     public String listUploadedFiles(Model model) {
-
         model.addAttribute("files", storageService.loadAll().map(
                 path -> MvcUriComponentsBuilder.fromMethodName(FileUploadController.class,
                     "serveFile", path.getFileName().toString()).build().toUri().toString())
             .collect(Collectors.toList()));
-
         return "uploadForm";
     }
 
@@ -56,7 +54,7 @@ public class FileUploadController {
             "attachment; filename=\"" + file.getFilename() + "\"").body(file);
     }
 
-    @PostMapping("/")
+    @PostMapping("/file/upload")
     public String handleFileUpload(@RequestParam("file") MultipartFile file,
                                    RedirectAttributes redirectAttributes) {
         String extension = FilenameUtils.getExtension(file.getOriginalFilename());

@@ -48,6 +48,10 @@ a:visited {
     background-color: var(--c-light-primary);
 }
 
+#nav > a {
+    margin: 1.5rem;
+}
+
 #nav-title {
     font-size: 1.5rem;
     font-weight: 800;
