@@ -30,4 +30,12 @@ public class PDFController {
         Files.walk(path, 1).map(p -> p.getFileName().toString()).filter(s -> !s.equals("pdf")).forEach(alPdfNames::add);
         return alPdfNames.toArray(new String[alPdfNames.size()]);
     }
+
+    @GetMapping({"/pdfview/{pdfName}"})
+    @ResponseBody
+    public String pdfView() throws IOException {
+        Resource resource = new ClassPathResource("static/pdf_view.html");
+        Path path = resource.getFile().toPath();
+        return new String(Files.readAllBytes(path));
+    }
 }
