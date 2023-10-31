@@ -2,6 +2,7 @@ package ch.fhnw.therewrite.controller;
 
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -31,6 +32,7 @@ public class PDFController {
         return alPdfNames.toArray(new String[alPdfNames.size()]);
     }
 
+    @CrossOrigin(origins = "https://mozilla.github.io", maxAge = 3600)
     @GetMapping({"/pdfview/{pdfName}"})
     @ResponseBody
     public String pdfView() throws IOException {
