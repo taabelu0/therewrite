@@ -17,7 +17,7 @@
             <a href="/" id="nav-title">TheRewrite</a>
         </nav>
         <section id="content">
-            <canvas id="pdfCanvas"></canvas>
+            <div id="pdfCanvasContainer"></div>
         </section>
         <script>
 
@@ -29,35 +29,49 @@
                 let path = window.location.pathname;
                 let pathArr = path.split("/");
 
+                let canvasContainer = document.querySelector("#pdfCanvasContainer");
+
                 let loadingTask = pdfjsLib.getDocument("/pdf/" + pathArr[pathArr.length - 1]);
                 loadingTask.promise
                     .then((pdf) => {
-                        pdf.getPage(1).then((page) => {
-                            const scale = 1.5;
-                            let viewport = page.getViewport({ scale: scale, });
-                            let outputScale = window.devicePixelRatio || 1;
 
-                            let canvas = document.querySelector("#pdfCanvas");
-                            let context = canvas.getContext('2d');
+                        for(let i = 0; i < pdf.numPages; i++) {
+                            renderPage(pdf, canvasContainer, i);
+                        }
 
-                            canvas.width = Math.floor(viewport.width * outputScale);
-                            canvas.height = Math.floor(viewport.height * outputScale);
-
-                            let transform = outputScale !== 1
-                                ? [outputScale, 0, 0, outputScale, 0, 0]
-                                : null;
-
-                            let renderContext = {
-                                canvasContext: context,
-                                transform: transform,
-                                viewport: viewport
-                            };
-                            page.render(renderContext);
-                        });
                     })
                     .catch(() => {
                         window.location.replace("/");
                     });
+            }
+
+            function renderPage(pdf, canvasContainer, pageNr) {
+                pdf.getPage(pageNr).then((page) => {
+                    const scale = 1.5;
+                    let viewport = page.getViewport({ scale: scale, });
+                    let outputScale = window.devicePixelRatio || 1;
+
+                    let canvas = document.createElement("canvas")
+                    let context = canvas.getContext('2d');
+
+                    canvas.id = "pdfCanvasPage-" + pageNr;
+                    canvas.className = "pdfCanvas";
+                    canvas.width = Math.floor(viewport.width * outputScale);
+                    canvas.height = Math.floor(viewport.height * outputScale);
+
+                    let transform = outputScale !== 1
+                        ? [outputScale, 0, 0, outputScale, 0, 0]
+                        : null;
+
+                    let renderContext = {
+                        canvasContext: context,
+                        transform: transform,
+                        viewport: viewport
+                    };
+                    page.render(renderContext);
+
+                    canvasContainer.appendChild(canvas);
+                });
             }
         </script>
     </body>
