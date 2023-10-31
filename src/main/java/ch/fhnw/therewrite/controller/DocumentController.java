@@ -26,14 +26,16 @@ public class DocumentController {
     }
     @GetMapping("/")
     public String index(Model model) {
-        Stream<Path> pdfs = storageService.loadAll();
-        model.addAttribute("pdfs", pdfs.map(
-                        path -> List.of(
-                                path.getFileName().toString(),
-                                "/view/"
-                                + path.getFileName()))
-                .toList());
+        model.addAttribute("pdfs", getAllPDFs());
         return "index";
+    }
+    private List getAllPDFs() {
+        Stream<Path> pdfs = storageService.loadAll();
+        return pdfs.map(
+                path -> List.of(
+                        path.getFileName().toString(),
+                        "/view/"
+                                + path.getFileName())).toList();
     }
 
     @GetMapping("/view/{pdfName}")

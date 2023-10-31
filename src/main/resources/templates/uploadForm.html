@@ -10,6 +10,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200;0,6..12,300;0,6..12,400;0,6..12,500;0,6..12,600;0,6..12,700;0,6..12,800;0,6..12,900;0,6..12,1000;1,6..12,200;1,6..12,300;1,6..12,400;1,6..12,500;1,6..12,600;1,6..12,700;1,6..12,800;1,6..12,900;1,6..12,1000&display=swap" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="/style/basic.css">
     <link rel="stylesheet" type="text/css" href="/style/list.css">
+    <script src="https://unpkg.com/dropzone@5/dist/min/dropzone.min.js"></script>
+    <link rel="stylesheet" href="/style/customDropZone.min.css" tpye="text/css"/>
 </head>
     <body>
     <nav id="nav">
@@ -21,14 +23,20 @@
             <div th:if="${message}">
                 <h2 th:text="${message}"/>
             </div>
-            <div>
-                <form method="POST" enctype="multipart/form-data" action="/file/upload">
-                    <table>
-                        <tr><td>File to upload:</td><td><input type="file" name="file" /></td></tr>
-                        <tr><td></td><td><input type="submit" value="Upload" /></td></tr>
-                    </table>
-                </form>
-            </div>
+            <form id="fileUpload" method="POST" enctype="multipart/form-data" action="/file/upload" class="dropzone-custom">
+                <div>Drag & Drop your file here</div>
+            </form>
         </section>
+    <script>
+        let myDropzone = new Dropzone("#fileUpload", {
+            url: "/file/upload",
+            method: "POST",
+            enctype: "multipart/form-data",
+            paramName: "file",
+        });
+        myDropzone.on("complete", function(file) {
+
+        });
+    </script>
     </body>
 </html>
