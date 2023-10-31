@@ -1,16 +1,18 @@
 .list-container {
     border-radius: var(--s-border-radius);
     overflow: hidden;
-    width: 100%;
+    width: calc(100% - (2 * var(--s-border-radius)));
     display: flex;
     flex-direction: column;
+
+    border: var(--s-border) solid var(--c-light-secondary);
 }
 
 .list-item {
-    width: calc(100% - 2rem - (2 * var(--s-border)));
+    width: calc(100% - 2rem);
     padding: 1rem;
+    font-weight: 600;
     background-color: var(--c-light-secondary);
-    border: var(--s-border) solid var(--c-light-secondary);
 }
 
 .list-item:nth-child(even) {

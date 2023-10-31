@@ -2,7 +2,7 @@
 
     --s-panel-img: 35%;
     --s-border-radius: 0.25rem;
-    --s-border: 2px;
+    --s-border: 4px;
 
     --c-light-primary: rgb(245, 245, 245);
     --c-light-secondary: rgb(225, 225, 225);
@@ -59,10 +59,29 @@ a:visited {
 #content {
 
     overflow: hidden;
-    margin: max(3em, 7vh) 20% 0 20%;
-    width: 50%;
-    padding: 5%;
+    margin: max(3em, 7vh) auto 0 auto;
+    width: min(100%, 810px);
+    padding: 3rem;
     min-height: 100%;
 
     background-color: var(--c-light-primary);
+}
+
+#fileUpload {
+    border-radius: var(--s-border-radius);
+    overflow: hidden;
+    width: 100%;
+    margin-bottom: 3rem;
+
+    border: var(--s-border) solid var(--c-dark-secondary);
+    background-color: transparent;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+
+    font-weight: 800;
+    font-size: 1.5rem;
+    color: var(--c-dark-secondary);
 }
