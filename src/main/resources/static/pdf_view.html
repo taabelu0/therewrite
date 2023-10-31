@@ -21,7 +21,7 @@
         </section>
         <script>
 
-            var { pdfjsLib } = globalThis;
+            const { pdfjsLib } = globalThis;
 
             pdfjsLib.GlobalWorkerOptions.workerSrc = '/script/pdf.worker.min.js';
 
@@ -30,30 +30,34 @@
                 let pathArr = path.split("/");
 
                 let loadingTask = pdfjsLib.getDocument("/pdf/" + pathArr[pathArr.length - 1]);
-                loadingTask.promise.then((pdf) => {
-                    pdf.getPage(1).then((page) => {
-                        var scale = 1.5;
-                        var viewport = page.getViewport({ scale: scale, });
-                        var outputScale = window.devicePixelRatio || 1;
+                loadingTask.promise
+                    .then((pdf) => {
+                        pdf.getPage(1).then((page) => {
+                            const scale = 1.5;
+                            let viewport = page.getViewport({ scale: scale, });
+                            let outputScale = window.devicePixelRatio || 1;
 
-                        var canvas = document.querySelector("#pdfCanvas");
-                        var context = canvas.getContext('2d');
+                            let canvas = document.querySelector("#pdfCanvas");
+                            let context = canvas.getContext('2d');
 
-                        canvas.width = Math.floor(viewport.width * outputScale);
-                        canvas.height = Math.floor(viewport.height * outputScale);
+                            canvas.width = Math.floor(viewport.width * outputScale);
+                            canvas.height = Math.floor(viewport.height * outputScale);
 
-                        var transform = outputScale !== 1
-                            ? [outputScale, 0, 0, outputScale, 0, 0]
-                            : null;
+                            let transform = outputScale !== 1
+                                ? [outputScale, 0, 0, outputScale, 0, 0]
+                                : null;
 
-                        var renderContext = {
-                            canvasContext: context,
-                            transform: transform,
-                            viewport: viewport
-                        };
-                        page.render(renderContext);
+                            let renderContext = {
+                                canvasContext: context,
+                                transform: transform,
+                                viewport: viewport
+                            };
+                            page.render(renderContext);
+                        });
+                    })
+                    .catch(() => {
+                        window.location.replace("/");
                     });
-                });
             }
         </script>
     </body>
