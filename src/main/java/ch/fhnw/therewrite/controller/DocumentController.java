@@ -30,10 +30,16 @@ public class DocumentController {
         model.addAttribute("pdfs", pdfs.map(
                         path -> List.of(
                                 path.getFileName().toString(),
-                                "/viewer/web/viewer.html?file=http://localhost:8080/pdf/get/"
+                                "/view/"
                                 + path.getFileName()))
                 .toList());
         return "index";
+    }
+
+    @GetMapping("/view/{pdfName}")
+    public String pdfView(@PathVariable("pdfName") String pdfName, Model model) {
+        model.addAttribute(pdfName);
+        return "pdfViewer";
     }
     @GetMapping(
             value = "/pdf/get/{pdfName}",

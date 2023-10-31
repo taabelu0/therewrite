@@ -8,31 +8,27 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200;0,6..12,300;0,6..12,400;0,6..12,500;0,6..12,600;0,6..12,700;0,6..12,800;0,6..12,900;0,6..12,1000;1,6..12,200;1,6..12,300;1,6..12,400;1,6..12,500;1,6..12,600;1,6..12,700;1,6..12,800;1,6..12,900;1,6..12,1000&display=swap" rel="stylesheet">
-    <link rel="stylesheet" type="text/css" href="style/basic.css">
-    <link rel="stylesheet" type="text/css" href="style/list.css">
+    <link rel="stylesheet" type="text/css" href="/style/basic.css">
+    <link rel="stylesheet" type="text/css" href="/style/list.css">
 </head>
-<body>
-<nav id="nav">
-    <a href="/" id="nav-title">TheRewrite</a>
-    <a href="/upload">Upload</a>
-</nav>
-<section id="content">
-<div th:if="${message}">
-    <h2 th:text="${message}"/>
-</div>
+    <body>
+    <nav id="nav">
+        <a href="/" id="nav-title">TheRewrite</a>
+        <a href="/upload">Upload</a>
+    </nav>
 
-<div>
-    <form method="POST" enctype="multipart/form-data" action="/file/upload">
-        <table>
-            <tr><td>File to upload:</td><td><input type="file" name="file" /></td></tr>
-            <tr><td></td><td><input type="submit" value="Upload" /></td></tr>
-        </table>
-    </form>
-</div>
-
-<div class="list-container" id="list-of-pdf" th:each="file : ${files}">
-    <a th:href="${file}" th:text="${file}" class="list-item" />
-</div>
-</section>
-</body>
+        <section id="content">
+            <div th:if="${message}">
+                <h2 th:text="${message}"/>
+            </div>
+            <div>
+                <form method="POST" enctype="multipart/form-data" action="/file/upload">
+                    <table>
+                        <tr><td>File to upload:</td><td><input type="file" name="file" /></td></tr>
+                        <tr><td></td><td><input type="submit" value="Upload" /></td></tr>
+                    </table>
+                </form>
+            </div>
+        </section>
+    </body>
 </html>

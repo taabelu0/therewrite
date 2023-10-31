@@ -1,0 +1,79 @@
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>TheRewrite</title>
+        <meta name="description" content="Annotations but creative">
+        <meta name="author" content="The Rewrite Team @ FHNW">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200;0,6..12,300;0,6..12,400;0,6..12,500;0,6..12,600;0,6..12,700;0,6..12,800;0,6..12,900;0,6..12,1000;1,6..12,200;1,6..12,300;1,6..12,400;1,6..12,500;1,6..12,600;1,6..12,700;1,6..12,800;1,6..12,900;1,6..12,1000&display=swap" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="/style/basic.css">
+        <link rel="stylesheet" type="text/css" href="/style/viewer.css">
+        <script src="/script/pdf.min.js" type="text/javascript"></script>
+    </head>
+    <body>
+        <nav id="nav">
+            <a href="/" id="nav-title">TheRewrite</a>
+        </nav>
+        <section id="content">
+            <div id="pdfCanvasContainer"></div>
+        </section>
+        <script>
+
+            const { pdfjsLib } = globalThis;
+
+            pdfjsLib.GlobalWorkerOptions.workerSrc = '/script/pdf.worker.min.js';
+
+            window.onload = () => {
+                let path = window.location.pathname;
+                let pathArr = path.split("/");
+
+                let canvasContainer = document.querySelector("#pdfCanvasContainer");
+
+                let loadingTask = pdfjsLib.getDocument("/pdf/get/" + pathArr[pathArr.length - 1]);
+
+                loadingTask.promise
+                    .then((pdf) => {
+
+                        for(let i = 0; i < pdf.numPages; i++) {
+                            renderPage(pdf, canvasContainer, i);
+                        }
+
+                    })
+                    .catch(() => {
+                        window.location.replace("/");
+                    });
+            }
+
+            function renderPage(pdf, canvasContainer, pageNr) {
+                pdf.getPage(pageNr).then((page) => {
+                    const scale = 1.5;
+                    let viewport = page.getViewport({ scale: scale, });
+                    let outputScale = window.devicePixelRatio || 1;
+
+                    let canvas = document.createElement("canvas")
+                    let context = canvas.getContext('2d');
+
+                    canvas.id = "pdfCanvasPage-" + pageNr;
+                    canvas.className = "pdfCanvas";
+                    canvas.width = Math.floor(viewport.width * outputScale);
+                    canvas.height = Math.floor(viewport.height * outputScale);
+
+                    let transform = outputScale !== 1
+                        ? [outputScale, 0, 0, outputScale, 0, 0]
+                        : null;
+
+                    let renderContext = {
+                        canvasContext: context,
+                        transform: transform,
+                        viewport: viewport
+                    };
+                    page.render(renderContext);
+
+                    canvasContainer.appendChild(canvas);
+                });
+            }
+        </script>
+    </body>
+</html>
