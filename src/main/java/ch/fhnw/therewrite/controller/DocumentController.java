@@ -1,27 +1,25 @@
 package ch.fhnw.therewrite.controller;
+import ch.fhnw.therewrite.AppConfigProperties;
 import ch.fhnw.therewrite.storage.StorageService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.google.gson.Gson;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
-import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-@Controller
+@RestController
 public class DocumentController {
     private final StorageService storageService;
 
-    public DocumentController(StorageService storageService) {
+    private final Gson gson = new Gson();
+
+    public DocumentController(StorageService storageService, AppConfigProperties appConfigProperties) {
         this.storageService = storageService;
     }
     @GetMapping("/")
@@ -29,6 +27,13 @@ public class DocumentController {
         model.addAttribute("pdfs", getAllPDFs());
         return "index";
     }
+
+    @CrossOrigin(origins="http://localhost:3000")
+    @GetMapping("/pdf/list")
+    public String getPDFList() {
+        return gson.toJson(getAllPDFs());
+    }
+
     private List getAllPDFs() {
         Stream<Path> pdfs = storageService.loadAll();
         return pdfs.map(
