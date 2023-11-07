@@ -19,7 +19,7 @@ public class DocumentController {
 
     private final Gson gson = new Gson();
 
-    public DocumentController(StorageService storageService, AppConfigProperties appConfigProperties) {
+    public DocumentController(StorageService storageService) {
         this.storageService = storageService;
     }
     @GetMapping("/")
