@@ -1,14 +1,12 @@
-import '../style/App.css';
 import '../style/basic.css';
 import '../style/list.css';
 import '../style/customDropZone.min.css';
-import {getPDFList, postPDF} from "./api.js";
-import {useEffect, useState} from "react";
-import Dropzone from 'react-dropzone'
+import '../style/index.css';
+import {getPDFList} from "./api.js";
+import {useEffect, useRef, useState} from "react";
 
 function App() {
     const [pdfs, setPdfs] = useState([["", ""]]);
-
     useEffect(() => {
         async function fetchData() {
             const resp = await getPDFList();
@@ -18,18 +16,17 @@ function App() {
     }, []);
 
 
+    const loaded = useRef(false);
+    useEffect(() => {
+        if (!loaded.current && window.Dropzone && window.registerDropzone) {
+            loaded.current = true;
+            window.registerDropzone("#fileUpload", window.Dropzone);
+        }
+    }, []);
+
     return (
         <div className="App">
-            <Dropzone onDrop={acceptedFiles => uploadPDF(acceptedFiles[0])}>
-                {({getRootProps, getInputProps}) => (
-                    <section>
-                        <form className="dropzone-custom" {...getRootProps()}>
-                            <input {...getInputProps()} />
-                            <p>Drag & Drop your file here</p>
-                        </form>
-                    </section>
-                )}
-            </Dropzone>
+            <form id="fileUpload" className="dropzone-custom">Drag & Drop your file here</form>
 
             <div className="list-container" id="list-of-pdf">
                 {pdfs.map((pdf, index) => (
@@ -41,13 +38,6 @@ function App() {
 
         </div>
     );
-}
-
-function uploadPDF(file) {
-    postPDF(file).finally();
-    setTimeout( () => {
-        window.location.reload()
-    }, 600);
 }
 
 export default App;

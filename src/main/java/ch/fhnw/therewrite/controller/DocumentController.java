@@ -4,6 +4,7 @@ import ch.fhnw.therewrite.storage.StorageService;
 import com.google.gson.Gson;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,7 +14,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Stream;
 
-@RestController
+@Controller
 public class DocumentController {
     private final StorageService storageService;
 
@@ -22,15 +23,14 @@ public class DocumentController {
     public DocumentController(StorageService storageService) {
         this.storageService = storageService;
     }
-    @GetMapping("/")
-    public String index(Model model) {
-        model.addAttribute("pdfs", getAllPDFs());
-        return "index";
-    }
+//    @GetMapping("/")
+//    public String index(Model model) {
+//        model.addAttribute("pdfs", getAllPDFs());
+//        return "index";
+//    }
 
-    @CrossOrigin(origins="http://localhost:3000")
-    @GetMapping("/pdf/list")
-    public String getPDFList() {
+    @GetMapping(value="/pdf/list", produces="application/json")
+    public @ResponseBody String getPDFList() {
         return gson.toJson(getAllPDFs());
     }
 
