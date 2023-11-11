@@ -1,6 +1,6 @@
 # TheRewrite
 
-Brief description of the project.
+A Web-App to collaboratively annotate documents.
 
 ## Getting Started
 
@@ -8,9 +8,9 @@ These instructions will get your copy of the project up and running on your loca
 
 ### Prerequisites
 
-- Java JDK 17 (or later)
+- Java JDK 17
 - Apache Maven 3.9.1
-- Node.js 20.9.0 (npm 10.1.0)
+- Optional: Node.js 20.9.0 -> npm 10.1.0
 
 ### Installing and Running the Full Application
 
@@ -27,7 +27,8 @@ Available at `http://localhost:8080/`.
 
 ### React Development
 
-For front-end development with React:
+Node or React are not requirements and only used for front-end development.
+Development with React:
 
 1. **Navigate to the React Directory**
    ```bash
@@ -44,12 +45,13 @@ For front-end development with React:
    npm start
    ```
    This starts the development server, accessible at `http://localhost:3000`. The front-end can be developed independently of the Spring Boot backend in this mode.
+
 4. **Build Changes**
-   To apply the changes made in the react-app navigate to "src/main/react-app" (step 1) and execute the bash script "build.sh":
+   To apply the changes made in the react-app navigate to `src/main/react-app` (step 1) and execute the bash script `build.sh`:
    ```bash
    sh build.sh
    ```
-   On Windows use a bash terminal (Git Bash)
+   On Windows use a bash terminal (Git Bash).
    
 
 
