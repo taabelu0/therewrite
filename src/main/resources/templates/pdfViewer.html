@@ -171,7 +171,16 @@
                     svg.src = `/media/icons/post-it-${addingColor}.svg`;
                     addingColor = null;
 
+                    let input = document.createElement("textarea");
+                    input.readOnly = true;
+                    input.classList = ["post-it-input"];
+                    input.addEventListener("blur", (e) => {
+                        console.log(e.target);
+                        e.target.readOnly = true;
+                    })
+
                     postIt.appendChild(svg);
+                    postIt.appendChild(input);
 
                     // the amount scrolled + distance from viewport edge to the mouse
                     x += (document.body.scrollLeft + e.clientX) / scale;
@@ -181,6 +190,13 @@
                     postIt.setAttribute("offset-y", y);
                     postIt.style.transform = `translate(${x}px, ${y}px)`;
                     postIt.classList = ["post-it"];
+
+
+                    postIt.addEventListener("dblclick", (e) => {
+                        let textarea = e.target;
+                        textarea.readOnly = false;
+                        textarea.focus();
+                    });
 
                     noteboard.appendChild(postIt);
                 }
