@@ -39,7 +39,7 @@
 
     position: relative;
     width: var(--s-workspace-post-it);
-    height: var(--s-workspace-post-it);
+    height: calc(var(--s-workspace-post-it) - var(--s-workspace-post-it-border));
     border-color: var(--c-dark-secondary);
     border-left: var(--s-workspace-post-it-border) solid;
     border-top: var(--s-workspace-post-it-border) solid;

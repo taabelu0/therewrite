@@ -164,7 +164,7 @@
 
                     let postIt = document.createElement("div");
                     let x = 0;
-                    let y = (0 - (noteboard.childElementCount * 160)); // for each already existing element, offset it by their height (so it starts at 0)
+                    let y = (0 - (noteboard.childElementCount * Number(getComputedStyle(document.body).getPropertyValue("--s-workspace-post-it").replace(/[^0-9]/g, '')))); // for each already existing element, offset it by their height (so it starts at 0)
 
                     let svg = document.createElement("img");
                     postIt.classList = ["post-it-svg"];
