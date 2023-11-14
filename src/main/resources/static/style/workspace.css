@@ -5,7 +5,7 @@
 
     width: var(--s-workspace-width);
     min-height: 100vh;
-    margin: max(3em, 7vh) auto 0 auto;
+    margin-top: max(3em, 7vh);
 
     transform-origin: top left; /* Only needed for transform: scale */
     background-color: white;
