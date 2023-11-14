@@ -177,6 +177,9 @@
                     input.addEventListener("blur", (e) => {
                         console.log(e.target);
                         e.target.readOnly = true;
+                        e.target.style.outline = "none";
+                        e.target.style.userSelect = false;
+                        e.target.style.cursor = "grab";
                     })
 
                     postIt.appendChild(svg);
@@ -196,6 +199,9 @@
                         let textarea = e.target;
                         textarea.readOnly = false;
                         textarea.focus();
+                        textarea.style.outline = "0.5rem solid rgba(180, 180, 255, 0.6)";
+                        textarea.style.userSelect = true;
+                        textarea.style.cursor = "text";
                     });
 
                     noteboard.appendChild(postIt);

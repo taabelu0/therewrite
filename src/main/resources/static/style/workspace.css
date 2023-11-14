@@ -49,6 +49,9 @@
     position: absolute;
     top: 0;
     left: 0;
+    display: flex;
+    text-align: center;
+
     padding: 1rem;
     width: 100%;
     height: 100%;
@@ -58,6 +61,7 @@
 
     font-family: 'Nunito Sans', sans-serif;
     font-size: 2rem;
+    cursor: grab;
 }
 
 .post-it-input:focus {
