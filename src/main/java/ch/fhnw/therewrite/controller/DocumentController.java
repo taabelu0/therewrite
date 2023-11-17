@@ -23,11 +23,15 @@ public class DocumentController {
     public DocumentController(StorageService storageService) {
         this.storageService = storageService;
     }
-//    @GetMapping("/")
-//    public String index(Model model) {
-//        model.addAttribute("pdfs", getAllPDFs());
-//        return "index";
-//    }
+    @GetMapping("/")
+    public String index() {
+        return "index";
+    }
+
+    @GetMapping("/view/{pdfName}")
+    public String pdfView(@PathVariable("pdfName") String pdfName) {
+        return "index";
+    }
 
     @GetMapping(value="/pdf/list", produces="application/json")
     public @ResponseBody String getPDFList() {
@@ -41,12 +45,6 @@ public class DocumentController {
                         path.getFileName().toString(),
                         "/view/"
                                 + path.getFileName())).toList();
-    }
-
-    @GetMapping("/view/{pdfName}")
-    public String pdfView(@PathVariable("pdfName") String pdfName, Model model) {
-        model.addAttribute(pdfName);
-        return "pdfViewer";
     }
     @GetMapping(
             value = "/pdf/get/{pdfName}",

@@ -15,7 +15,7 @@ function App() {
             <section id="content">
                 <Routes>
                     <Route path="/" element={<Home/>}/>
-                    <Route path="/viewer" element={<Viewer/>}/>
+                    <Route path="/view/:pdfName" element={<Viewer />} />
                 </Routes>
             </section>
             {/*    Footer  */}
