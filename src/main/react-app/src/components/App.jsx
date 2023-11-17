@@ -2,41 +2,24 @@ import '../style/basic.css';
 import '../style/list.css';
 import '../style/customDropZone.min.css';
 import '../style/index.css';
-import {getPDFList} from "./api.js";
-import {useEffect, useRef, useState} from "react";
+import Navigation from './Navigation.jsx';
+import Home from'./Home.jsx';
+import {BrowserRouter as Router, Routes, Route} from 'react-router-dom';
+import Viewer from "./Viewer.jsx";
 
 function App() {
-    const [pdfs, setPdfs] = useState([["", ""]]);
-    useEffect(() => {
-        async function fetchData() {
-            const resp = await getPDFList();
-            setPdfs(resp);
-        }
-        fetchData().finally();
-    }, []);
-
-
-    const loaded = useRef(false);
-    useEffect(() => {
-        if (!loaded.current && window.Dropzone && window.registerDropzone) {
-            loaded.current = true;
-            window.registerDropzone("#fileUpload", window.Dropzone);
-        }
-    }, []);
 
     return (
-        <div className="App">
-            <form id="fileUpload" className="dropzone-custom">Drag & Drop your file here</form>
-
-            <div className="list-container" id="list-of-pdf">
-                {pdfs.map((pdf, index) => (
-                    <a key={index} href={pdf[1]} className="list-item">
-                        {pdf[0]}
-                    </a>
-                ))}
-            </div>
-
-        </div>
+        <Router>
+            <Navigation/>
+            <section id="content">
+                <Routes>
+                    <Route path="/" element={<Home/>}/>
+                    <Route path="/viewer" element={<Viewer/>}/>
+                </Routes>
+            </section>
+            {/*    Footer  */}
+        </Router>
     );
 }
 

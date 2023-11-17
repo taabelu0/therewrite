@@ -56,8 +56,12 @@ a:visited {
     font-weight: 800;
 }
 
-#content {
+#react-content {
+    width: 100%;
+    position: relative;
+}
 
+#content {
     overflow: hidden;
     margin: max(3em, 7vh) auto 0 auto;
     width: min(100%, 810px);

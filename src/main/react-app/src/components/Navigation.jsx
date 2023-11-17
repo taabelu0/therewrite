@@ -1,4 +1,3 @@
-
 function Navigation() {
     return (
         <nav id="nav">
@@ -6,5 +5,4 @@ function Navigation() {
         </nav>
     );
 }
-
 export default Navigation;
