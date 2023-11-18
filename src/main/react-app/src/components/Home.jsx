@@ -1,7 +1,6 @@
 import '../style/basic.css';
 import '../style/list.css';
 import '../style/customDropZone.min.css';
-import '../style/index.css';
 import {useEffect, useRef, useState} from "react";
 import {getPDFList} from "./api";
 

@@ -1,0 +1,145 @@
+#pdfContainer {
+    width: 100%;
+}
+
+.pdfCanvas {
+    width: 100%;
+    margin-bottom: 2rem;
+}
+
+.pdfCanvas:last-of-type {
+    margin-bottom: 0;
+}
+
+#workspace-scroll {
+    height: calc(100% - 14vh - 3em);
+    max-height: calc(100% - 14vh - 3em);
+    overflow: scroll;
+    position: relative;
+    z-index: 100;
+}
+
+#workspace {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    width: var(--s-workspace-width);
+    min-height: 100vh;
+    transform-origin: top left; /* Only needed for transform: scale */
+    background-color: white;
+    overflow: hidden;
+}
+
+#viewer {
+    width: var(--s-workspace-pdf-width);
+    background-color: var(--c-light-secondary);
+    padding: 2rem 0 0 0;
+    position: relative;
+    text-align: center;
+    overflow: hidden;
+}
+
+.viewer-page {
+    width: 100%;
+    margin-bottom: 2rem;
+}
+
+.viewer-page:last-of-type {
+    margin-bottom: 0;
+}
+
+#noteboard {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.post-it {
+
+    position: relative;
+    width: var(--s-workspace-post-it);
+    height: calc(var(--s-workspace-post-it) - var(--s-workspace-post-it-border));
+    border-color: var(--c-dark-secondary);
+    border-left: var(--s-workspace-post-it-border) solid;
+    border-top: var(--s-workspace-post-it-border) solid;
+}
+
+.post-it-input {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: flex;
+    text-align: center;
+
+    padding: 1rem;
+    width: 100%;
+    height: 100%;
+    background-color: transparent;
+    border: none;
+    resize: none;
+
+    font-family: 'Nunito Sans', sans-serif;
+    font-size: 2rem;
+    cursor: grab;
+}
+
+.post-it-input:focus {
+    outline: none;
+}
+
+.post-it-svg {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+#toolbar {
+    position: fixed;
+    left: 0;
+    top: calc(var(--s-nav-height) + var(--s-workspace-toolbar-margin));
+    z-index: 100000;
+
+    width: 3rem;
+    padding: 0.5rem;
+
+    border-radius:  0 0.25rem 0.25rem 0;
+    overflow: hidden;
+    box-shadow: 0 0 1rem var(--c-light-secondary);
+    background-color: var(--c-light-primary);
+}
+
+.tool {
+    line-height: 3rem;
+    text-align: center;
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: white;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    margin-bottom: 0.5rem;
+    border-radius: 0.25rem;
+    overflow: hidden;
+}
+
+.tool:last-of-type {
+    margin: 0;
+}
+
+.add-post-it:hover {
+    cursor: pointer;
+}
+
+#add-post-it-green {
+    background-color: var(--c-workspace-post-it-green);
+}
+
+#add-post-it-yellow {
+    background-color: var(--c-workspace-post-it-yellow);
+}
+
+#add-post-it-red {
+    background-color: var(--c-workspace-post-it-red);
+}
