@@ -11,12 +11,10 @@ function App() {
     return (
         <Router>
             <Navigation/>
-            <section id="content">
-                <Routes>
-                    <Route path="/" element={<Home/>}/>
-                    <Route path="/view/:pdfName" element={<Viewer />} />
-                </Routes>
-            </section>
+            <Routes>
+                <Route path="/" element={<Home/>}/>
+                <Route path="/view/:pdfName" element={<Viewer />} />
+            </Routes>
             {/*    Footer  */}
         </Router>
     );

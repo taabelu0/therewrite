@@ -63,7 +63,6 @@ const PDFViewer = function () {
     };
 
     return (
-        <div id={"workspace-scroll"}>
             <section id={"workspace"}>
                 <div id={"viewer"}>
                     {Array.from(new Array(numPages), (_, index) => (
@@ -78,7 +77,6 @@ const PDFViewer = function () {
                 </div>
                 <div id={"noteboard"}></div>
             </section>
-        </div>
     );
 };
 

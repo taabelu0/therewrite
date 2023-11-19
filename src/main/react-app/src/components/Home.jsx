@@ -26,17 +26,19 @@ function Home() {
     }, []);
 
     return (
-        <div className="App">
-            <form id="fileUpload" className="dropzone-custom">Drag & Drop your file here</form>
+        <section id="content">
+            <div className="App">
+                <form id="fileUpload" className="dropzone-custom">Drag & Drop your file here</form>
 
-            <div className="list-container" id="list-of-pdf">
-                {pdfs.map((pdf, index) => (
-                    <a key={index} href={pdf[1]} className="list-item">
-                        {pdf[0]}
-                    </a>
-                ))}
+                <div className="list-container" id="list-of-pdf">
+                    {pdfs.map((pdf, index) => (
+                        <a key={index} href={pdf[1]} className="list-item">
+                            {pdf[0]}
+                        </a>
+                    ))}
+                </div>
             </div>
-        </div>
+        </section>
     );
 }
 
