@@ -60,7 +60,7 @@ deploy-docker-job:
   # creates a 'develop' environment in gitlab
   environment:
     name: develop
-    url: http://<host/ip>
+    url: http://86.119.46.240
   image: docker:latest
   variables:
     DOCKER_TLS_CERTDIR: ''
