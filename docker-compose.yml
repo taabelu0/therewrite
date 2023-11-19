@@ -1,7 +1,7 @@
 version: '3.5'
 services:
     app:
-        image: cr.gitlab.fhnw.ch/ip34-21vt/ip34-23vt_therewrite/therewrite:latest
+        image: cr.gitlab.fhnw.ch/ip34-21vt/ip34-23vt_therewrite/therewrite/frontend:latest
         restart: always
         ports:
             - "80:80"
