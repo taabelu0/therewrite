@@ -5,6 +5,7 @@ import './annotations/PostIt.jsx';
 import {useParams} from "react-router-dom";
 import {useState, useRef, useEffect} from 'react';
 import {GlobalWorkerOptions, getDocument} from 'pdfjs-dist';
+import PostIt from "./annotations/PostIt";
 GlobalWorkerOptions.workerSrc = "/script/pdf.worker.4.0.min.js";
 
 const PDFViewer = function () {
