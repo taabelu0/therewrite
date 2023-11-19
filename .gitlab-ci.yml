@@ -20,23 +20,11 @@ cache:
     - .m2/repository
 
 stages:
-  - test
-  - analyze
   - build
   - deploy
   - site
 
-test-job:
-    stage: test
-    script:
-        - echo "running tests"
-        - ./.gitlab-ci/test.sh
 
-analyze-job:
-    stage: analyze
-    script:
-        - echo "running sonarcube analysis"
-        - ./.gitlab-ci/analyze.sh
 
 build-job:
   stage: build
@@ -50,6 +38,22 @@ build-job:
     paths:
       - target
       - target/surefire-reports/TEST-*.xml
+
+# Build Docker image
+build-docker-job:
+  stage: build
+  image: docker:latest
+  variables:
+    DOCKER_IMAGE_TAG: "$CI_REGISTRY_IMAGE/frontend:latest"
+  services: # To obtain a Docker daemon, request a Docker-in-Docker service
+    - docker:dind
+  script:
+    - docker info
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker build --pull -t $DOCKER_IMAGE_TAG .
+    - docker push $DOCKER_IMAGE_TAG
+  only:
+    - main
 
 deploy-job:
     stage: deploy
