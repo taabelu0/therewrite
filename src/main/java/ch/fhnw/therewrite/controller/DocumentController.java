@@ -1,11 +1,9 @@
 package ch.fhnw.therewrite.controller;
-import ch.fhnw.therewrite.AppConfigProperties;
 import ch.fhnw.therewrite.storage.StorageService;
 import com.google.gson.Gson;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;

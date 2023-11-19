@@ -14,7 +14,6 @@ const PDFViewer = function () {
     let {pdfName} = useParams();
     let file = '/pdf/get/' + pdfName;
 
-
     useEffect(() => {
         const loadingTask = getDocument(file);
         loadingTask.promise.then(_pdf => {
@@ -24,7 +23,6 @@ const PDFViewer = function () {
         }).catch(err => {
             console.error('Error during PDF loading or rendering:', err);
         });
-
     }, [file]);
 
     useEffect(() => {
