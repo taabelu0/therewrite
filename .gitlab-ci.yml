@@ -55,13 +55,40 @@ build-docker-job:
   only:
     - main
 
-deploy-job:
-    stage: deploy
-    script:
-        - echo "running deployment"
-        - ./.gitlab-ci/deploy.sh
-    only:
-        - main
+deploy-docker-job:
+  stage: deploy
+  # creates a 'develop' environment in gitlab
+  environment:
+    name: develop
+    url: http://<host/ip>
+  image: docker:latest
+  variables:
+    DOCKER_TLS_CERTDIR: ''
+    # tell docker to run commands on your deployment host
+    DOCKER_HOST: "ssh://$DEPLOY_USER@$DEPLOY_HOST"
+  before_script:
+    - apk update
+    # install ssh client and add the deployment key
+    - apk add openssh-client
+    - eval $(ssh-agent -s)
+    - echo "$DEPLOY_KEY" | tr -d '\r' | ssh-add -
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - echo "HOST *" > ~/.ssh/config
+    - echo "StrictHostKeyChecking no" >> ~/.ssh/config
+    # create Docker auth config
+    - mkdir -p ~/.docker
+    - echo $DOCKER_AUTH_CONFIG > ~/.docker/config.json
+  script:
+    - echo "running deploy job to $DOCKER_HOST"
+    - docker login $CI_REGISTRY
+    - docker compose pull
+    - docker compose up -d
+    - docker image prune -a -f
+  needs:
+    - job: build-docker-job
+  only:
+    - develop
 
 pages:
   stage: site
