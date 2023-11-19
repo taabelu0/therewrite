@@ -20,8 +20,23 @@ cache:
     - .m2/repository
 
 stages:
+  - test
+  - analyze
   - build
+  - deploy
   - site
+
+test-job:
+    stage: test
+    script:
+        - echo "running tests"
+        - ./.gitlab-ci/test.sh
+
+analyze-job:
+    stage: analyze
+    script:
+        - echo "running sonarcube analysis"
+        - ./.gitlab-ci/analyze.sh
 
 build-job:
   stage: build
@@ -35,6 +50,14 @@ build-job:
     paths:
       - target
       - target/surefire-reports/TEST-*.xml
+
+deploy-job:
+    stage: deploy
+    script:
+        - echo "running deployment"
+        - ./.gitlab-ci/deploy.sh
+    only:
+        - main
 
 pages:
   stage: site
