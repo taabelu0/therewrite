@@ -50,15 +50,12 @@ const PDFViewer = () => {
             * calculation/creation time.                                                                    */
             let tempViewport = page.getViewport({scale: 1}); // Look up at what resolution it wants to render at default
             let scale = viewerPage.offsetWidth / tempViewport.width; // Calc scale to fit effective width
-            let viewport = page.getViewport({scale: 1}); // Create effective viewport with new scale
+            let viewport = page.getViewport({scale}); // Create effective viewport with new scale
 
             canvas.width = viewport.width;
             canvas.height = viewport.height;
 
-            textLayerDiv.style.width = viewport.width;
-            textLayerDiv.style.height = viewport.height;
-
-            console.log(viewport);
+            textLayerDiv.style.setProperty('--scale-factor', scale);
 
             page.render({
                 canvasContext: canvas.getContext('2d'),
