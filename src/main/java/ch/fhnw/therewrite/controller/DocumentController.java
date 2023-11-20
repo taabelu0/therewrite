@@ -31,6 +31,7 @@ public class DocumentController {
         return "index";
     }
 
+    @CrossOrigin(origins = "http://localhost:3000")
     @GetMapping(value="/pdf/list", produces="application/json")
     public @ResponseBody String getPDFList() {
         return gson.toJson(getAllPDFs());
@@ -44,6 +45,7 @@ public class DocumentController {
                         "/view/"
                                 + path.getFileName())).toList();
     }
+    @CrossOrigin(origins = "http://localhost:3000")
     @GetMapping(
             value = "/pdf/get/{pdfName}",
             produces = MediaType.APPLICATION_PDF_VALUE

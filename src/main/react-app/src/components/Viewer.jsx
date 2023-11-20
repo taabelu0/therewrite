@@ -4,21 +4,21 @@ import '../style/viewer.scss';
 import './annotations/PostIt.jsx';
 import {useParams} from "react-router-dom";
 import {useState, useRef, useEffect} from 'react';
-import {GlobalWorkerOptions, getDocument} from 'pdfjs-dist';
+import {GlobalWorkerOptions, getDocument, renderTextLayer, Util} from 'pdfjs-dist';
 import PostIt from "./annotations/PostIt";
 GlobalWorkerOptions.workerSrc = "/script/pdf.worker.4.0.min.js";
 
-const PDFViewer = function () {
+const PDFViewer = () => {
     const [numPages, setNumPages] = useState(null);
     const [pdf, setPDF] = useState(null);
-    const canvasRefs = useRef([]);
+    const viewerPageRefs = useRef([]);
     let {pdfName} = useParams();
-    let file = '/pdf/get/' + pdfName;
+    let file = 'http://localhost:8080/pdf/get/' + pdfName;
 
     useEffect(() => {
         const loadingTask = getDocument(file);
         loadingTask.promise.then(_pdf => {
-            canvasRefs.current = new Array(_pdf.numPages);
+            viewerPageRefs.current = new Array(_pdf.numPages);
             setNumPages(_pdf.numPages);
             setPDF(_pdf);
         }).catch(err => {
@@ -37,28 +37,42 @@ const PDFViewer = function () {
 
     function renderPage(_pdf, pageNumber) {
         return _pdf.getPage(pageNumber).then(page => {
-            const canvas = canvasRefs.current[pageNumber - 1];
+            let viewerPage = viewerPageRefs.current[pageNumber - 1];
+            let canvas = viewerPage.querySelector(".viewer-page-canvas");
+            let textLayerDiv = viewerPage.querySelector(".viewer-page-text");
             if (!canvas) {
                 console.error(`Canvas for page ${pageNumber} is not initialized.`);
                 return;
             }
-            const scale = 1.8;
-            const viewport = page.getViewport({ scale });
-            let outputScale = window.devicePixelRatio || 1;
 
-            canvas.width = Math.floor(viewport.width * outputScale);
-            canvas.height = Math.floor(viewport.height * outputScale);
+            /* All this is needed, as text contents of the text layer are formatted using absolute values, thus
+            * they do not scale with the width of the outer div, but the width of the viewport it was given at
+            * calculation/creation time.                                                                    */
+            let tempViewport = page.getViewport({scale: 1}); // Look up at what resolution it wants to render at default
+            let scale = viewerPage.offsetWidth / tempViewport.width; // Calc scale to fit effective width
+            let viewport = page.getViewport({scale: 1}); // Create effective viewport with new scale
 
-            let transform = outputScale !== 1
-                ? [outputScale, 0, 0, outputScale, 0, 0]
-                : null;
+            canvas.width = viewport.width;
+            canvas.height = viewport.height;
 
-            const renderContext = {
+            textLayerDiv.style.width = viewport.width;
+            textLayerDiv.style.height = viewport.height;
+
+            console.log(viewport);
+
+            page.render({
                 canvasContext: canvas.getContext('2d'),
-                viewport,
-                transform
-            };
-            return page.render(renderContext).promise;
+                viewport: viewport
+            });
+            page.getTextContent().then((textContent) => {
+                let smt = renderTextLayer({
+                    textContentSource: textContent,
+                    container: textLayerDiv,
+                    viewport: viewport
+                })
+                console.log(smt);
+            });
+
         });
     };
 
@@ -66,13 +80,21 @@ const PDFViewer = function () {
             <section id={"workspace"}>
                 <div id={"viewer"}>
                     {Array.from(new Array(numPages), (_, index) => (
-                        <canvas
+                        <div
                             ref={(el) => {
-                                canvasRefs.current[index] = el; // Assign the element to the ref array
+                                viewerPageRefs.current[index] = el; // Assign the element to the ref array
                             }}
-                            key={`canvas_${index}`
+                            key={`page_${index}`
                             }
-                        />
+                            className={'viewer-page'}
+                        >
+                            <canvas
+                                className={'viewer-page-canvas'}
+                            />
+                            <div
+                                className={'textLayer viewer-page-text'}
+                            ></div>
+                        </div>
                     ))}
                 </div>
                 <div id={"noteboard"}></div>

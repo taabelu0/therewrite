@@ -33,19 +33,66 @@
 #viewer {
     width: var(--s-workspace-pdf-width);
     background-color: var(--c-light-secondary);
-    padding: 2rem 0 0 0;
-    position: relative;
-    text-align: center;
-    overflow: hidden;
+    padding: 2rem;
 }
 
 .viewer-page {
+    position: relative;
     width: 100%;
     margin-bottom: 2rem;
 }
 
 .viewer-page:last-of-type {
     margin-bottom: 0;
+}
+
+.viewer-page-canvas {
+
+    width: 100%;
+}
+
+.viewer-page-text {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    color: #000;
+    font-family: sans-serif;
+    overflow: hidden;
+    z-index: 10;
+}
+
+.viewer-page-text > div, .viewer-page-text > span {
+    color: transparent;
+    position: absolute;
+    line-height: 1;
+    white-space: pre;
+    cursor: text;
+}
+
+.viewer-page-text .highlight {
+    margin: -1px;
+    padding: 1px;
+
+    background-color: rgba(180, 0, 170, 0.2);
+    border-radius: 4px;
+}
+
+.viewer-page-text .highlight.begin {
+    border-radius: 4px 0px 0px 4px;
+}
+
+.viewer-page-text .highlight.end {
+    border-radius: 0px 4px 4px 0px;
+}
+
+.viewer-page-text .highlight.middle {
+    border-radius: 0px;
+}
+
+.viewer-page-text .highlight.selected {
+    background-color: rgba(0, 100, 0, 0.2);
 }
 
 #noteboard {
