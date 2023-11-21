@@ -1,4 +1,4 @@
-import React, {Component, useEffect, useState} from "react";
+import React, {Component, useEffect, useRef, useState} from "react";
 import {
     PdfLoader,
     PdfHighlighter,
@@ -56,6 +56,9 @@ function Noteboard() {
     const [selectedColor, setSelectedColor] = useState("green");
     const [postIts, setPostIts] = useState([]);
 
+    let width = useRef("100%");
+    let height = useRef("100%");
+
     function handleDocumentMouseDown(event) {
         if (creatingPostIt) {
             const { clientX, clientY } = event;
@@ -70,6 +73,11 @@ function Noteboard() {
             setCreatingPostIt(false);
         }
     }
+
+    useEffect(() => {
+        width.current = `${document.querySelector(".PdfHighlighter")?.offsetWidth}px`;
+        height.current = `${document.querySelector(".PdfHighlighter")?.offsetHeight}px`;
+    })
 
 
     useEffect(() => {
@@ -102,7 +110,10 @@ function Noteboard() {
     }
 
     return(
-        <section id={"workspace"}>
+        <section id={"workspace"} style={{
+            width: width.current,
+            height: height.current
+        }}>
             <nav id="toolbar">
                 <div className="tool add-post-it" id="add-post-it-green" onClick={() => setPostItMeta("green")}>+</div>
                 <div className="tool add-post-it" id="add-post-it-yellow" onClick={() => setPostItMeta("yellow")}>+</div>

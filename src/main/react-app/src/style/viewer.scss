@@ -20,14 +20,12 @@
 }
 
 #workspace {
-    margin-top: max(3em, 7vh);
     position: relative;
     display: flex;
     justify-content: center;
     width: var(--s-workspace-width);
     min-height: 100vh;
     transform-origin: top left; /* Only needed for transform: scale */
-    background-color: white;
 }
 
 #viewer {

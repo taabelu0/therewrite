@@ -5,6 +5,7 @@
   border-color: var(--c-dark-secondary);
   border-left: var(--s-workspace-post-it-border) solid;
   border-top: var(--s-workspace-post-it-border) solid;
+  z-index: 20;
 
   &-inner {
     position: relative;
