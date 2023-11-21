@@ -1,18 +1,21 @@
+import React, { useState, useRef, useEffect } from 'react';
+import { GlobalWorkerOptions, getDocument } from 'pdfjs-dist';
+import PostIt from "./annotations/PostIt";
+import { useParams } from "react-router-dom";
 import '../style/basic.css';
 import '../style/list.css';
 import '../style/viewer.scss';
-import './annotations/PostIt.jsx';
-import {useParams} from "react-router-dom";
-import {useState, useRef, useEffect} from 'react';
-import {GlobalWorkerOptions, getDocument} from 'pdfjs-dist';
-import PostIt from "./annotations/PostIt";
+
 GlobalWorkerOptions.workerSrc = "/script/pdf.worker.4.0.min.js";
 
 const PDFViewer = function () {
     const [numPages, setNumPages] = useState(null);
     const [pdf, setPDF] = useState(null);
+    const [creatingPostIt, setCreatingPostIt] = useState(false);
+    const [selectedColor, setSelectedColor] = useState("green");
     const canvasRefs = useRef([]);
-    let {pdfName} = useParams();
+    const [postIts, setPostIts] = useState([]);
+    let { pdfName } = useParams();
     let file = '/pdf/get/' + pdfName;
 
     useEffect(() => {
@@ -29,11 +32,11 @@ const PDFViewer = function () {
     useEffect(() => {
         if (pdf != null) {
             for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber++) {
-                renderPage(pdf, pageNumber).finally();
+                renderPage(pdf, pageNumber, canvasRefs.current[pageNumber - 1]).finally();
             }
             setPDF(null);
         }
-    }, [pdf]);
+    }, [pdf, postIts]);
 
     function renderPage(_pdf, pageNumber) {
         return _pdf.getPage(pageNumber).then(page => {
@@ -42,7 +45,7 @@ const PDFViewer = function () {
                 console.error(`Canvas for page ${pageNumber} is not initialized.`);
                 return;
             }
-            const scale = 1.8;
+            const scale = 1;
             const viewport = page.getViewport({ scale });
             let outputScale = window.devicePixelRatio || 1;
 
@@ -62,27 +65,79 @@ const PDFViewer = function () {
         });
     };
 
+    function handleDocumentMouseDown(event) {
+        if (creatingPostIt) {
+            const { clientX, clientY } = event;
+            const noteboard = document.getElementById("noteboard");
+            const rect = noteboard.getBoundingClientRect();
+
+            const x = clientX - rect.left;
+            const y = clientY - rect.top;
+
+            addPostIt(selectedColor, x, y);
+
+            setCreatingPostIt(false);
+        }
+    }
+
+
+    useEffect(() => {
+        if (creatingPostIt) {
+            document.addEventListener("mousedown", handleDocumentMouseDown);
+        } else {
+            document.removeEventListener("mousedown", handleDocumentMouseDown);
+        }
+
+        return () => {
+            document.removeEventListener("mousedown", handleDocumentMouseDown);
+        };
+    }, [creatingPostIt, selectedColor]);
+
+
+    function addPostIt(color, x, y) {
+        const newPostIt = {
+            color: color,
+            top: y,
+            left: x,
+            text: "New Post-It",
+        };
+
+        setPostIts([...postIts, newPostIt]);
+    }
+
+    function handleButtonClick(color) {
+        setSelectedColor(color);
+        setCreatingPostIt(true);
+    }
+
     return (
-            <section id={"workspace"}>
-                <div id={"viewer"}>
-                    {Array.from(new Array(numPages), (_, index) => (
-                        <canvas
-                            ref={(el) => {
-                                canvasRefs.current[index] = el; // Assign the element to the ref array
-                            }}
-                            key={`canvas_${index}`
-                            }
-                        />
-                    ))}
-                </div>
-                <div id={"noteboard"}></div>
-            </section>
+        <section id={"workspace"}>
+            <nav id="toolbar">
+                <div className="tool add-post-it" id="add-post-it-green" onClick={() => handleButtonClick("green")}>+</div>
+                <div className="tool add-post-it" id="add-post-it-yellow" onClick={() => handleButtonClick("yellow")}>+</div>
+                <div className="tool add-post-it" id="add-post-it-red" onClick={() => handleButtonClick("red")}>+</div>
+            </nav>
+            <div id={"viewer"}>
+                {Array.from(new Array(numPages), (_, index) => (
+                    <canvas
+
+                        // ... (other canvas properties)
+                    />
+                ))}
+            </div>
+            <div id={"noteboard"}>
+                {postIts.map((postIt, index) => (
+                    <PostIt
+                        key={`postIt_${index}`}
+                        color={postIt.color}
+                        top={postIt.top}
+                        left={postIt.left}
+                        text={postIt.text}
+                    />
+                ))}
+            </div>
+        </section>
     );
 };
-
-
-function addPostIt() {
-
-}
 
 export default PDFViewer;
