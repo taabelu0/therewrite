@@ -1,4 +1,4 @@
-import React, {Component, useEffect} from "react";
+import React, {Component, useEffect, useState} from "react";
 import {
     PdfLoader,
     PdfHighlighter,
@@ -13,6 +13,9 @@ import '../style/viewer.scss';
 import '../style/react-viewer.scss';
 import { IHighlight, NewHighlight } from "react-pdf-highlighter";
 import {useParams} from "react-router-dom";
+import PostIt from "./annotations/PostIt";
+import ReactDOM from "react-dom/client";
+
 
 const getNextId = () => String(Math.random()).slice(2);
 
@@ -40,12 +43,85 @@ let isReady = false;
 function PDFViewer() {
     let {pdfName} = useParams();
     initialUrl.url = BASE_URL + "/pdf/get/" + pdfName;
-    useEffect(() => {
-        let parent = document.querySelector(".PdfHighlighter").parentElement;
-        parent.appendChild()
-    }, [isReady]);
     return (
-        <Core></Core>
+        <div>
+            <Core></Core>
+            <Noteboard></Noteboard>
+        </div>
+    );
+}
+
+function Noteboard() {
+    const [creatingPostIt, setCreatingPostIt] = useState(false);
+    const [selectedColor, setSelectedColor] = useState("green");
+    const [postIts, setPostIts] = useState([]);
+
+    function handleDocumentMouseDown(event) {
+        if (creatingPostIt) {
+            const { clientX, clientY } = event;
+            const noteboard = document.getElementById("noteboard");
+            const rect = noteboard.getBoundingClientRect();
+
+            const x = clientX - rect.left;
+            const y = clientY - rect.top;
+
+            addPostIt(selectedColor, x, y);
+
+            setCreatingPostIt(false);
+        }
+    }
+
+
+    useEffect(() => {
+        if (creatingPostIt) {
+            document.addEventListener("mousedown", handleDocumentMouseDown);
+        } else {
+            document.removeEventListener("mousedown", handleDocumentMouseDown);
+        }
+
+        return () => {
+            document.removeEventListener("mousedown", handleDocumentMouseDown);
+        };
+    }, [creatingPostIt, selectedColor]);
+
+
+    function addPostIt(color, x, y) {
+        const newPostIt = {
+            color: color,
+            dataX: x,
+            dataY: y,
+            text: "",
+        };
+
+        setPostIts([...postIts, newPostIt]);
+    }
+
+    function setPostItMeta(color) {
+        setSelectedColor(color);
+        setCreatingPostIt(true);
+    }
+
+    return(
+        <section id={"workspace"}>
+            <nav id="toolbar">
+                <div className="tool add-post-it" id="add-post-it-green" onClick={() => setPostItMeta("green")}>+</div>
+                <div className="tool add-post-it" id="add-post-it-yellow" onClick={() => setPostItMeta("yellow")}>+</div>
+                <div className="tool add-post-it" id="add-post-it-red" onClick={() => setPostItMeta("red")}>+</div>
+            </nav>
+            <div id={"noteboard"}>
+                <div className={"post-it-wrapper"}>
+                    {postIts.map((postIt, index) => (
+                        <PostIt
+                            key={`postIt_${index}`}
+                            color={postIt.color}
+                            text={postIt.text}
+                            dataX={postIt.dataX}
+                            dataY={postIt.dataY}
+                        />
+                    ))}
+                </div>
+            </div>
+        </section>
     );
 }
 
@@ -73,7 +149,6 @@ class Core extends Component<> {
     };
 
     componentDidMount() {
-        isReady = true;
         window.addEventListener(
             "hashchange",
             this.scrollToHighlightFromHash,
@@ -122,7 +197,6 @@ class Core extends Component<> {
 
     render() {
         const { url, highlights } = this.state;
-
         return (
                     <PdfLoader url={url} beforeLoad={()=>{}}>
                         {(pdfDocument) => (
