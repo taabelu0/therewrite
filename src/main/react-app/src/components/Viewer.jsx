@@ -97,15 +97,15 @@ const PDFViewer = function () {
     function addPostIt(color, x, y) {
         const newPostIt = {
             color: color,
-            top: y,
-            left: x,
-            text: "New Post-It",
+            dataX: x,
+            dataY: y,
+            text: "",
         };
 
         setPostIts([...postIts, newPostIt]);
     }
 
-    function handleButtonClick(color) {
+    function setPostItMeta(color) {
         setSelectedColor(color);
         setCreatingPostIt(true);
     }
@@ -113,9 +113,9 @@ const PDFViewer = function () {
     return (
         <section id={"workspace"}>
             <nav id="toolbar">
-                <div className="tool add-post-it" id="add-post-it-green" onClick={() => handleButtonClick("green")}>+</div>
-                <div className="tool add-post-it" id="add-post-it-yellow" onClick={() => handleButtonClick("yellow")}>+</div>
-                <div className="tool add-post-it" id="add-post-it-red" onClick={() => handleButtonClick("red")}>+</div>
+                <div className="tool add-post-it" id="add-post-it-green" onClick={() => setPostItMeta("green")}>+</div>
+                <div className="tool add-post-it" id="add-post-it-yellow" onClick={() => setPostItMeta("yellow")}>+</div>
+                <div className="tool add-post-it" id="add-post-it-red" onClick={() => setPostItMeta("red")}>+</div>
             </nav>
             <div id={"viewer"}>
                 {Array.from(new Array(numPages), (_, index) => (
@@ -126,15 +126,17 @@ const PDFViewer = function () {
                 ))}
             </div>
             <div id={"noteboard"}>
-                {postIts.map((postIt, index) => (
-                    <PostIt
-                        key={`postIt_${index}`}
-                        color={postIt.color}
-                        top={postIt.top}
-                        left={postIt.left}
-                        text={postIt.text}
-                    />
-                ))}
+                <div className={"post-it-wrapper"}>
+                    {postIts.map((postIt, index) => (
+                        <PostIt
+                            key={`postIt_${index}`}
+                            color={postIt.color}
+                            text={postIt.text}
+                            dataX={postIt.dataX}
+                            dataY={postIt.dataY}
+                        />
+                    ))}
+                </div>
             </div>
         </section>
     );

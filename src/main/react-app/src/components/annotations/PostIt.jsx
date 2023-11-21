@@ -1,11 +1,11 @@
 import React, {useState, useRef, useEffect} from 'react';
-import '../../style/post-it.css';
+import '../../style/post-it.scss';
 import interact from 'interactjs';
 import GreenPostIt from "./postits/post-it-green.png";
 import RedPostIt from "./postits/post-it-red.png";
 import YellowPostIt from "./postits/post-it-yellow.png";
 
-export default function PostIt({ color, top, left, text }) {
+export default function PostIt({ color, dataX, dataY, text }) {
     const [postitText, setPostitText] = useState(text);
     const postitRef = useRef(null);
 
@@ -23,14 +23,25 @@ export default function PostIt({ color, top, left, text }) {
         });
     }, []);
 
+    function enableTextEdit(event) {
+        let textArea = event.target;
+        textArea.readOnly = false;
+        textArea.focus();
+        textArea.style.userSelect = true;
+        textArea.classList.add("post-it-input-selected");
+    }
+
+    function disableTextEdit(event) {
+        let textArea = event.target;
+        textArea.readOnly = true;
+        textArea.style.userSelect = false;
+        textArea.classList.remove("post-it-input-selected");
+    }
     function dragMoveListener(event) {
         const target = event.target;
-        const x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
-        const y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
-
-        target.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
-        target.setAttribute('data-x', x);
-        target.setAttribute('data-y', y);
+        dataX += event.dx;
+        dataY += event.dy;
+        target.style.transform = `translate(${dataX}px, ${dataY}px)`;
     }
 
     const postitImages = {
@@ -42,13 +53,20 @@ export default function PostIt({ color, top, left, text }) {
     const postitImage = postitImages[color];
 
     return (
-        <div className="post-it" ref={postitRef} style={{ top: top + "px", left: left + "px" }}>
-            <img src={postitImage} alt={`${color} post-it`} className="post-it-png" />
-            <textarea
-                className="post-it-input"
-                value={postitText}
-                onChange={event => setPostitText(event.target.value)}
-            />
+        <div className="post-it" ref={postitRef} style={{
+            transform: `translate(${dataX}px, ${dataY}px)`
+        }}>
+            <div className={"post-it-inner"}>
+                <img src={postitImage} alt={`${color} post-it`} className="post-it-png" />
+                <textarea
+                    className="post-it-input"
+                    readOnly={true}
+                    value={postitText}
+                    onDoubleClick={enableTextEdit}
+                    onBlur={disableTextEdit}
+                    onChange={event => setPostitText(event.target.value)}
+                />
+            </div>
         </div>
     );
 }

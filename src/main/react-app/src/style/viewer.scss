@@ -5,10 +5,10 @@
 .pdfCanvas {
     width: 100%;
     margin-bottom: 2rem;
-}
 
-.pdfCanvas:last-of-type {
-    margin-bottom: 0;
+    &:last-of-type {
+        margin-bottom: 0;
+    }
 }
 
 #workspace-scroll {
@@ -42,10 +42,10 @@
 .viewer-page {
     width: 100%;
     margin-bottom: 2rem;
-}
 
-.viewer-page:last-of-type {
-    margin-bottom: 0;
+    &:last-of-type {
+        margin-bottom: 0;
+    }
 }
 
 #noteboard {
@@ -57,43 +57,10 @@
     overflow: hidden;
 }
 
-.post-it {
-
+.post-it-wrapper {
     position: relative;
-    width: var(--s-workspace-post-it);
-    height: calc(var(--s-workspace-post-it) - var(--s-workspace-post-it-border));
-    border-color: var(--c-dark-secondary);
-    border-left: var(--s-workspace-post-it-border) solid;
-    border-top: var(--s-workspace-post-it-border) solid;
-}
-
-.post-it-input {
-    position: absolute;
-    top: 0;
-    left: 0;
-    display: flex;
-    text-align: center;
-
-    padding: 1rem;
     width: 100%;
     height: 100%;
-    background-color: transparent;
-    border: none;
-    resize: none;
-
-    font-family: 'Nunito Sans', sans-serif;
-    font-size: 2rem;
-    cursor: grab;
-}
-
-.post-it-input:focus {
-    outline: none;
-}
-
-.post-it-svg {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
 }
 
 #toolbar {
@@ -122,24 +89,24 @@
     margin-bottom: 0.5rem;
     border-radius: 0.25rem;
     overflow: hidden;
-}
 
-.tool:last-of-type {
-    margin: 0;
+    &:last-of-type {
+        margin: 0;
+    }
 }
 
 .add-post-it:hover {
     cursor: pointer;
 }
 
-#add-post-it-green {
-    background-color: var(--c-workspace-post-it-green);
-}
-
-#add-post-it-yellow {
-    background-color: var(--c-workspace-post-it-yellow);
-}
-
-#add-post-it-red {
-    background-color: var(--c-workspace-post-it-red);
+#add-post-it {
+    &-green {
+        background-color: var(--c-workspace-post-it-green);
+    }
+    &-yellow {
+        background-color: var(--c-workspace-post-it-yellow);
+    }
+    &-red {
+        background-color: var(--c-workspace-post-it-red);
+    }
 }
