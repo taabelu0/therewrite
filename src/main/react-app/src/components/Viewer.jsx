@@ -1,5 +1,4 @@
 import React, {Component, useEffect} from "react";
-
 import {
     PdfLoader,
     PdfHighlighter,
@@ -14,8 +13,6 @@ import '../style/viewer.scss';
 import '../style/react-viewer.scss';
 import { IHighlight, NewHighlight } from "react-pdf-highlighter";
 import {useParams} from "react-router-dom";
-
-
 
 const getNextId = () => String(Math.random()).slice(2);
 
@@ -35,16 +32,27 @@ const HighlightPopup = ({
         </div>
     ) : null;
 
-const PRIMARY_PDF_URL = "https://arxiv.org/pdf/1708.08021.pdf";
-const SECONDARY_PDF_URL = "https://arxiv.org/pdf/1604.02480.pdf";
+const BASE_URL = 'http://localhost:8080';
+const initialUrl = {"url": ""};
+let isReady = false;
 
-const searchParams = new URLSearchParams(document.location.search);
 
-let initialUrl = "http://localhost:8080/pdf/get/gobook.pdf";
-class App extends Component<> {
+function PDFViewer() {
+    let {pdfName} = useParams();
+    initialUrl.url = BASE_URL + "/pdf/get/" + pdfName;
+    useEffect(() => {
+        let parent = document.querySelector(".PdfHighlighter").parentElement;
+        parent.appendChild()
+    }, [isReady]);
+    return (
+        <Core></Core>
+    );
+}
+
+class Core extends Component<> {
 
     state = {
-        url: initialUrl,
+        url: initialUrl.url,
         highlights: [],
     };
 
@@ -65,6 +73,7 @@ class App extends Component<> {
     };
 
     componentDidMount() {
+        isReady = true;
         window.addEventListener(
             "hashchange",
             this.scrollToHighlightFromHash,
@@ -195,4 +204,4 @@ class App extends Component<> {
     }
 }
 
-export default App;
+export default PDFViewer;

@@ -13,7 +13,7 @@ function App() {
             <Navigation/>
             <Routes>
                 <Route path="/" element={<Home/>}/>
-                <Route path="/view/:pdfName" element={<Viewer />} />
+                <Route path="/view/:pdfName" element={<Viewer/>} />
             </Routes>
             {/*    Footer  */}
         </Router>
