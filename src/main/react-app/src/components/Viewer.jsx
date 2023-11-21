@@ -1,107 +1,198 @@
+import React, {Component, useEffect} from "react";
+
+import {
+    PdfLoader,
+    PdfHighlighter,
+    Tip,
+    Highlight,
+    Popup,
+    AreaHighlight,
+} from "react-pdf-highlighter";
 import '../style/basic.css';
 import '../style/list.css';
 import '../style/viewer.scss';
-import './annotations/PostIt.jsx';
+import '../style/react-viewer.scss';
+import { IHighlight, NewHighlight } from "react-pdf-highlighter";
 import {useParams} from "react-router-dom";
-import {useState, useRef, useEffect} from 'react';
-import {GlobalWorkerOptions, getDocument, renderTextLayer, Util} from 'pdfjs-dist';
-import PostIt from "./annotations/PostIt";
-GlobalWorkerOptions.workerSrc = "/script/pdf.worker.4.0.min.js";
 
-const PDFViewer = () => {
-    const [numPages, setNumPages] = useState(null);
-    const [pdf, setPDF] = useState(null);
-    const viewerPageRefs = useRef([]);
-    let {pdfName} = useParams();
-    let file = 'http://localhost:8080/pdf/get/' + pdfName;
 
-    useEffect(() => {
-        const loadingTask = getDocument(file);
-        loadingTask.promise.then(_pdf => {
-            viewerPageRefs.current = new Array(_pdf.numPages);
-            setNumPages(_pdf.numPages);
-            setPDF(_pdf);
-        }).catch(err => {
-            console.error('Error during PDF loading or rendering:', err);
-        });
-    }, [file]);
 
-    useEffect(() => {
-        if (pdf != null) {
-            for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber++) {
-                renderPage(pdf, pageNumber).finally();
-            }
-            setPDF(null);
-        }
-    }, [pdf]);
+const getNextId = () => String(Math.random()).slice(2);
 
-    function renderPage(_pdf, pageNumber) {
-        return _pdf.getPage(pageNumber).then(page => {
-            let viewerPage = viewerPageRefs.current[pageNumber - 1];
-            let canvas = viewerPage.querySelector(".viewer-page-canvas");
-            let textLayerDiv = viewerPage.querySelector(".viewer-page-text");
-            if (!canvas) {
-                console.error(`Canvas for page ${pageNumber} is not initialized.`);
-                return;
-            }
+const parseIdFromHash = () =>
+    document.location.hash.slice("#highlight-".length);
 
-            /* All this is needed, as text contents of the text layer are formatted using absolute values, thus
-            * they do not scale with the width of the outer div, but the width of the viewport it was given at
-            * calculation/creation time.                                                                    */
-            let tempViewport = page.getViewport({scale: 1}); // Look up at what resolution it wants to render at default
-            let scale = viewerPage.offsetWidth / tempViewport.width; // Calc scale to fit effective width
-            let viewport = page.getViewport({scale}); // Create effective viewport with new scale
+const resetHash = () => {
+    document.location.hash = "";
+};
 
-            canvas.width = viewport.width;
-            canvas.height = viewport.height;
+const HighlightPopup = ({
+                            comment,
+                        }) =>
+    comment.text ? (
+        <div className="Highlight__popup">
+            {comment.emoji} {comment.text}
+        </div>
+    ) : null;
 
-            textLayerDiv.style.setProperty('--scale-factor', scale);
+const PRIMARY_PDF_URL = "https://arxiv.org/pdf/1708.08021.pdf";
+const SECONDARY_PDF_URL = "https://arxiv.org/pdf/1604.02480.pdf";
 
-            page.render({
-                canvasContext: canvas.getContext('2d'),
-                viewport: viewport
-            });
-            page.getTextContent().then((textContent) => {
-                let smt = renderTextLayer({
-                    textContentSource: textContent,
-                    container: textLayerDiv,
-                    viewport: viewport
-                })
-                console.log(smt);
-            });
+const searchParams = new URLSearchParams(document.location.search);
 
+let initialUrl = "http://localhost:8080/pdf/get/gobook.pdf";
+class App extends Component<> {
+
+    state = {
+        url: initialUrl,
+        highlights: [],
+    };
+
+    resetHighlights = () => {
+        this.setState({
+            highlights: [],
         });
     };
 
-    return (
-            <section id={"workspace"}>
-                <div id={"viewer"}>
-                    {Array.from(new Array(numPages), (_, index) => (
-                        <div
-                            ref={(el) => {
-                                viewerPageRefs.current[index] = el; // Assign the element to the ref array
-                            }}
-                            key={`page_${index}`
-                            }
-                            className={'viewer-page'}
-                        >
-                            <canvas
-                                className={'viewer-page-canvas'}
+    scrollViewerTo = (highlight) => {};
+
+    scrollToHighlightFromHash = () => {
+        const highlight = this.getHighlightById(parseIdFromHash());
+
+        if (highlight) {
+            this.scrollViewerTo(highlight);
+        }
+    };
+
+    componentDidMount() {
+        window.addEventListener(
+            "hashchange",
+            this.scrollToHighlightFromHash,
+            false
+        );
+    }
+
+    getHighlightById(id) {
+        const { highlights } = this.state;
+
+        return highlights.find((highlight) => highlight.id === id);
+    }
+
+    addHighlight(highlight) {
+        const { highlights } = this.state;
+
+        console.log("Saving highlight", highlight);
+
+        this.setState({
+            highlights: [{ ...highlight, id: getNextId() }, ...highlights],
+        });
+    }
+
+    updateHighlight(highlightId, position, content) {
+        console.log("Updating highlight", highlightId, position, content);
+
+        this.setState({
+            highlights: this.state.highlights.map((h) => {
+                const {
+                    id,
+                    position: originalPosition,
+                    content: originalContent,
+                    ...rest
+                } = h;
+                return id === highlightId
+                    ? {
+                        id,
+                        position: { ...originalPosition, ...position },
+                        content: { ...originalContent, ...content },
+                        ...rest,
+                    }
+                    : h;
+            }),
+        });
+    }
+
+    render() {
+        const { url, highlights } = this.state;
+
+        return (
+                    <PdfLoader url={url} beforeLoad={()=>{}}>
+                        {(pdfDocument) => (
+                            <PdfHighlighter
+                                pdfDocument={pdfDocument}
+                                enableAreaSelection={(event) => event.altKey}
+                                onScrollChange={resetHash}
+                                pdfScaleValue={1.39}
+                                scrollRef={(scrollTo) => {
+                                    this.scrollViewerTo = scrollTo;
+
+                                    this.scrollToHighlightFromHash();
+                                }}
+                                onSelectionFinished={(
+                                    position,
+                                    content,
+                                    hideTipAndSelection,
+                                    transformSelection
+                                ) => (
+                                    <Tip
+                                        onOpen={transformSelection}
+                                        onConfirm={(comment) => {
+                                            this.addHighlight({ content, position, comment });
+
+                                            hideTipAndSelection();
+                                        }}
+                                    />
+                                )}
+                                highlightTransform={(
+                                    highlight,
+                                    index,
+                                    setTip,
+                                    hideTip,
+                                    viewportToScaled,
+                                    screenshot,
+                                    isScrolledTo
+                                ) => {
+                                    const isTextHighlight = !Boolean(
+                                        highlight.content && highlight.content.image
+                                    );
+
+                                    const component = isTextHighlight ? (
+                                        <Highlight
+                                            isScrolledTo={isScrolledTo}
+                                            position={highlight.position}
+                                            comment={highlight.comment}
+                                        />
+                                    ) : (
+                                        <AreaHighlight
+                                            isScrolledTo={isScrolledTo}
+                                            highlight={highlight}
+                                            onChange={(boundingRect) => {
+                                                this.updateHighlight(
+                                                    highlight.id,
+                                                    { boundingRect: viewportToScaled(boundingRect) },
+                                                    { image: screenshot(boundingRect) }
+                                                );
+                                            }}
+                                        />
+                                    );
+
+                                    return (
+                                        <Popup
+                                            popupContent={<HighlightPopup {...highlight} />}
+                                            onMouseOver={(popupContent) =>
+                                                setTip(highlight, (highlight) => popupContent)
+                                            }
+                                            onMouseOut={hideTip}
+                                            key={index}
+                                            children={component}
+                                        />
+                                    );
+                                }}
+                                highlights={highlights}
                             />
-                            <div
-                                className={'textLayer viewer-page-text'}
-                            ></div>
-                        </div>
-                    ))}
-                </div>
-                <div id={"noteboard"}></div>
-            </section>
-    );
-};
-
-
-function addPostIt() {
-
+                        )}
+                    </PdfLoader>
+        );
+    }
 }
 
-export default PDFViewer;
+export default App;

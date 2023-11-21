@@ -1,0 +1,28 @@
+
+body {
+  width: 100%;
+  height: calc(100vh - max(3em, 7vh));
+}
+
+.PdfHighlighter {
+
+  margin-top: max(3em, 7vh);
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  width: var(--s-workspace-width);
+  min-height: 100vh;
+  transform-origin: top left; /* Only needed for transform: scale */
+  background-color: white;
+  height: unset;
+}
+
+.pdfViewer {
+
+  background-color: var(--c-light-secondary);
+  padding: 2rem;
+}
+
+.pdfViewer.removePageBorders .page {
+  margin: 0 0 2rem 0;
+}
