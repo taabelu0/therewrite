@@ -7,12 +7,15 @@ import {
     Popup,
     AreaHighlight,
 } from "react-pdf-highlighter";
-import '../style/basic.css';
-import '../style/list.css';
+import '../style/basic.scss';
+import '../style/list.scss';
 import '../style/viewer.scss';
 import '../style/react-viewer.scss';
 import {useParams} from "react-router-dom";
 import PostIt from "./annotations/PostIt";
+import {pdfAPI} from "../apis/pdfAPI";
+
+
 const getNextId = () => String(Math.random()).slice(2);
 
 const parseIdFromHash = () =>
@@ -32,12 +35,10 @@ const HighlightPopup = ({
     ) : null;
 
 const initialUrl = {"url": ""};
-let isReady = false;
-
 
 function PDFViewer() {
     let {pdfName} = useParams();
-    initialUrl.url = process.env.REACT_APP_API_URL + "/pdf/get/" + pdfName;
+    initialUrl.url = pdfAPI.getUrl(pdfName);
     return (
         <div>
             <Core></Core>

@@ -1,3 +1,5 @@
+@import "variables";
+
 #pdfContainer {
     width: 100%;
 }
@@ -23,74 +25,9 @@
     position: relative;
     display: flex;
     justify-content: center;
-    width: var(--s-workspace-width);
+    width: $s-workspace-width;
     min-height: 100vh;
     transform-origin: top left; /* Only needed for transform: scale */
-}
-
-#viewer {
-    width: var(--s-workspace-pdf-width);
-    background-color: var(--c-light-secondary);
-    padding: 2rem;
-}
-
-.viewer-page {
-    position: relative;
-    width: 100%;
-    margin-bottom: 2rem;
-
-    &:last-of-type {
-        margin-bottom: 0;
-    }
-}
-
-.viewer-page-canvas {
-
-    width: 100%;
-}
-
-.viewer-page-text {
-    position: absolute;
-    left: 0;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    font-family: sans-serif;
-    overflow: hidden;
-    z-index: 10;
-}
-
-.viewer-page-text > div, .viewer-page-text > span {
-    color: transparent;
-    transform-origin: left;
-    position: absolute;
-    line-height: 1;
-    white-space: pre;
-    cursor: text;
-}
-
-.viewer-page-text .highlight {
-    margin: -1px;
-    padding: 1px;
-
-    background-color: rgba(180, 0, 170, 0.2);
-    border-radius: 4px;
-}
-
-.viewer-page-text .highlight.begin {
-    border-radius: 4px 0px 0px 4px;
-}
-
-.viewer-page-text .highlight.end {
-    border-radius: 0px 4px 4px 0px;
-}
-
-.viewer-page-text .highlight.middle {
-    border-radius: 0px;
-}
-
-.viewer-page-text .highlight.selected {
-    background-color: rgba(0, 100, 0, 0.2);
 }
 
 #noteboard {
@@ -111,7 +48,7 @@
 #toolbar {
     position: fixed;
     left: 0;
-    top: calc(var(--s-nav-height) + var(--s-workspace-toolbar-margin));
+    top: calc($s-nav-height + $s-workspace-toolbar-margin);
     z-index: 100000;
 
     width: 3rem;
@@ -119,8 +56,8 @@
 
     border-radius:  0 0.25rem 0.25rem 0;
     overflow: hidden;
-    box-shadow: 0 0 1rem var(--c-light-secondary);
-    background-color: var(--c-light-primary);
+    box-shadow: 0 0 1rem $c-light-secondary;
+    background-color: $c-light-primary;
 }
 
 .tool {
@@ -146,12 +83,12 @@
 
 #add-post-it {
     &-green {
-        background-color: var(--c-workspace-post-it-green);
+        background-color: $c-workspace-post-it-green;
     }
     &-yellow {
-        background-color: var(--c-workspace-post-it-yellow);
+        background-color: $c-workspace-post-it-yellow;
     }
     &-red {
-        background-color: var(--c-workspace-post-it-red);
+        background-color: $c-workspace-post-it-red;
     }
 }

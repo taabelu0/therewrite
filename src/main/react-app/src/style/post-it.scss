@@ -1,10 +1,12 @@
+@import "variables";
+
 .post-it {
   position: absolute;
-  width: var(--s-workspace-post-it);
-  height: calc(var(--s-workspace-post-it) - var(--s-workspace-post-it-border));
-  border-color: var(--c-dark-secondary);
-  border-left: var(--s-workspace-post-it-border) solid;
-  border-top: var(--s-workspace-post-it-border) solid;
+  width: $s-workspace-post-it;
+  height: calc($s-workspace-post-it - $s-workspace-post-it-border);
+  border-color: $c-dark-secondary;
+  border-left: $s-workspace-post-it-border solid;
+  border-top: $s-workspace-post-it-border solid;
   z-index: 20;
 
   &-inner {
@@ -41,7 +43,7 @@
     cursor: grab;
 
     &-selected {
-      outline: 0.5rem solid rgba(180, 180, 255, 0.6);
+      outline: 0.5rem solid $c-selected;
     }
   }
 }
