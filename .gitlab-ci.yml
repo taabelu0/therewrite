@@ -67,22 +67,21 @@ deploy-docker-job:
     # tell docker to run commands on your deployment host
     DOCKER_HOST: "ssh://$DEPLOYMENT_USER@$DEPLOYMENT_HOST"
   before_script:
-      - apk update
-      # install ssh client and add the deployment key
-      - apk add openssh-client
-      - eval $(ssh-agent -s)
-      - echo ssh-add "$DEPLOYMENT_KEY" | tr -d '\r'
-      - mkdir -p ~/.ssh
-      - chmod 700 ~/.ssh
-      - echo "HOST *" > ~/.ssh/config
-      - echo "StrictHostKeyChecking no" >> ~/.ssh/config
-      # create Docker auth config
-      - mkdir -p ~/.docker
-      - echo $DOCKER_AUTH_CONFIG > ~/.docker/config.json
-
+    - apk update
+    # install ssh client and add the deployment key
+    - apk add openssh-client
+    - eval $(ssh-agent -s)
+    - echo ssh-add "$DEPLOYMENT_KEY" | tr -d '\r'
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - echo "HOST *" > ~/.ssh/config
+    - echo "StrictHostKeyChecking no" >> ~/.ssh/config
+    # create Docker auth config
+    - mkdir -p ~/.docker
+    - echo $DOCKER_AUTH_CONFIG > ~/.docker/config.json
   script:
     - echo "running deploy job to $DOCKER_HOST"
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker login $CI_REGISTRY
     - docker compose pull
     - docker compose up -d
     - docker image prune -a -f
