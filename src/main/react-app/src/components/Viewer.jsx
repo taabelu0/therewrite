@@ -13,6 +13,7 @@ import '../style/viewer.scss';
 import '../style/react-viewer.scss';
 import {useParams} from "react-router-dom";
 import PostIt from "./annotations/PostIt";
+import {pdfAPI} from "../apis/pdfAPI";
 
 
 const getNextId = () => String(Math.random()).slice(2);
@@ -33,14 +34,11 @@ const HighlightPopup = ({
         </div>
     ) : null;
 
-const BASE_URL = 'http://localhost:8080';
 const initialUrl = {"url": ""};
-let isReady = false;
-
 
 function PDFViewer() {
     let {pdfName} = useParams();
-    initialUrl.url = BASE_URL + "/pdf/get/" + pdfName;
+    initialUrl.url = pdfAPI.getUrl(pdfName);
     return (
         <div>
             <Core></Core>

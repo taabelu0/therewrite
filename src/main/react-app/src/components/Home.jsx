@@ -2,14 +2,14 @@ import '../style/basic.scss';
 import '../style/list.scss';
 import '../style/customDropZone.min.scss';
 import {useEffect, useRef, useState} from "react";
-import {getPDFList} from "./api";
+import {pdfAPI} from "../apis/pdfAPI";
 
 function Home() {
 
     const [pdfs, setPdfs] = useState([["", ""]]);
     useEffect(() => {
         async function fetchData() {
-            const resp = await getPDFList();
+            const resp = await pdfAPI.getList();
             setPdfs(resp);
         }
 
