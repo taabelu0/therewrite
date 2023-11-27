@@ -86,17 +86,6 @@ deploy-docker-job:
     - docker compose up -d
     - docker image prune -a -f
   needs:
-    - job: build-docker-job
+    - job: release-docker-job
   only:
     - develop
-
-pages:
-  stage: site
-  script:
-    - mvn site
-    - mv target/site public
-  rules:
-  - when: always
-  artifacts:
-    paths:
-    - public
