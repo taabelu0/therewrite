@@ -7,8 +7,8 @@ import {
     Popup,
     AreaHighlight,
 } from "react-pdf-highlighter";
-import '../style/basic.css';
-import '../style/list.css';
+import '../style/basic.scss';
+import '../style/list.scss';
 import '../style/viewer.scss';
 import '../style/react-viewer.scss';
 import {useParams} from "react-router-dom";

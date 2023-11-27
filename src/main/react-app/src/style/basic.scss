@@ -1,0 +1,71 @@
+@import "variables";
+
+body {
+
+  min-height: 100vh;
+  margin: 0;
+
+  background-color: $c-light-secondary;
+  color: $c-dark-primary;
+  font-size: 16px;
+  font-family: 'Nunito Sans', sans-serif;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+  &:visited {
+    color: inherit;
+  }
+}
+
+#nav {
+  position: fixed;
+  display: flex;
+  padding: 0 1.5rem;
+  height: $s-nav-height;
+  min-height: $s-nav-min-height;
+  width: calc(100% - 3rem);
+  align-items: center;
+  top: 0;
+  z-index: 10000;
+
+  box-shadow: 0 0 $s-nav-shadow $c-dark-secondary;
+  background-color: $c-light-primary;
+
+  &-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+  }
+
+  a {
+    margin: 1.5rem;
+  }
+}
+
+#content {
+  position: relative;
+  overflow: hidden;
+  margin: max($s-nav-min-height, $s-nav-height) auto 0 auto;
+  width: min(100%, 810px);
+  padding: 3rem;
+  background-color: $c-light-primary;
+}
+
+#fileUpload {
+  border-radius: $s-border-radius;
+  overflow: hidden;
+  width: 100%;
+  margin-bottom: 3rem;
+  border: $s-border solid $c-dark-secondary;
+  background-color: transparent;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+
+  font-weight: 800;
+  font-size: 1.5rem;
+  color: $c-dark-secondary;
+}

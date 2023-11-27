@@ -1,6 +1,6 @@
-import '../style/basic.css';
-import '../style/list.css';
-import '../style/customDropZone.min.css';
+import '../style/basic.scss';
+import '../style/list.scss';
+import '../style/customDropZone.min.scss';
 import {useEffect, useRef, useState} from "react";
 import {pdfAPI} from "../apis/pdfAPI";
 
