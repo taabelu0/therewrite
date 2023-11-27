@@ -7,14 +7,12 @@ import {
     Popup,
     AreaHighlight,
 } from "react-pdf-highlighter";
-import '../style/basic.css';
-import '../style/list.css';
+import '../style/basic.scss';
+import '../style/list.scss';
 import '../style/viewer.scss';
 import '../style/react-viewer.scss';
-import { IHighlight, NewHighlight } from "react-pdf-highlighter";
 import {useParams} from "react-router-dom";
 import PostIt from "./annotations/PostIt";
-import ReactDOM from "react-dom/client";
 
 
 const getNextId = () => String(Math.random()).slice(2);

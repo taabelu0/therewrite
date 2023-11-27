@@ -1,0 +1,24 @@
+@import "variables";
+
+.list {
+  &-container {
+    border-radius: $s-border-radius;
+    overflow: hidden;
+    width: calc(100% - (2 * $s-border-radius));
+    display: flex;
+    flex-direction: column;
+
+    border: $s-border solid $c-light-secondary;
+  }
+
+  &-item {
+    width: calc(100% - 2rem);
+    padding: 1rem;
+    font-weight: 600;
+    background-color: $c-light-secondary;
+
+    &:nth-child(even) {
+      background-color: $c-light-primary;
+    }
+  }
+}
