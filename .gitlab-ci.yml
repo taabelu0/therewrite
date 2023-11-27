@@ -81,7 +81,7 @@ deploy-docker-job:
     - echo $DOCKER_AUTH_CONFIG > ~/.docker/config.json
   script:
     - echo "running deploy job to $DOCKER_HOST"
-    - docker login $CI_REGISTRY
+    - docker login $DEPLOYMENT_REGISTRY
     - docker compose pull
     - docker compose up -d
     - docker image prune -a -f
