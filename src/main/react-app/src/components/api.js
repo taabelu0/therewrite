@@ -1,10 +1,9 @@
 import axios from "axios";
 const url = process.env.REACT_APP_API_URL;
 
-
 export async function getPDFList() {
     try {
-        let data = (await axios.get(url + "/pdf/list")).data;
+        let data = ((await axios.get(url + "/pdf/list"))).data;
         return data;
     } catch (exception) {
         // log exception
