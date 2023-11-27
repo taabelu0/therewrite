@@ -75,7 +75,6 @@ deploy-docker-job:
       - mkdir -p ~/.ssh
       - chmod 700 ~/.ssh
       - echo "HOST *" > ~/.ssh/config
-      - echo "StrictHostKeyChecking no" >> ~/.ssh/config
       - mkdir -p ~/.docker
       - echo "$DOCKER_AUTH_CONFIG" > ~/.docker/config.json
   script:
