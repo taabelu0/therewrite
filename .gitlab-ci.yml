@@ -21,8 +21,8 @@ cache:
 
 stages:
   - build
+  - release
   - deploy
-  - site
 
 
 
@@ -40,8 +40,8 @@ build-job:
       - target/surefire-reports/TEST-*.xml
 
 # Build Docker image
-build-docker-job:
-  stage: build
+release-docker-job:
+  stage: release
   image: docker:latest
   variables:
     DOCKER_IMAGE_TAG: "$CI_REGISTRY_IMAGE/frontend:latest"
