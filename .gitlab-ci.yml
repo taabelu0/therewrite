@@ -88,4 +88,4 @@ deploy-docker-job:
   needs:
     - job: release-docker-job
   only:
-    - develop
+    - main
