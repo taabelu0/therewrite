@@ -13,8 +13,6 @@ import '../style/viewer.scss';
 import '../style/react-viewer.scss';
 import {useParams} from "react-router-dom";
 import PostIt from "./annotations/PostIt";
-
-
 const getNextId = () => String(Math.random()).slice(2);
 
 const parseIdFromHash = () =>
@@ -39,7 +37,7 @@ let isReady = false;
 
 function PDFViewer() {
     let {pdfName} = useParams();
-    initialUrl.url = process.env.API_URL + "/pdf/get/" + pdfName;
+    initialUrl.url = process.env.REACT_APP_API_URL + "/pdf/get/" + pdfName;
     return (
         <div>
             <Core></Core>
