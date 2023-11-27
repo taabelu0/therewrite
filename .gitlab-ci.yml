@@ -65,13 +65,13 @@ deploy-docker-job:
   variables:
     DOCKER_TLS_CERTDIR: ''
     # tell docker to run commands on your deployment host
-    DOCKER_HOST: "ssh://$DEPLOY_USER@$DEPLOY_HOST"
+    DOCKER_HOST: "ssh://$DEPLOYMENT_USER@$DEPLOYMENT_HOST"
   before_script:
     - apk update
     # install ssh client and add the deployment key
     - apk add openssh-client
     - eval $(ssh-agent -s)
-    - echo "$DEPLOY_KEY" | tr -d '\r' | ssh-add -
+    - echo "$DEPLOYMENT_KEY" | tr -d '\r' | ssh-add -
     - mkdir -p ~/.ssh
     - chmod 700 ~/.ssh
     - echo "HOST *" > ~/.ssh/config
