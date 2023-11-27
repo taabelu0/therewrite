@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import './style/index.css';
 import App from './components/App.jsx';
 import reportWebVitals from './reportWebVitals';
+require('dotenv').config();
 
 const content = ReactDOM.createRoot(document.getElementById('react-content'));
 content.render(

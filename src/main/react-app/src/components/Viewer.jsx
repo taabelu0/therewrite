@@ -11,10 +11,8 @@ import '../style/basic.css';
 import '../style/list.css';
 import '../style/viewer.scss';
 import '../style/react-viewer.scss';
-import { IHighlight, NewHighlight } from "react-pdf-highlighter";
 import {useParams} from "react-router-dom";
 import PostIt from "./annotations/PostIt";
-import ReactDOM from "react-dom/client";
 
 
 const getNextId = () => String(Math.random()).slice(2);
@@ -35,14 +33,13 @@ const HighlightPopup = ({
         </div>
     ) : null;
 
-const BASE_URL = 'http://localhost:8080';
 const initialUrl = {"url": ""};
 let isReady = false;
 
 
 function PDFViewer() {
     let {pdfName} = useParams();
-    initialUrl.url = BASE_URL + "/pdf/get/" + pdfName;
+    initialUrl.url = process.env.API_URL + "/pdf/get/" + pdfName;
     return (
         <div>
             <Core></Core>

@@ -1,4 +1,5 @@
 package ch.fhnw.therewrite.controller;
+import ch.fhnw.therewrite.AppConfigProperties;
 import ch.fhnw.therewrite.storage.StorageService;
 import com.google.gson.Gson;
 import org.springframework.core.io.Resource;
@@ -18,8 +19,9 @@ public class DocumentController {
 
     private final Gson gson = new Gson();
 
-    public DocumentController(StorageService storageService) {
+    public DocumentController(StorageService storageService, AppConfigProperties acp) {
         this.storageService = storageService;
+
     }
     @GetMapping("/")
     public String index() {
@@ -31,7 +33,6 @@ public class DocumentController {
         return "index";
     }
 
-    @CrossOrigin(origins = "http://localhost:3000")
     @GetMapping(value="/pdf/list", produces="application/json")
     public @ResponseBody String getPDFList() {
         return gson.toJson(getAllPDFs());
@@ -45,7 +46,7 @@ public class DocumentController {
                         "/view/"
                                 + path.getFileName())).toList();
     }
-    @CrossOrigin(origins = "http://localhost:3000")
+
     @GetMapping(
             value = "/pdf/get/{pdfName}",
             produces = MediaType.APPLICATION_PDF_VALUE
