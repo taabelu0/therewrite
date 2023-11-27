@@ -3,20 +3,28 @@
     --s-panel-img: 35%;
     --s-border-radius: 0.25rem;
     --s-border: 4px;
+    --s-workspace-width: 2400px;
+    --s-workspace-pdf-width: 800px;
+    --s-workspace-post-it: 192px;
+    --s-workspace-post-it-border: 1px;
+    --s-workspace-toolbar-margin: 80px;
+    --s-nav-height: 7vh;
 
     --c-light-primary: rgb(245, 245, 245);
     --c-light-secondary: rgb(225, 225, 225);
     --c-color-primary: #F5404D;
     --c-dark-primary: rgb(20, 20, 20);
     --c-dark-secondary: rgb(50, 50, 50);
+
+    --c-workspace-post-it-yellow: #FFFF99;
+    --c-workspace-post-it-green: #9BFA75;
+    --c-workspace-post-it-red: #FA8175;
 }
 
 body {
 
-    width: 100%;
     min-height: 100vh;
     margin: 0;
-    display: flex;
 
     background-color: var(--c-light-secondary);
     color: var(--c-dark-primary);
@@ -42,6 +50,7 @@ a:visited {
     width: calc(100% - 3rem);
     align-items: center;
     top: 0;
+    z-index: 10000;
 
     box-shadow: 0 0 5px var(--c-dark-secondary);
     background-color: var(--c-light-primary);
@@ -57,13 +66,12 @@ a:visited {
 }
 
 #content {
-
+    position: relative;
     overflow: hidden;
     margin: max(3em, 7vh) auto 0 auto;
     width: min(100%, 810px);
     padding: 3rem;
-    min-height: 100%;
-
+    max-height: calc(100% - 14vh - 3em);
     background-color: var(--c-light-primary);
 }
 
@@ -72,7 +80,6 @@ a:visited {
     overflow: hidden;
     width: 100%;
     margin-bottom: 3rem;
-
     border: var(--s-border) solid var(--c-dark-secondary);
     background-color: transparent;
 
