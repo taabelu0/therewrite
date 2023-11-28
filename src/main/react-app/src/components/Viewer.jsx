@@ -11,6 +11,8 @@ import '../style/basic.scss';
 import '../style/list.scss';
 import '../style/viewer.scss';
 import '../style/react-viewer.scss';
+import { v4 as uuidv4 } from 'uuid';
+import { IHighlight, NewHighlight } from "react-pdf-highlighter";
 import {useParams} from "react-router-dom";
 import Noteboard from "./Noteboard";
 import {pdfAPI} from "../apis/pdfAPI";

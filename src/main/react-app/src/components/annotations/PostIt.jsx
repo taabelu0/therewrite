@@ -44,6 +44,7 @@ export default function PostIt({ color, dataX, dataY, text }) {
         target.style.transform = `translate(${dataX}px, ${dataY}px)`;
     }
 
+
     const postitImages = {
         green: GreenPostIt,
         red: RedPostIt,
