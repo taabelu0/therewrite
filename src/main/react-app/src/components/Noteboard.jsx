@@ -1,10 +1,14 @@
 import React, { useEffect, useRef, useState } from "react";
 import PostIt from "./annotations/PostIt";
+import '../style/annotations.scss';
+import ParagraphSideBar from "./annotations/ParagraphSideBar";
+import Annotation from "./annotations/Annotation";
 
 function Noteboard() {
     const [creatingPostIt, setCreatingPostIt] = useState(false);
     const [selectedColor, setSelectedColor] = useState("green");
     const [postIts, setPostIts] = useState([]);
+    const [annotations, setAnnotations] = useState([]);
     let width = useRef("100%");
     let height = useRef("100%");
 
@@ -43,6 +47,26 @@ function Noteboard() {
             document.removeEventListener("mousedown", handleDocumentMouseDown);
         };
     }, [creatingPostIt, selectedColor]);
+
+    useEffect(() => {
+        document.addEventListener("keydown", addParagraphAnnotation, true)
+    }, []);
+
+
+    useEffect(() => {
+        console.log(annotations);
+    }, [annotations]);
+
+
+    const getNextId = () => String(Math.random()).slice(2);
+
+    function addParagraphAnnotation() {
+        let selection = window.getSelection();
+        if(selection.rangeCount < 1) return;
+        let scroll = { x: window.scrollX, y: window.scrollY };
+        const props = {selection: selection, category: null, scroll, annotation: ParagraphSideBar};
+        setAnnotations([...annotations, props]);
+    }
 
     function addPostIt(color, x, y) {
         const newPostIt = {
@@ -92,6 +116,17 @@ function Noteboard() {
                 </div>
             </nav>
             <div id={"noteboard"}>
+                <div id={"annotation-container"}>
+                    {annotations.map((annotation, index) => {
+                        const SpecificAnnotation = annotation.annotation;
+                        return <SpecificAnnotation
+                            key={`annotation_${index}`}
+                            selection={annotation.selection}
+                            category={annotation.category}
+                            scroll={annotation.scroll}
+                        />;
+                    })}
+                </div>
                 <div className={"post-it-wrapper"}>
                     {postIts.map((postIt, index) => (
                         <PostIt
