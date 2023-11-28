@@ -1,0 +1,49 @@
+@import "variables";
+
+.post-it {
+  position: absolute;
+  width: $s-workspace-post-it;
+  height: calc($s-workspace-post-it - $s-workspace-post-it-border);
+  border-color: $c-dark-secondary;
+  border-left: $s-workspace-post-it-border solid;
+  border-top: $s-workspace-post-it-border solid;
+  z-index: 20;
+
+  &-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+
+  &-png {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: -1;
+  }
+
+  &-input {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: flex;
+    text-align: center;
+
+    padding: 1rem;
+    width: 100%;
+    height: 100%;
+    background-color: transparent;
+    border: none;
+    resize: none;
+
+    font-family: 'Nunito Sans', sans-serif;
+    font-size: 2rem;
+    cursor: grab;
+
+    &-selected {
+      outline: 0.5rem solid $c-selected;
+    }
+  }
+}

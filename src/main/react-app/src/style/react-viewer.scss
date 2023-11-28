@@ -1,0 +1,29 @@
+@import "variables";
+
+body {
+  width: 100%;
+  height: calc(100vh - max($s-nav-min-height, $s-nav-height));
+}
+
+.PdfHighlighter {
+
+  margin-top: max($s-nav-min-height, $s-nav-height);
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  width: $s-workspace-width;
+  min-height: 100vh;
+  transform-origin: top left; /* Only needed for transform: scale */
+  background-color: white;
+  height: unset;
+}
+
+.pdfViewer {
+
+  background-color: $c-light-secondary;
+  padding: 2rem;
+}
+
+.pdfViewer.removePageBorders .page {
+  margin: 0 0 2rem 0;
+}
