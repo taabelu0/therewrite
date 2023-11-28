@@ -1,0 +1,92 @@
+# Build JAVA applications using Apache Maven (http://maven.apache.org)
+# For docker image tags see https://hub.docker.com/_/maven/
+#
+# For general lifecycle information see https://maven.apache.org/guides/introduction/introduction-to-the-lifecycle.html
+variables:
+   MAVEN_CLI_OPTS: >-
+      --batch-mode
+      --errors
+      --fail-at-end
+      --show-version
+      --no-transfer-progress
+
+# run with docker, choose maven 3.9.0 with latest Java and a small linux footprint
+image: maven:3.9.0-eclipse-temurin-19-alpine
+
+# Cache downloaded dependencies and plugins between builds.
+# To keep cache across branches add 'key: "$CI_JOB_NAME"'
+cache:
+  paths:
+    - .m2/repository
+
+stages:
+  - build
+  - release
+  - deploy
+
+
+
+build-job:
+  stage: build
+  script:
+    - mvn $MAVEN_CLI_OPTS package
+  coverage: '/Total.*?([0-9]{1,3})%/'
+  artifacts:
+    when: always
+    reports:
+      junit: target/surefire-reports/TEST-*.xml
+    paths:
+      - target
+      - target/surefire-reports/TEST-*.xml
+
+# Build Docker image
+release-docker-job:
+  stage: release
+  image: docker:latest
+  variables:
+    DOCKER_IMAGE_TAG: "$CI_REGISTRY_IMAGE/frontend:latest"
+  services: # To obtain a Docker daemon, request a Docker-in-Docker service
+    - docker:dind
+  script:
+    - docker info
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker build --pull -t $DOCKER_IMAGE_TAG .
+    - docker push $DOCKER_IMAGE_TAG
+  only:
+    - main
+
+deploy-docker-job:
+  stage: deploy
+  # creates a 'develop' environment in gitlab
+  environment:
+    name: develop
+    url: http://86.119.46.240
+  image: docker:latest
+  variables:
+    DOCKER_TLS_CERTDIR: ''
+    # tell docker to run commands on your deployment host
+    DOCKER_HOST: "ssh://$DEPLOYMENT_USER@$DEPLOYMENT_HOST"
+  before_script:
+    - apk update
+    # install ssh client and add the deployment key
+    - apk add openssh-client
+    - eval $(ssh-agent -s)
+    - echo "$DEPLOYMENT_KEY" | tr -d '\r' | ssh-add -
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - echo "HOST *" > ~/.ssh/config
+    - echo "StrictHostKeyChecking no" >> ~/.ssh/config
+    # create Docker auth config
+    - mkdir -p ~/.docker
+    - echo $DOCKER_AUTH_CONFIG > ~/.docker/config.json
+  script:
+    - echo "running deploy job to $DOCKER_HOST"
+    - echo "registry $CI_REGISTRY"
+    - docker login $CI_REGISTRY
+    - docker compose pull
+    - docker compose up -d
+    - docker image prune -a -f
+  needs:
+    - job: release-docker-job
+  only:
+    - main
