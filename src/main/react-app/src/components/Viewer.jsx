@@ -1,4 +1,4 @@
-import React, {Component, useEffect, useRef, useState} from "react";
+import React, {Component} from "react";
 import {
     PdfLoader,
     PdfHighlighter,
@@ -7,15 +7,15 @@ import {
     Popup,
     AreaHighlight,
 } from "react-pdf-highlighter";
-import '../style/basic.css';
-import '../style/list.css';
+import '../style/basic.scss';
+import '../style/list.scss';
 import '../style/viewer.scss';
 import '../style/react-viewer.scss';
 import { v4 as uuidv4 } from 'uuid';
 import { IHighlight, NewHighlight } from "react-pdf-highlighter";
 import {useParams} from "react-router-dom";
-import PostIt from "./annotations/PostIt";
-import ReactDOM from "react-dom/client";
+import Noteboard from "./Noteboard";
+import {pdfAPI} from "../apis/pdfAPI";
 
 
 const getNextId = () => String(Math.random()).slice(2);
@@ -36,131 +36,18 @@ const HighlightPopup = ({
         </div>
     ) : null;
 
-const BASE_URL = 'http://localhost:8080';
 const initialUrl = {"url": ""};
-let isReady = false;
-
 
 function PDFViewer() {
-    let {pdfName} = useParams();
-    initialUrl.url = BASE_URL + "/pdf/get/" + pdfName;
+    let { pdfName } = useParams();
+    initialUrl.url = pdfAPI.getUrl(pdfName);
+
     return (
         <div>
             <Core></Core>
-            <Noteboard></Noteboard>
+            <Noteboard
+            ></Noteboard>
         </div>
-    );
-}
-
-function Noteboard() {
-    const [creatingPostIt, setCreatingPostIt] = useState(false);
-    const [selectedColor, setSelectedColor] = useState("green");
-    const [postIts, setPostIts] = useState([]);
-    console.log("initialize reached")
-
-    let width = useRef("100%");
-    let height = useRef("100%");
-
-    function handleDocumentMouseDown(event) {
-        if (creatingPostIt) {
-            const { clientX, clientY } = event;
-            const noteboard = document.getElementById("noteboard");
-            const rect = noteboard.getBoundingClientRect();
-
-            const x = clientX - rect.left;
-            const y = clientY - rect.top;
-
-            addPostIt(selectedColor, x, y);
-
-            setCreatingPostIt(false);
-        }
-    }
-
-    useEffect(() => {
-        width.current = `${document.querySelector(".PdfHighlighter")?.offsetWidth}px`;
-        height.current = `${document.querySelector(".PdfHighlighter")?.offsetHeight}px`;
-    })
-
-
-    useEffect(() => {
-        if (creatingPostIt) {
-            document.addEventListener("mousedown", handleDocumentMouseDown);
-        } else {
-            document.removeEventListener("mousedown", handleDocumentMouseDown);
-        }
-
-        return () => {
-            document.removeEventListener("mousedown", handleDocumentMouseDown);
-        };
-    }, [creatingPostIt, selectedColor]);
-
-
-    function addPostIt(color, x, y) {
-        const newPostIt = {
-            color: color,
-            dataX: x,
-            dataY: y,
-            text: "",
-        };
-
-        setPostIts([...postIts, newPostIt]);
-        savePostItPositionToDatabase(x,y)
-    }
-
-    function savePostItPositionToDatabase(x, y) {
-        const annotation = {
-            idAnnotation: uuidv4(),
-            dataX: x,
-            dataY: y,
-            annotationDetail: JSON.stringify({"Test": "Test"}),
-        };
-
-        // Make a POST request to your backend to save the post-it information
-        fetch('/api/saveAnnotation', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(annotation),
-        })
-            .then(response => response.json())
-            .then(data => {
-                console.log('Success:', data);
-            })
-            .catch((error) => {
-                console.error('Error:', error);
-            });
-    }
-
-    function setPostItMeta(color) {
-        setSelectedColor(color);
-        setCreatingPostIt(true);
-    }
-
-    return(
-        <section id={"workspace"} style={{
-            width: width.current,
-            height: height.current
-        }}>
-            <nav id="toolbar">
-                <div className="tool add-post-it" id="add-post-it-green" onClick={() => setPostItMeta("green")}>+</div>
-                <div className="tool add-post-it" id="add-post-it-yellow" onClick={() => setPostItMeta("yellow")}>+</div>
-                <div className="tool add-post-it" id="add-post-it-red" onClick={() => setPostItMeta("red")}>+</div>
-            </nav>
-            <div id={"noteboard"}>
-                <div className={"post-it-wrapper"}>
-                    {postIts.map((postIt, index) => (
-                        <PostIt
-                            key={`postIt_${index}`}
-                            color={postIt.color}
-                            text={postIt.text}
-                            dataX={postIt.dataX}
-                            dataY={postIt.dataY}
-                        />
-                    ))}
-                </div>
-            </div>
-        </section>
     );
 }
 
