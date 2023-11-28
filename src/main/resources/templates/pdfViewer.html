@@ -1,0 +1,219 @@
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>TheRewrite</title>
+        <meta name="description" content="Annotations but creative">
+        <meta name="author" content="The Rewrite Team @ FHNW">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200;0,6..12,300;0,6..12,400;0,6..12,500;0,6..12,600;0,6..12,700;0,6..12,800;0,6..12,900;0,6..12,1000;1,6..12,200;1,6..12,300;1,6..12,400;1,6..12,500;1,6..12,600;1,6..12,700;1,6..12,800;1,6..12,900;1,6..12,1000&display=swap" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="/style/basic.css">
+        <link rel="stylesheet" type="text/css" href="/style/workspace.css">
+        <script src="/script/pdfjs/pdf.js" type="text/javascript"></script>
+        <script src="/script/pdfjs/textlayerbuilder.js" type="text/javascript"></script>
+        <script src="/script/interact.min.js" type="text/javascript"></script>
+
+    </head>
+    <body>
+        <nav id="nav">
+            <a href="/" id="nav-title">TheRewrite</a>
+        </nav>
+        <nav id="toolbar">
+            <div class="tool add-post-it" id="add-post-it-green">+</div>
+            <div class="tool add-post-it" id="add-post-it-yellow">+</div>
+            <div class="tool add-post-it" id="add-post-it-red">+</div>
+        </nav>
+        <section id="workspace">
+            <div id="viewer"></div>
+            <div id="noteboard"></div>
+        </section>
+        <script> /* PDF Viewer Script */
+            PDFJS.disableWorker = true;
+
+            let path = window.location.pathname;
+            let pathArr = path.split("/");
+            let documentName = "/pdf/get/" + pathArr[pathArr.length - 1];
+
+            let loadingTask = PDFJS.getDocument(documentName);
+            loadingTask.then((pdf) => {
+                for(let i = 0; i <= pdf.numPages; i++) {
+                    pdf.getPage(i).then(addPage);
+                }
+            });
+
+
+            function addPage(page) { // canvas.id = "viewer-page-" + pageNr;
+
+                let viewerPage = document.createElement("div");
+                viewerPage.classList.add("viewer-page");
+                document.querySelector("#viewer").appendChild(viewerPage); // Add page to outer div
+
+                /* All this is needed, as text contents of the text layer are formatted using absolute values, thus
+                * they do not scale with the width of the outer div, but the width of the viewport it was given at
+                * calculation/creation time.                                                                    */
+                let tempViewport = page.getViewport(1); // Look up at what resolution it wants to render at default
+                let scale = viewerPage.offsetWidth / tempViewport.width; // Calc scale to fit effective width
+                let viewport = page.getViewport(scale); // Create effective viewport with new scale
+
+                let canvasLayer = getPageCanvasLayer(viewport);
+                let textLayerDiv = getPageTextLayer(viewport);
+
+                viewerPage.appendChild(canvasLayer);
+                viewerPage.appendChild(textLayerDiv);
+
+                page.getTextContent().then((textContent) => {
+                    let textLayer = new TextLayerBuilder(textLayerDiv, page.number-1); // Counting from zero
+                    textLayer.setTextContent(textContent);
+                    let renderContext = {
+                        canvasContext: canvasLayer.getContext("2d"),
+                        viewport: viewport,
+                        textLayer: textLayer
+                    };
+                    page.render(renderContext);
+                });
+            }
+
+            function getPageCanvasLayer(viewport) {
+                let canvasLayer = document.createElement("canvas");
+                canvasLayer.width = viewport.width;
+                canvasLayer.height = viewport.height;
+                canvasLayer.classList.add("viewer-page-canvas");
+                return canvasLayer;
+            }
+
+            function getPageTextLayer(viewport) {
+                let textLayer = document.createElement("div");
+                textLayer.style.width = viewport.width;
+                textLayer.style.height = viewport.height;
+                textLayer.classList.add("textLayer");
+                textLayer.classList.add("viewer-page-text");
+                return textLayer;
+            }
+        </script>
+        <script> /* Drag and Drop Script */
+
+            //scale     // scale to screen size      // round up to next 0.2 increment
+            let scale = (window.innerWidth / 2400) - ((window.innerWidth / 2400) % 0.2) + 0.2;
+            let workspace = document.getElementById("workspace");
+            let noteboard = document.getElementById("noteboard"); // needed for restriction of drag and drops
+            let navbar = document.getElementById("nav");
+
+            let addingColor = null;
+
+            // set a initial scale
+            workspace.style.transform = `scale(${scale})`;
+
+            interact('.post-it')
+                .draggable({
+                    modifiers: [
+                        interact.modifiers.snap({
+                            targets: [
+                                interact.snappers.grid({ x: 16, y: 16 })
+                            ],
+                            range: Infinity,
+                            relativePoints: [ { x: 0, y: 0 } ]
+                        }),
+                        interact.modifiers.restrict({
+                            restriction: noteboard,
+                            elementRect: { top: 0, left: 0, bottom: 1, right: 1 },
+                            endOnly: true
+                        })
+                    ],
+                    listeners: {
+                        move: (event) => {
+
+                            // Grid Elements have offset attributes to save their current translation
+                            let x = Number(event.target.getAttribute("offset-x"));
+                            let y = Number(event.target.getAttribute("offset-y"));
+
+                            // transform: scale() doesn't change width, but viewport. Apply scale to match it
+                            x += event.dx / scale;
+                            y += event.dy / scale;
+
+                            event.target.setAttribute("offset-x", x);
+                            event.target.setAttribute("offset-y", y);
+                            event.target.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
+                        }
+                    },
+                    inertia: true
+                });
+
+            // scroll to the middle of the screen on load
+            document.body.scrollLeft = (document.body.scrollWidth - document.body.clientWidth) / 2
+
+            // adjusts scale based on key input
+            document.addEventListener("keydown", (event) => {
+                if (event.keyCode === 38) { // Arrow Up
+                    scale += 0.2;
+                    workspace.style.transform = `scale(${scale})`;
+                }
+                if (event.keyCode === 40 && scale > 0.41) { // Arrow Down
+                    scale -= 0.2;
+                    workspace.style.transform = `scale(${scale})`;
+                }
+            });
+
+            // add eventlistener to add button
+            document.getElementById("add-post-it-green").addEventListener("click", (e) => {
+                addingColor = "green";
+            });
+            document.getElementById("add-post-it-yellow").addEventListener("click", (e) => {
+                addingColor = "yellow";
+            });
+            document.getElementById("add-post-it-red").addEventListener("click", (e) => {
+                addingColor = "red";
+            });
+
+            // if you click the canvas...
+            noteboard.addEventListener("click", (e) => {
+                if(addingColor != null) { // ...and clicked the add button before
+
+                    let postIt = document.createElement("div");
+                    let x = 0;
+                    let y = (0 - (noteboard.childElementCount * Number(getComputedStyle(document.body).getPropertyValue("--s-workspace-post-it").replace(/[^0-9]/g, '')))); // for each already existing element, offset it by their height (so it starts at 0)
+
+                    let svg = document.createElement("img");
+                    postIt.classList = ["post-it-svg"];
+                    svg.src = `/media/icons/post-it-${addingColor}.svg`;
+                    addingColor = null;
+
+                    let input = document.createElement("textarea");
+                    input.readOnly = true;
+                    input.classList = ["post-it-input"];
+                    input.addEventListener("blur", (e) => {
+                        console.log(e.target);
+                        e.target.readOnly = true;
+                        e.target.style.outline = "none";
+                        e.target.style.userSelect = false;
+                        e.target.style.cursor = "grab";
+                    })
+
+                    postIt.appendChild(svg);
+                    postIt.appendChild(input);
+
+                    // the amount scrolled + distance from viewport edge to the mouse
+                    x += (document.body.scrollLeft + e.clientX) / scale;
+                    y += (document.body.scrollTop + e.clientY - navbar.offsetHeight) / scale; // also add navbar height
+
+                    postIt.setAttribute("offset-x", x);
+                    postIt.setAttribute("offset-y", y);
+                    postIt.style.transform = `translate(${x}px, ${y}px)`;
+                    postIt.classList = ["post-it"];
+
+
+                    postIt.addEventListener("dblclick", (e) => {
+                        let textarea = e.target;
+                        textarea.readOnly = false;
+                        textarea.focus();
+                        textarea.style.outline = "0.5rem solid rgba(180, 180, 255, 0.6)";
+                        textarea.style.userSelect = true;
+                        textarea.style.cursor = "text";
+                    });
+
+                    noteboard.appendChild(postIt);
+                }
+            });
+        </script>
+    </body>
+</html>
