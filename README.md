@@ -1,8 +1,6 @@
 # TheRewrite
 
-A Web-App to collaboratively annotate documents.
-
-## Getting Started
+Project Documentation: https://ip34-23vt.pages.fhnw.ch/ip34-23vt_therewrite/therewrite/
 
 These instructions will get your copy of the project up and running on your local machine.
 
