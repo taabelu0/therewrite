@@ -11,6 +11,7 @@ import '../style/basic.css';
 import '../style/list.css';
 import '../style/viewer.scss';
 import '../style/react-viewer.scss';
+import { v4 as uuidv4 } from 'uuid';
 import { IHighlight, NewHighlight } from "react-pdf-highlighter";
 import {useParams} from "react-router-dom";
 import PostIt from "./annotations/PostIt";
@@ -55,6 +56,7 @@ function Noteboard() {
     const [creatingPostIt, setCreatingPostIt] = useState(false);
     const [selectedColor, setSelectedColor] = useState("green");
     const [postIts, setPostIts] = useState([]);
+    console.log("initialize reached")
 
     let width = useRef("100%");
     let height = useRef("100%");
@@ -102,6 +104,32 @@ function Noteboard() {
         };
 
         setPostIts([...postIts, newPostIt]);
+        savePostItPositionToDatabase(x,y)
+    }
+
+    function savePostItPositionToDatabase(x, y) {
+        const annotation = {
+            idAnnotation: uuidv4(),
+            dataX: x,
+            dataY: y,
+            annotationDetail: JSON.stringify({"Test": "Test"}),
+        };
+
+        // Make a POST request to your backend to save the post-it information
+        fetch('/api/saveAnnotation', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(annotation),
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Success:', data);
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
     }
 
     function setPostItMeta(color) {
