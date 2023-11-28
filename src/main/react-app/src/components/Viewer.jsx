@@ -34,9 +34,7 @@ const HighlightPopup = ({
         </div>
     ) : null;
 
-const BASE_URL = 'http://localhost:8080';
 const initialUrl = {"url": ""};
-let isReady = false;
 
 function PDFViewer() {
     let { pdfName } = useParams();
