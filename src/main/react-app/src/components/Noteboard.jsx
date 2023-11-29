@@ -50,18 +50,12 @@ function Noteboard() {
         document.addEventListener("keydown", addParagraphAnnotation, true);
     }, []);
 
-
-    useEffect(() => {
-        console.log(annotations);
-    }, [annotations]);
-
-
     function addParagraphAnnotation() {
         let selection = window.getSelection();
         if(selection.rangeCount < 1) return;
         let scroll = { x: window.scrollX, y: window.scrollY };
         const props = {selection: selection, category: null, scroll, annotation: ParagraphSideBar};
-        setAnnotations([...annotations, props]);
+        setAnnotations(prevAnnotations => [...prevAnnotations, props]);
     }
 
     function addPostIt(color, x, y) {
