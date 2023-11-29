@@ -36,11 +36,32 @@
     left: 0;
     width: 100%;
     height: 100%;
-    overflow: hidden;
+}
+
+#annotation-absolute {
+    position: absolute;
+    top:0;
+    left:0;
+    width: 100%;
+    height: 100%;
+}
+
+#annotation-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
 }
 
 .post-it-wrapper {
     position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+#post-it-absolute {
+    position: absolute;
+    top:0;
+    left:0;
     width: 100%;
     height: 100%;
 }

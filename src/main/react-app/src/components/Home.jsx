@@ -3,6 +3,7 @@ import '../style/list.scss';
 import '../style/customDropZone.min.scss';
 import {useEffect, useRef, useState} from "react";
 import {pdfAPI} from "../apis/pdfAPI";
+import {baseURL} from "../apis/config/axiosConfig";
 
 function Home() {
 
@@ -21,7 +22,7 @@ function Home() {
     useEffect(() => {
         if (!loaded.current && window.Dropzone && window.registerDropzone) {
             loaded.current = true;
-            window.registerDropzone("#fileUpload", window.Dropzone);
+            window.registerDropzone("#fileUpload", window.Dropzone, baseURL);
         }
     }, []);
 
@@ -33,7 +34,7 @@ function Home() {
                 <div className="list-container" id="list-of-pdf">
                     {pdfs.map((pdf, index) => (
                         <a key={index} href={pdf[1]} className="list-item">
-                            {pdf[0]}
+                            /view/{pdf[0]}
                         </a>
                     ))}
                 </div>

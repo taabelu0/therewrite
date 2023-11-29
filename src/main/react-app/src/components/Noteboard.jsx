@@ -1,11 +1,13 @@
 import React, { useEffect, useRef, useState } from "react";
 import PostIt from "./annotations/PostIt";
-import {api} from "../apis/config/axiosConfig";
+import '../style/annotations.scss';
+import ParagraphSideBar from "./annotations/ParagraphSideBar";
 
 function Noteboard() {
     const [creatingPostIt, setCreatingPostIt] = useState(false);
-    const [selectedColor, setSelectedColor] = useState("green");
+    const [selectedColor, setSelectedColor] = useState("");
     const [postIts, setPostIts] = useState([]);
+    const [annotations, setAnnotations] = useState([]);
     let width = useRef("100%");
     let height = useRef("100%");
 
@@ -19,7 +21,6 @@ function Noteboard() {
             const y = clientY - rect.top;
 
             addPostIt(selectedColor, x, y);
-
             setCreatingPostIt(false);
         }
     }
@@ -45,6 +46,18 @@ function Noteboard() {
         };
     }, [creatingPostIt, selectedColor]);
 
+    useEffect(() => {
+        document.addEventListener("keydown", addParagraphAnnotation, true);
+    }, []);
+
+    function addParagraphAnnotation() {
+        let selection = window.getSelection();
+        if(selection.rangeCount < 1) return;
+        let scroll = { x: window.scrollX, y: window.scrollY };
+        const props = {selection: selection, category: null, scroll, annotation: ParagraphSideBar};
+        setAnnotations(prevAnnotations => [...prevAnnotations, props]);
+    }
+
     function addPostIt(color, x, y) {
         const newPostIt = {
             color: color,
@@ -52,28 +65,7 @@ function Noteboard() {
             dataY: y,
             text: "",
         };
-
-        savePostItPositionToDatabase(x, y, color).then((data) => {
-            newPostIt.id = data;
-            setPostIts([...postIts, newPostIt]);
-        });
-    }
-
-    async function savePostItPositionToDatabase(x, y, color) {
-        const annotation = {
-            dataX: x,
-            dataY: y,
-            annotationType: "post-it",
-            annotationDetail: JSON.stringify({"x": x, "y": y, "color": color}),
-        };
-
-        return await api.post('/api/saveAnnotation',
-            annotation
-        )
-            .then(response => response.data)
-            .catch((error) => {
-                console.error('Error:', error);
-            });
+        setPostIts([...postIts, newPostIt]);
     }
 
     function setPostItMeta(color) {
@@ -113,17 +105,31 @@ function Noteboard() {
                 </div>
             </nav>
             <div id={"noteboard"}>
-                <div className={"post-it-wrapper"}>
-                    {postIts.map((postIt, index) => (
-                        <PostIt
-                            key={`postIt_${index}`}
-                            id={postIt.id}
-                            color={postIt.color}
-                            text={postIt.text}
-                            dataX={postIt.dataX}
-                            dataY={postIt.dataY}
-                        />
-                    ))}
+                <div id={"annotation-absolute"}>
+                    <div id={"annotation-container"}>
+                        {annotations.map((annotation, index) => {
+                            const SpecificAnnotation = annotation.annotation;
+                            return <SpecificAnnotation
+                                key={`annotation_${index}`}
+                                selection={annotation.selection}
+                                category={annotation.category}
+                                scroll={annotation.scroll}
+                            />;
+                        })}
+                    </div>
+                </div>
+                <div id={"post-it-absolute"}>
+                    <div className={"post-it-wrapper"}>
+                        {postIts.map((postIt, index) => (
+                            <PostIt
+                                key={`postIt_${index}`}
+                                color={postIt.color}
+                                text={postIt.text}
+                                dataX={postIt.dataX}
+                                dataY={postIt.dataY}
+                            />
+                        ))}
+                    </div>
                 </div>
             </div>
         </section>

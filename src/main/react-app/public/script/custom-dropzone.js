@@ -1,6 +1,6 @@
-function registerDropzone(id, Dropzone) {
+function registerDropzone(id, Dropzone, url) {
     let myDropzone = new Dropzone(id, {
-        url: "/file/upload",
+        url: url + "/file/upload",
         method: "POST",
         enctype: "multipart/form-data",
         paramName: "file",

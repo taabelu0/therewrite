@@ -22,7 +22,6 @@ import org.springframework.web.multipart.MultipartFile;
 public class FileSystemStorageService implements StorageService {
 
 	private final Path rootLocation;
-	private final DocumentRepository documentRepository;
 
 	@Autowired
 	public FileSystemStorageService(StorageProperties properties, DocumentRepository documentRepository) {
@@ -32,8 +31,6 @@ public class FileSystemStorageService implements StorageService {
         } else {
             throw new StorageException("File upload location can not be Empty.");
         }
-
-		this.documentRepository = documentRepository;
     }
 
 	@Override
@@ -45,6 +42,7 @@ public class FileSystemStorageService implements StorageService {
 			Path destinationFile = this.rootLocation.resolve(
 					Paths.get(Objects.requireNonNull(file.getOriginalFilename())))
 				.normalize().toAbsolutePath();
+
 			if (!destinationFile.getParent().equals(this.rootLocation.toAbsolutePath())) {
 				// This is a security check
 				throw new StorageException(
@@ -53,10 +51,6 @@ public class FileSystemStorageService implements StorageService {
 			try (InputStream inputStream = file.getInputStream()) {
 				Files.copy(inputStream, destinationFile,
 					StandardCopyOption.REPLACE_EXISTING);
-				Document document = new Document();
-				document.setDocumentName(file.getOriginalFilename());
-				document.setPath(destinationFile.toString());
-				documentRepository.save(document);
 			}
 		}
 		catch (IOException e) {
@@ -110,5 +104,9 @@ public class FileSystemStorageService implements StorageService {
 		catch (IOException e) {
 			throw new StorageException("Could not initialize storage", e);
 		}
+	}
+
+	public Path getRootLocation() {
+		return rootLocation;
 	}
 }

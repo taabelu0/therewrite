@@ -42,7 +42,7 @@ public class AppConfigProperties {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.addAllowedOrigin(this.url);
         configuration.addAllowedHeader("*");
-        configuration.addAllowedMethod("GET");
+        configuration.addAllowedMethod("*");
         configuration.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         for (String endpoint : getAccessEndpoints()) {
