@@ -2,8 +2,9 @@ import React, { useEffect, useRef, useState } from "react";
 import PostIt from "./annotations/PostIt";
 import '../style/annotations.scss';
 import ParagraphSideBar from "./annotations/ParagraphSideBar";
+import HighlightAnnotation from "./annotations/HighlightAnnotation";
 
-function Noteboard() {
+function Noteboard( {highlight} ) {
     const [creatingPostIt, setCreatingPostIt] = useState(false);
     const [selectedColor, setSelectedColor] = useState("");
     const [postIts, setPostIts] = useState([]);
@@ -46,9 +47,6 @@ function Noteboard() {
         };
     }, [creatingPostIt, selectedColor]);
 
-    useEffect(() => {
-        document.addEventListener("keydown", addParagraphAnnotation, true);
-    }, []);
 
 
     useEffect(() => {
@@ -63,6 +61,21 @@ function Noteboard() {
         const props = {selection: selection, category: null, scroll, annotation: ParagraphSideBar};
         setAnnotations([...annotations, props]);
     }
+
+    useEffect(() => {
+        addHighlightAnnotation();
+    }, [highlight]);
+
+    const addHighlightAnnotation = () => {
+        console.log("Adding highlight annotation:", highlight);
+        let selection = window.getSelection();
+        if(selection.rangeCount < 1) return;
+        let scroll = { x: window.scrollX, y: window.scrollY };
+        const props = {selection: selection, category: null, scroll, annotation: HighlightAnnotation};
+
+        setAnnotations(prevAnnotations => [...prevAnnotations, props]);
+    };
+
 
     function addPostIt(color, x, y) {
         const newPostIt = {
@@ -114,14 +127,17 @@ function Noteboard() {
                 <div id={"annotation-absolute"}>
                     <div id={"annotation-container"}>
                         {annotations.map((annotation, index) => {
-                            const SpecificAnnotation = annotation.annotation;
-                            return <SpecificAnnotation
-                                key={`annotation_${index}`}
-                                selection={annotation.selection}
-                                category={annotation.category}
-                                scroll={annotation.scroll}
-                            />;
+                            let SpecificAnnotation = annotation.annotation;
+                            return (
+                                <SpecificAnnotation
+                                    key={`annotation_${index}`}
+                                    selection={annotation.selection}
+                                    category={annotation.category}
+                                    scroll={annotation.scroll}
+                                />
+                            );
                         })}
+
                     </div>
                 </div>
                 <div id={"post-it-absolute"}>
