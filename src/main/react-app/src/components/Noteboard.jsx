@@ -9,23 +9,6 @@ function Noteboard() {
     let width = useRef("100%");
     let height = useRef("100%");
 
-    useEffect(() => {
-        // Fetch post-its from the database when the component mounts
-        fetchPostItsFromDatabase();
-    }, []);
-
-    async function fetchPostItsFromDatabase() {
-        try {
-            const response = await api.get('/api/getAnnotations');
-            const { data } = response;
-
-            // Update state with post-its from the server
-            setPostIts(data);
-        } catch (error) {
-            console.error('Error fetching post-its:', error);
-        }
-    }
-
     function handleDocumentMouseDown(event) {
         if (creatingPostIt) {
             const { clientX, clientY } = event;

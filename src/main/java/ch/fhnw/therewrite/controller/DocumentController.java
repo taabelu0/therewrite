@@ -1,9 +1,11 @@
 package ch.fhnw.therewrite.controller;
 import ch.fhnw.therewrite.AppConfigProperties;
+import ch.fhnw.therewrite.data.Document;
 import ch.fhnw.therewrite.storage.StorageService;
 import com.google.gson.Gson;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,6 +18,7 @@ import java.util.stream.Stream;
 @Controller
 public class DocumentController {
     private final StorageService storageService;
+    private Document currentDocument;
 
     private final Gson gson = new Gson();
 

@@ -25,6 +25,10 @@ public class Annotation {
     @JoinColumn(name = "idUserCreator")
     private User userCreator;
 
+    @ManyToOne
+    @JoinColumn(name = "document_id")
+    private Document document;
+
     private Timestamp timeCreated = new Timestamp(System.currentTimeMillis());
 
     private String annotationType = "text";
@@ -58,6 +62,12 @@ public class Annotation {
                 '}';
     }
 
+    public Document getDocument() {
+        return document;
+    }
+    public void setDocument(Document document) {
+        this.document = document;
+    }
 
     public User getUserCreator() {
         return userCreator;

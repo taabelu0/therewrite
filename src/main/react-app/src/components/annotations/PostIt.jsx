@@ -24,7 +24,6 @@ export default function PostIt({ id, color, dataX, dataY, text }) {
         });
     }, []);
 
-
     useEffect(() => {
         fetchPostItDataFromDatabase();
     }, []);

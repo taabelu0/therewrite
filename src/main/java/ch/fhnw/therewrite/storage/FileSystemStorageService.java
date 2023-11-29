@@ -10,6 +10,8 @@ import java.nio.file.StandardCopyOption;
 import java.util.Objects;
 import java.util.stream.Stream;
 
+import ch.fhnw.therewrite.data.Document;
+import ch.fhnw.therewrite.repository.DocumentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -20,9 +22,10 @@ import org.springframework.web.multipart.MultipartFile;
 public class FileSystemStorageService implements StorageService {
 
 	private final Path rootLocation;
+	private final DocumentRepository documentRepository;
 
 	@Autowired
-	public FileSystemStorageService(StorageProperties properties) {
+	public FileSystemStorageService(StorageProperties properties, DocumentRepository documentRepository) {
 
         if (!properties.getLocation().trim().isEmpty()) {
             this.rootLocation = Paths.get(properties.getLocation());
@@ -30,6 +33,7 @@ public class FileSystemStorageService implements StorageService {
             throw new StorageException("File upload location can not be Empty.");
         }
 
+		this.documentRepository = documentRepository;
     }
 
 	@Override
@@ -49,6 +53,10 @@ public class FileSystemStorageService implements StorageService {
 			try (InputStream inputStream = file.getInputStream()) {
 				Files.copy(inputStream, destinationFile,
 					StandardCopyOption.REPLACE_EXISTING);
+				Document document = new Document();
+				document.setDocumentName(file.getOriginalFilename());
+				document.setPath(destinationFile.toString());
+				documentRepository.save(document);
 			}
 		}
 		catch (IOException e) {
