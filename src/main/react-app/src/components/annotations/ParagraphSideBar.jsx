@@ -3,6 +3,8 @@ export default class ParagraphSideBar extends Annotation {
     offset = 10;
     constructor(props) {
         super(props);
+        this.state.currentWidth = 10;
+        this.state.currentHeight = this.state.currentBound.height;
     }
 
     render() { return (<div style={{

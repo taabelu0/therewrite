@@ -2,11 +2,10 @@ import React, { useEffect, useRef, useState } from "react";
 import PostIt from "./annotations/PostIt";
 import '../style/annotations.scss';
 import ParagraphSideBar from "./annotations/ParagraphSideBar";
-import Annotation from "./annotations/Annotation";
 
 function Noteboard() {
     const [creatingPostIt, setCreatingPostIt] = useState(false);
-    const [selectedColor, setSelectedColor] = useState("green");
+    const [selectedColor, setSelectedColor] = useState("");
     const [postIts, setPostIts] = useState([]);
     const [annotations, setAnnotations] = useState([]);
     let width = useRef("100%");
@@ -22,7 +21,6 @@ function Noteboard() {
             const y = clientY - rect.top;
 
             addPostIt(selectedColor, x, y);
-
             setCreatingPostIt(false);
         }
     }
@@ -49,7 +47,7 @@ function Noteboard() {
     }, [creatingPostIt, selectedColor]);
 
     useEffect(() => {
-        document.addEventListener("keydown", addParagraphAnnotation, true)
+        document.addEventListener("keydown", addParagraphAnnotation, true);
     }, []);
 
 
@@ -57,8 +55,6 @@ function Noteboard() {
         console.log(annotations);
     }, [annotations]);
 
-
-    const getNextId = () => String(Math.random()).slice(2);
 
     function addParagraphAnnotation() {
         let selection = window.getSelection();
@@ -75,7 +71,6 @@ function Noteboard() {
             dataY: y,
             text: "",
         };
-
         setPostIts([...postIts, newPostIt]);
     }
 
@@ -116,27 +111,31 @@ function Noteboard() {
                 </div>
             </nav>
             <div id={"noteboard"}>
-                <div id={"annotation-container"}>
-                    {annotations.map((annotation, index) => {
-                        const SpecificAnnotation = annotation.annotation;
-                        return <SpecificAnnotation
-                            key={`annotation_${index}`}
-                            selection={annotation.selection}
-                            category={annotation.category}
-                            scroll={annotation.scroll}
-                        />;
-                    })}
+                <div id={"annotation-absolute"}>
+                    <div id={"annotation-container"}>
+                        {annotations.map((annotation, index) => {
+                            const SpecificAnnotation = annotation.annotation;
+                            return <SpecificAnnotation
+                                key={`annotation_${index}`}
+                                selection={annotation.selection}
+                                category={annotation.category}
+                                scroll={annotation.scroll}
+                            />;
+                        })}
+                    </div>
                 </div>
-                <div className={"post-it-wrapper"}>
-                    {postIts.map((postIt, index) => (
-                        <PostIt
-                            key={`postIt_${index}`}
-                            color={postIt.color}
-                            text={postIt.text}
-                            dataX={postIt.dataX}
-                            dataY={postIt.dataY}
-                        />
-                    ))}
+                <div id={"post-it-absolute"}>
+                    <div className={"post-it-wrapper"}>
+                        {postIts.map((postIt, index) => (
+                            <PostIt
+                                key={`postIt_${index}`}
+                                color={postIt.color}
+                                text={postIt.text}
+                                dataX={postIt.dataX}
+                                dataY={postIt.dataY}
+                            />
+                        ))}
+                    </div>
                 </div>
             </div>
         </section>
