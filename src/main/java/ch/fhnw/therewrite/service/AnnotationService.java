@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class AnnotationService {
@@ -23,6 +24,13 @@ public class AnnotationService {
 
     public void saveAnnotation(Annotation annotation) {
         annotationRepository.save(annotation);
+    }
+
+    public void updateAnnotation(Annotation annotation, String id) {
+        Annotation a = annotationRepository.findById(UUID.fromString(id)).orElseThrow(() -> new IllegalArgumentException("Invalid annotation Id:" + id));
+        a.setAnnotationDetail(annotation.getAnnotationDetail());
+        a.setAnnotationText(annotation.getAnnotationText());
+        annotationRepository.save(a);
     }
 }
 

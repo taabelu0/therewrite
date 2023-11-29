@@ -4,8 +4,9 @@ import interact from 'interactjs';
 import GreenPostIt from "./postits/post-it-green.png";
 import RedPostIt from "./postits/post-it-red.png";
 import YellowPostIt from "./postits/post-it-yellow.png";
+import {api} from "../../apis/config/axiosConfig";
 
-export default function PostIt({ color, dataX, dataY, text }) {
+export default function PostIt({ id, color, dataX, dataY, text }) {
     const [postitText, setPostitText] = useState(text);
     const postitRef = useRef(null);
 
@@ -23,6 +24,22 @@ export default function PostIt({ color, dataX, dataY, text }) {
         });
     }, []);
 
+
+    useEffect(() => {
+        fetchPostItDataFromDatabase();
+    }, []);
+
+    async function fetchPostItDataFromDatabase() {
+        try {
+            const response = await api.get(`/api/getAnnotations`);
+            const { data } = response;
+
+            setPostitText(data.annotationText);
+        } catch (error) {
+            console.error('Error fetching post-it data:', error);
+        }
+    }
+
     function enableTextEdit(event) {
         let textArea = event.target;
         textArea.readOnly = false;
@@ -31,17 +48,40 @@ export default function PostIt({ color, dataX, dataY, text }) {
         textArea.classList.add("post-it-input-selected");
     }
 
-    function disableTextEdit(event) {
+    async function disableTextEdit(event) {
         let textArea = event.target;
         textArea.readOnly = true;
         textArea.style.userSelect = false;
         textArea.classList.remove("post-it-input-selected");
+
+        await updatePostItDetails(id, dataX, dataY, color, textArea.value);
     }
-    function dragMoveListener(event) {
+
+    async function dragMoveListener(event) {
         const target = event.target;
         dataX += event.dx;
         dataY += event.dy;
         target.style.transform = `translate(${dataX}px, ${dataY}px)`;
+
+        await updatePostItDetails(id, dataX, dataY, color, text)
+    }
+
+    async function updatePostItDetails(id, x, y, color, text) {
+        const annotation = {
+            annotationId: id,
+            dataX: x,
+            dataY: y,
+            color: color,
+            annotationText: text,
+            annotationDetail: JSON.stringify({"x": x, "y": y, "color": color,})
+        };
+
+        return api.put(`/api/updateAnnotation/${id}`,
+            annotation
+        )
+            .catch((error) => {
+                console.error('Error:', error);
+            });
     }
 
 

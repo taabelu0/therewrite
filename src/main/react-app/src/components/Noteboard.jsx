@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import PostIt from "./annotations/PostIt";
+import {api} from "../apis/config/axiosConfig";
 
 function Noteboard() {
     const [creatingPostIt, setCreatingPostIt] = useState(false);
@@ -7,6 +8,23 @@ function Noteboard() {
     const [postIts, setPostIts] = useState([]);
     let width = useRef("100%");
     let height = useRef("100%");
+
+    useEffect(() => {
+        // Fetch post-its from the database when the component mounts
+        fetchPostItsFromDatabase();
+    }, []);
+
+    async function fetchPostItsFromDatabase() {
+        try {
+            const response = await api.get('/api/getAnnotations');
+            const { data } = response;
+
+            // Update state with post-its from the server
+            setPostIts(data);
+        } catch (error) {
+            console.error('Error fetching post-its:', error);
+        }
+    }
 
     function handleDocumentMouseDown(event) {
         if (creatingPostIt) {
@@ -52,7 +70,27 @@ function Noteboard() {
             text: "",
         };
 
-        setPostIts([...postIts, newPostIt]);
+        savePostItPositionToDatabase(x, y, color).then((data) => {
+            newPostIt.id = data;
+            setPostIts([...postIts, newPostIt]);
+        });
+    }
+
+    async function savePostItPositionToDatabase(x, y, color) {
+        const annotation = {
+            dataX: x,
+            dataY: y,
+            annotationType: "post-it",
+            annotationDetail: JSON.stringify({"x": x, "y": y, "color": color}),
+        };
+
+        return await api.post('/api/saveAnnotation',
+            annotation
+        )
+            .then(response => response.data)
+            .catch((error) => {
+                console.error('Error:', error);
+            });
     }
 
     function setPostItMeta(color) {
@@ -96,6 +134,7 @@ function Noteboard() {
                     {postIts.map((postIt, index) => (
                         <PostIt
                             key={`postIt_${index}`}
+                            id={postIt.id}
                             color={postIt.color}
                             text={postIt.text}
                             dataX={postIt.dataX}

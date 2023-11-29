@@ -1,8 +1,8 @@
 package ch.fhnw.therewrite.data;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.ColumnTransformer;
 import org.hibernate.annotations.GenericGenerator;
-import org.springframework.data.annotation.Id;
 
 import java.sql.Timestamp;
 import java.util.UUID;
@@ -11,17 +11,23 @@ import java.util.UUID;
 @Table(name = "Annotation")
 public class Annotation {
 
-    @Id
+    @jakarta.persistence.Id
     @GeneratedValue(generator = "uuid2")
     @GenericGenerator(name = "uuid2", strategy = "uuid2")
-    @Column(name = "idAnnotation", columnDefinition = "BINARY(16)")
+    @Column(name = "id")
     private UUID idAnnotation;
+
+    @Column(columnDefinition = "jsonb")
+    @ColumnTransformer(write = "?::jsonb")
+    private String annotationDetail;
 
     @ManyToOne
     @JoinColumn(name = "idUserCreator")
     private User userCreator;
 
     private Timestamp timeCreated = new Timestamp(System.currentTimeMillis());
+
+    private String annotationType = "text";
 
     @ManyToOne
     @JoinColumn(name = "idUserLastEditor")
@@ -31,14 +37,6 @@ public class Annotation {
 
     private String annotationText;
 
-    @jakarta.persistence.Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    public String toString() {
-        return annotationDetail;
-    }
-
     public UUID getIdAnnotation() {
         return idAnnotation;
     }
@@ -46,6 +44,20 @@ public class Annotation {
     public void setIdAnnotation(UUID idAnnotation) {
         this.idAnnotation = idAnnotation;
     }
+
+    public String toString() {
+        return "Annotation{" +
+                "idAnnotation=" + idAnnotation +
+                ", userCreator=" + userCreator +
+                ", timeCreated=" + timeCreated +
+                ", userLastEditor=" + userLastEditor +
+                ", timeLastEdited=" + timeLastEdited +
+                ", annotationText='" + annotationText + '\'' +
+                ", annotationType=" + annotationType +
+                ", annotationDetail='" + annotationDetail + '\'' +
+                '}';
+    }
+
 
     public User getUserCreator() {
         return userCreator;
@@ -87,11 +99,11 @@ public class Annotation {
         this.annotationText = annotationText;
     }
 
-    public char getAnnotationType() {
+    public String getAnnotationType() {
         return annotationType;
     }
 
-    public void setAnnotationType(char annotationType) {
+    public void setAnnotationType(String annotationType) {
         this.annotationType = annotationType;
     }
 
@@ -101,18 +113,5 @@ public class Annotation {
 
     public void setAnnotationDetail(String annotationDetail) {
         this.annotationDetail = annotationDetail;
-    }
-
-    private char annotationType;
-
-    @Column(columnDefinition = "jsonb")
-    private String annotationDetail;
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Long getId() {
-        return id;
     }
 }

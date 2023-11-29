@@ -3,6 +3,7 @@ package ch.fhnw.therewrite.controller;
 import ch.fhnw.therewrite.data.Annotation;
 import ch.fhnw.therewrite.service.AnnotationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,15 +19,20 @@ public class AnnotationController {
         this.annotationService = annotationService;
     }
 
-    @GetMapping("/annotations")
+    @GetMapping("/getAnnotations")
     public List<Annotation> getAllAnnotations() {
         return annotationService.getAllAnnotations();
     }
 
     @PostMapping("/saveAnnotation")
-    public void saveAnnotation(@RequestBody Annotation annotation) {
-        System.out.println(annotation.toString());
+    public String saveAnnotation(@RequestBody Annotation annotation) {
         annotationService.saveAnnotation(annotation);
+        return annotation.getIdAnnotation().toString();
+    }
 
+    @Modifying
+    @PutMapping("/updateAnnotation/{id}")
+    public void saveAnnotation(@RequestBody Annotation annotation, @PathVariable String id) {
+        annotationService.updateAnnotation(annotation, id);
     }
 }
