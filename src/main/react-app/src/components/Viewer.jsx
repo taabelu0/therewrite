@@ -1,4 +1,4 @@
-import React, {Component} from "react";
+import React, {Component, useState} from "react";
 import {
     PdfLoader,
     PdfHighlighter,
@@ -37,14 +37,23 @@ const HighlightPopup = ({
 
 const initialUrl = {"url": ""};
 
+
+
 function PDFViewer() {
     let { pdfName } = useParams();
     initialUrl.url = pdfAPI.getUrl(pdfName);
 
+    const [highlightsForNoteboard, setHighlightsForNoteboard] = useState([]);
+
+    const addHighlightToNoteboard = (highlight) => {
+        console.log("Adding highlight to Noteboard:", highlight);
+        setHighlightsForNoteboard([highlight]);
+    };
+
     return (
         <div>
-            <Core></Core>
-            <Noteboard></Noteboard>
+            <Core onAddHighlightToNoteboard={addHighlightToNoteboard} />
+            <Noteboard highlight={highlightsForNoteboard} />
         </div>
     );
 }
@@ -90,6 +99,8 @@ class Core extends Component<> {
         const { highlights } = this.state;
 
         console.log("Saving highlight", highlight);
+
+        this.props.onAddHighlightToNoteboard(highlight);
 
         this.setState({
             highlights: [{ ...highlight, id: getNextId() }, ...highlights],
