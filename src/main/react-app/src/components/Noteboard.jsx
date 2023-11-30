@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import PostIt from "./annotations/PostIt";
+import TinyText from "./annotations/TinyText";
 import '../style/annotations.scss';
 import ParagraphSideBar from "./annotations/ParagraphSideBar";
 import HighlightAnnotation from "./annotations/HighlightAnnotation";
@@ -8,6 +9,7 @@ function Noteboard( {highlight} ) {
     const [creatingPostIt, setCreatingPostIt] = useState(false);
     const [selectedColor, setSelectedColor] = useState("");
     const [postIts, setPostIts] = useState([]);
+    const [tinyTexts, setTinyTexts] = useState([]);
     const [annotations, setAnnotations] = useState([]);
     let width = useRef("100%");
     let height = useRef("100%");
@@ -22,7 +24,7 @@ function Noteboard( {highlight} ) {
             const x = clientX - rect.left;
             const y = clientY - rect.top;
 
-            addPostIt(selectedColor, x, y);
+            addTinyText(selectedColor, x, y);
             setCreatingPostIt(false);
         }
     }
@@ -71,6 +73,16 @@ function Noteboard( {highlight} ) {
         setAnnotations(prevAnnotations => [...prevAnnotations, props]);
     };
 
+
+    function addTinyText(color, x, y) {
+        const newTinyText = {
+            category: selectedCategory,
+            dataX: x,
+            dataY: y,
+            text: "",
+        };
+        setTinyTexts([...tinyTexts, newTinyText]);
+    }
 
     function addPostIt(color, x, y) {
         const newPostIt = {
@@ -122,7 +134,7 @@ function Noteboard( {highlight} ) {
                 <div id="category-selection">
                     {["Definition", "Explosion", "Deletion", "Correction", "Speculation", "Addition"].map((cat, key) => (
                         <div
-                            className={selectedCategory === cat ? `category category-${cat.toLowerCase()} category-active` : `category category-${cat.toLowerCase()}`}
+                            className={`category category-${cat.toLowerCase()} ${selectedCategory === cat ? "category-active" : ""}`}
                             key={key}
                             onClick={() => setSelectedCategory(`${cat}`)}
                         >
@@ -158,6 +170,15 @@ function Noteboard( {highlight} ) {
                                 text={postIt.text}
                                 dataX={postIt.dataX}
                                 dataY={postIt.dataY}
+                            />
+                        ))}
+                        {tinyTexts.map((tinyText, index) => (
+                            <TinyText
+                                key={`tinyText_${index}`}
+                                category={tinyText.category}
+                                text={tinyText.text}
+                                dataX={tinyText.dataX}
+                                dataY={tinyText.dataY}
                             />
                         ))}
                     </div>

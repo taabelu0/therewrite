@@ -1,0 +1,49 @@
+@import "variables";
+
+.tiny-text {
+  position: absolute;
+  min-height: 2rem;
+  min-width: 4rem;
+  z-index: 2000000;
+
+  &-input {
+
+    color: inherit;
+    background-color: transparent;
+    border: none;
+    resize: none;
+
+    font-family: 'Nunito Sans', sans-serif;
+    font-size: 1.25rem;
+    cursor: grab;
+    font-weight: 800;
+
+    &-selected {
+      outline: 0.5rem solid $c-selected;
+    }
+  }
+
+  &-definition {
+    color: $c-category-definition;
+  }
+
+  &-explosion {
+    color: $c-category-explosion;
+  }
+
+  &-deletion {
+    color: $c-category-deletion;
+  }
+
+  &-correction {
+    color: $c-category-correction;
+  }
+
+  &-speculation {
+    color: $c-category-speculation;
+  }
+
+  &-addition {
+    color: $c-category-addition;
+  }
+}
