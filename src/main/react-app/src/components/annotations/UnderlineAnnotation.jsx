@@ -10,31 +10,49 @@ export default class UnderlineAnnotation extends Annotation {
 
     }
 
+    componentDidUpdate(prevProps, prevState) {
+        // Check if the scroll position has changed
+        if (window.scrollY !== prevState.scrollY) {
+            // Update the state with the new scroll position
+            this.setState({
+                scrollY: window.scrollY || document.documentElement.scrollTop,
+            });
+        }
+    }
+
     render() {
-        const { currentTop, currentLeft, currentWidth, currentHeight, currentScrollX, currentScrollY, currentSelection, currentBound, props } = this.state;
+        console.log("Start");
+        let range = this.state.currentSelection.getRangeAt(0);
+        let rects = range.getClientRects();
 
-        // Get the position of the PdfHighlighter div
-        const pdfHighlighterDiv = document.querySelector(".pdfViewer.removePageBorders");
-        const pdfHighlighterRect = pdfHighlighterDiv.getBoundingClientRect();
-
-        console.log(props)
-        console.log(currentScrollX)
-        console.log(currentScrollY)
-        console.log(currentSelection)
-        console.log(currentBound)
-        console.log(pdfHighlighterRect.top)
-        console.log(pdfHighlighterRect.left)
-        const underlineStyle = {
-
-            top: currentTop + pdfHighlighterRect.top, // Adjusted to consider the PdfHighlighter position
-            left: currentLeft +  pdfHighlighterRect.left, // Adjusted to consider the PdfHighlighter position
-            height: 2, // Adjust the height of the underline as needed
-            width: currentWidth + 2 * this.offset, // Adjust the width of the underline as needed
-        };
+        console.log("Rects:", rects);
 
         return (
-            <div style={underlineStyle} className={"underline"}>
+            <div>
+                {rects.length > 0 &&
+                    Array.from(rects).map((rect, index) => {
+                        // Check if rect.top and this.state.scrollY are valid numbers
+                        const isValidTop = Number.isFinite(rect.top) && Number.isFinite(this.state.scrollY);
+
+                        // Adjust the top position based on the scroll position and the rect's top
+                        const adjustedTop = isValidTop ? rect.top + this.state.scrollY : 0;
+
+                        console.log(`Line ${index + 1} - isValidTop: ${isValidTop}, adjustedTop: ${adjustedTop}`);
+
+                        return (
+                            <div
+                                key={`underline_${index}`}
+                                style={{
+                                    top: adjustedTop,
+                                    left: rect.left,
+                                    height: rect.height,
+                                    width: rect.width,
+                                }}
+                                className={"underline"}
+                            ></div>
+                        );
+                    })}
             </div>
         );
-    };
+    }
 }

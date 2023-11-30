@@ -29,6 +29,10 @@ function Noteboard( {highlight} ) {
     }
 
     useEffect(() => {
+        document.addEventListener("keydown", addUnderlineAnnotation, true)
+    }, []);
+
+    useEffect(() => {
         width.current = `${
             document.querySelector(".PdfHighlighter")?.offsetWidth
         }px`;
