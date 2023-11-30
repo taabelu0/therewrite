@@ -1,0 +1,33 @@
+.Highlight {
+  position: absolute;
+}
+
+.Highlight__parts {
+  opacity: 1;
+}
+
+.Highlight__part {
+  cursor: pointer;
+  position: absolute;
+  background: rgba(255, 226, 143, 1);
+  transition: background 0.3s;
+}
+
+//the actual tooltip
+.Highlight__popup {
+  background-color: #2c373f;
+  color: white;
+  padding: 0.75rem 1.25rem;
+  border-radius: 10px;
+  max-width: 300px;
+  word-wrap: break-word;
+  white-space: normal;
+  box-shadow: 0 8px 20px rgba(37, 40, 43, 0.4);
+  border: none;
+  font-size: 1rem;
+  margin-left: 50px;
+}
+
+.Highlight--scrolledTo .Highlight__part {
+  background: #ff4141;
+}

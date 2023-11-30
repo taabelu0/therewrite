@@ -11,9 +11,8 @@ import '../style/basic.scss';
 import '../style/list.scss';
 import '../style/viewer.scss';
 import '../style/react-viewer.scss';
-import '../style/addComment.scss';
-import { v4 as uuidv4 } from 'uuid';
-import { IHighlight, NewHighlight } from "react-pdf-highlighter";
+import '../style/tip.scss';
+import'../style/highlight.scss';
 import {useParams} from "react-router-dom";
 import Noteboard from "./Noteboard";
 import {pdfAPI} from "../apis/pdfAPI";
@@ -40,7 +39,6 @@ const HighlightPopup = ({
 const initialUrl = {"url": ""};
 
 
-
 function PDFViewer() {
     let { pdfName } = useParams();
     initialUrl.url = pdfAPI.getUrl(pdfName);
@@ -60,7 +58,7 @@ function PDFViewer() {
     );
 }
 
-class Core extends Component<> {
+class Core extends Component {
 
     constructor(props) {
         super(props);
@@ -111,6 +109,7 @@ class Core extends Component<> {
         this.setState({
             highlights: [{ ...highlight, id: getNextId() }, ...highlights],
         });
+        console.log(this.state);
     }
 
     updateHighlight(highlightId, position, content) {
@@ -179,10 +178,11 @@ class Core extends Component<> {
                                     );
 
                                     const component = isTextHighlight ? (
-                                        <Highlight
+                                        <Highlight  
                                             isScrolledTo={isScrolledTo}
                                             position={highlight.position}
                                             comment={highlight.comment}
+                                            className="test"
                                         />
                                     ) : (
                                         <AreaHighlight
