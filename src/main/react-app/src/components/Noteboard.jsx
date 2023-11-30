@@ -68,27 +68,55 @@ function Noteboard() {
                 height: height.current,
             }}
         >
-            <nav id="toolbar">
-                <div
-                    className="tool add-post-it"
-                    id="add-post-it-green"
-                    onClick={() => setPostItMeta("green")}
-                >
-                    +
+            <nav id="sidebar">
+                <div id="toolbar">
+                    <div
+                        className="tool add-post-it"
+                        id="add-post-it-green"
+                        onClick={() => setPostItMeta("green")}
+                    >
+                        +
+                    </div>
+                    <div
+                        className="tool add-post-it"
+                        id="add-post-it-yellow"
+                        onClick={() => setPostItMeta("yellow")}
+                    >
+                        +
+                    </div>
+                    <div
+                        className="tool add-post-it"
+                        id="add-post-it-red"
+                        onClick={() => setPostItMeta("red")}
+                    >
+                        +
+                    </div>
                 </div>
-                <div
-                    className="tool add-post-it"
-                    id="add-post-it-yellow"
-                    onClick={() => setPostItMeta("yellow")}
-                >
-                    +
-                </div>
-                <div
-                    className="tool add-post-it"
-                    id="add-post-it-red"
-                    onClick={() => setPostItMeta("red")}
-                >
-                    +
+                <div id="category-selection">
+                    <div className="category category-definition">
+                        <div className="category-ball"></div>
+                        <div>Definition</div>
+                    </div>
+                    <div className="category category-explosion">
+                        <div className="category-ball"></div>
+                        <div>Explosion</div>
+                    </div>
+                    <div className="category category-deletion">
+                        <div className="category-ball"></div>
+                        <div>Deletion</div>
+                    </div>
+                    <div className="category category-correction">
+                        <div className="category-ball"></div>
+                        <div>Correction</div>
+                    </div>
+                    <div className="category category-speculation">
+                        <div className="category-ball"></div>
+                        <div>Speculation</div>
+                    </div>
+                    <div className="category category-addition">
+                        <div className="category-ball"></div>
+                        <div>Addition</div>
+                    </div>
                 </div>
             </nav>
             <div id={"noteboard"}>
