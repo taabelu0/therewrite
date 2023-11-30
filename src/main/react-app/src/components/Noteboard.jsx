@@ -3,6 +3,7 @@ import PostIt from "./annotations/PostIt";
 import '../style/annotations.scss';
 import ParagraphSideBar from "./annotations/ParagraphSideBar";
 import HighlightAnnotation from "./annotations/HighlightAnnotation";
+import UnderlineAnnotation from "./annotations/UnderlineAnnotation";
 
 function Noteboard( {highlight} ) {
     const [creatingPostIt, setCreatingPostIt] = useState(false);
@@ -57,8 +58,18 @@ function Noteboard( {highlight} ) {
         setAnnotations(prevAnnotations => [...prevAnnotations, props]);
     }
 
+    function addUnderlineAnnotation() {
+        let selection = window.getSelection();
+        if(selection.rangeCount < 1) return;
+        let scroll = { x: window.scrollX, y: window.scrollY };
+        const props = {selection: selection, category: null, scroll, annotation: UnderlineAnnotation};
+        setAnnotations(prevAnnotations => [...prevAnnotations, props]);
+    }
+
     useEffect(() => {
         addHighlightAnnotation();
+        addUnderlineAnnotation()
+        addParagraphAnnotation()
     }, [highlight]);
 
     const addHighlightAnnotation = () => {
