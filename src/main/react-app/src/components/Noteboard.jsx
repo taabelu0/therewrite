@@ -10,6 +10,7 @@ function Noteboard() {
     const [annotations, setAnnotations] = useState([]);
     let width = useRef("100%");
     let height = useRef("100%");
+    const [selectedCategory, setSelectedCategory] = useState("Definition");
 
     function handleDocumentMouseDown(event) {
         if (creatingPostIt) {
@@ -81,27 +82,41 @@ function Noteboard() {
                 height: height.current,
             }}
         >
-            <nav id="toolbar">
-                <div
-                    className="tool add-post-it"
-                    id="add-post-it-green"
-                    onClick={() => setPostItMeta("green")}
-                >
-                    +
+            <nav id="sidebar">
+                <div id="toolbar">
+                    <div
+                        className="tool add-post-it"
+                        id="add-post-it-green"
+                        onClick={() => setPostItMeta("green")}
+                    >
+                        +
+                    </div>
+                    <div
+                        className="tool add-post-it"
+                        id="add-post-it-yellow"
+                        onClick={() => setPostItMeta("yellow")}
+                    >
+                        +
+                    </div>
+                    <div
+                        className="tool add-post-it"
+                        id="add-post-it-red"
+                        onClick={() => setPostItMeta("red")}
+                    >
+                        +
+                    </div>
                 </div>
-                <div
-                    className="tool add-post-it"
-                    id="add-post-it-yellow"
-                    onClick={() => setPostItMeta("yellow")}
-                >
-                    +
-                </div>
-                <div
-                    className="tool add-post-it"
-                    id="add-post-it-red"
-                    onClick={() => setPostItMeta("red")}
-                >
-                    +
+                <div id="category-selection">
+                    {["Definition", "Explosion", "Deletion", "Correction", "Speculation", "Addition"].map((cat, key) => (
+                        <div
+                            className={selectedCategory === cat ? `category category-${cat.toLowerCase()} category-active` : `category category-${cat.toLowerCase()}`}
+                            key={key}
+                            onClick={() => setSelectedCategory(`${cat}`)}
+                        >
+                            <div className="category-ball"></div>
+                            <div>{cat}</div>
+                        </div>
+                    ))}
                 </div>
             </nav>
             <div id={"noteboard"}>
