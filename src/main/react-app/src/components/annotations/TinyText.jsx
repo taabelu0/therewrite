@@ -41,18 +41,31 @@ export default function TinyText({ category, dataX, dataY, text }) {
         target.style.transform = `translate(${dataX}px, ${dataY}px)`;
     }
 
+    function rescaleTinyText(event) {
+        let fake = document.createElement("div");
+        fake.classList.add("tiny-text-fake");
+        fake.innerText = event.target.value;
+        event.target.parentElement.appendChild(fake);
+        event.target.style.width = `${fake.clientWidth + 20}px`;
+
+    }
+
     return (
         <div className={`tiny-text tiny-text-${category.toLowerCase()}`} ref={tinyTextRef} style={{
             transform: `translate(${dataX}px, ${dataY}px)`
         }}>
-            <textarea
-                className="tiny-text-input"
-                readOnly={true}
-                value={tinyText}
-                onDoubleClick={enableTextEdit}
-                onBlur={disableTextEdit}
-                onChange={event => setTinyText(event.target.value)}
-            />
+            <div className="tiny-text-input-wrapper">
+                <input
+                    type={"text"}
+                    className="tiny-text-input"
+                    readOnly={true}
+                    value={tinyText}
+                    onInput={rescaleTinyText}
+                    onDoubleClick={enableTextEdit}
+                    onBlur={disableTextEdit}
+                    onChange={event => setTinyText(event.target.value)}
+                />
+            </div>
         </div>
     );
 }

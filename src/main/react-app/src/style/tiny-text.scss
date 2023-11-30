@@ -2,8 +2,7 @@
 
 .tiny-text {
   position: absolute;
-  min-height: 2rem;
-  min-width: 4rem;
+  height: 1.5rem;
   z-index: 2000000;
 
   &-input {
@@ -11,16 +10,30 @@
     color: inherit;
     background-color: transparent;
     border: none;
+    padding: 0;
     resize: none;
+    height: 100%;
+    width: 100%;
 
     font-family: 'Nunito Sans', sans-serif;
     font-size: 1.25rem;
     cursor: grab;
     font-weight: 800;
 
+    &-wrapper {
+      position: relative;
+    }
+
     &-selected {
       outline: 0.5rem solid $c-selected;
     }
+  }
+
+  &-fake {
+    font-weight: 800;
+    font-size: 1.25rem;
+    visibility: hidden;
+    position: absolute;
   }
 
   &-definition {

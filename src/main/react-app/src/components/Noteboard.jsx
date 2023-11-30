@@ -6,8 +6,7 @@ import ParagraphSideBar from "./annotations/ParagraphSideBar";
 import HighlightAnnotation from "./annotations/HighlightAnnotation";
 
 function Noteboard( {highlight} ) {
-    const [creatingPostIt, setCreatingPostIt] = useState(false);
-    const [selectedColor, setSelectedColor] = useState("");
+    const [addingElement, setAddingElement] = useState(0);
     const [postIts, setPostIts] = useState([]);
     const [tinyTexts, setTinyTexts] = useState([]);
     const [annotations, setAnnotations] = useState([]);
@@ -15,8 +14,15 @@ function Noteboard( {highlight} ) {
     let height = useRef("100%");
     const [selectedCategory, setSelectedCategory] = useState("Definition");
 
+    const ADDING_STATUS = {
+        EMPTY: 0,
+        POSTIT: 1,
+        TINYTEXT: 2
+    }
+
     function handleDocumentMouseDown(event) {
-        if (creatingPostIt) {
+        if(addingElement !== ADDING_STATUS.EMPTY ) {
+
             const { clientX, clientY } = event;
             const noteboard = document.getElementById("noteboard");
             const rect = noteboard.getBoundingClientRect();
@@ -24,8 +30,15 @@ function Noteboard( {highlight} ) {
             const x = clientX - rect.left;
             const y = clientY - rect.top;
 
-            addTinyText(selectedColor, x, y);
-            setCreatingPostIt(false);
+            switch(addingElement) {
+                case ADDING_STATUS.TINYTEXT:
+                    addTinyText(selectedCategory, x, y);
+                    break;
+                case ADDING_STATUS.POSTIT:
+                    addPostIt(selectedCategory, x, y);
+                    break;
+            }
+            setAddingElement(ADDING_STATUS.EMPTY);
         }
     }
 
@@ -39,7 +52,7 @@ function Noteboard( {highlight} ) {
     });
 
     useEffect(() => {
-        if (creatingPostIt) {
+        if (addingElement) {
             document.addEventListener("mousedown", handleDocumentMouseDown);
         } else {
             document.removeEventListener("mousedown", handleDocumentMouseDown);
@@ -48,7 +61,7 @@ function Noteboard( {highlight} ) {
         return () => {
             document.removeEventListener("mousedown", handleDocumentMouseDown);
         };
-    }, [creatingPostIt, selectedColor]);
+    }, [addingElement, selectedCategory]);
 
 
     function addParagraphAnnotation() {
@@ -74,9 +87,9 @@ function Noteboard( {highlight} ) {
     };
 
 
-    function addTinyText(color, x, y) {
+    function addTinyText(category, x, y) {
         const newTinyText = {
-            category: selectedCategory,
+            category: category,
             dataX: x,
             dataY: y,
             text: "",
@@ -84,19 +97,14 @@ function Noteboard( {highlight} ) {
         setTinyTexts([...tinyTexts, newTinyText]);
     }
 
-    function addPostIt(color, x, y) {
+    function addPostIt(category, x, y) {
         const newPostIt = {
-            color: color,
+            color: "green",
             dataX: x,
             dataY: y,
             text: "",
         };
         setPostIts([...postIts, newPostIt]);
-    }
-
-    function setPostItMeta(color) {
-        setSelectedColor(color);
-        setCreatingPostIt(true);
     }
 
     return (
@@ -112,21 +120,21 @@ function Noteboard( {highlight} ) {
                     <div
                         className="tool add-post-it"
                         id="add-post-it-green"
-                        onClick={() => setPostItMeta("green")}
+                        onClick={() => {setAddingElement(ADDING_STATUS.TINYTEXT)}}
                     >
                         +
                     </div>
                     <div
                         className="tool add-post-it"
                         id="add-post-it-yellow"
-                        onClick={() => setPostItMeta("yellow")}
+                        onClick={() => {setAddingElement(ADDING_STATUS.POSTIT)}}
                     >
                         +
                     </div>
                     <div
                         className="tool add-post-it"
                         id="add-post-it-red"
-                        onClick={() => setPostItMeta("red")}
+                        onClick={() => {setAddingElement(ADDING_STATUS.EMPTY)}}
                     >
                         +
                     </div>
