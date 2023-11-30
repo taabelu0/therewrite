@@ -33,7 +33,7 @@ function Home() {
 
                 <div className="list-container" id="list-of-pdf">
                     {pdfs.map((pdf, index) => (
-                        <a key={index} href={pdf[1]} className="list-item">
+                        <a key={index} href={"/view/" + pdf[1]} className="list-item">
                             {pdf[0]}
                         </a>
                     ))}
