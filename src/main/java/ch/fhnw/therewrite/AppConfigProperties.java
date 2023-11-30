@@ -32,6 +32,7 @@ public class AppConfigProperties {
     }
 
     public String[] getAccessEndpoints() {
+        if(access == null) return new String[]{};
         return access.split(SEPARATOR);
     }
 

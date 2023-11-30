@@ -12,6 +12,8 @@ import '../style/list.scss';
 import '../style/viewer.scss';
 import '../style/react-viewer.scss';
 import '../style/addComment.scss';
+import { v4 as uuidv4 } from 'uuid';
+import { IHighlight, NewHighlight } from "react-pdf-highlighter";
 import {useParams} from "react-router-dom";
 import Noteboard from "./Noteboard";
 import {pdfAPI} from "../apis/pdfAPI";
@@ -59,6 +61,10 @@ function PDFViewer() {
 }
 
 class Core extends Component<> {
+
+    constructor(props) {
+        super(props);
+    }
 
     state = {
         url: initialUrl.url,
@@ -155,7 +161,6 @@ class Core extends Component<> {
                                         onOpen={transformSelection}
                                         onConfirm={(comment) => {
                                             this.addHighlight({ content, position, comment });
-
                                             hideTipAndSelection();
                                         }}
                                     />
