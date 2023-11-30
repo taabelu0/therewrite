@@ -45,7 +45,7 @@ public class DocumentController {
         Stream<Document> pdfs = documentService.getAllPDF().stream();
         return pdfs.map(
                 document -> List.of(
-                        document.getPath(),
+                        document.getDocumentName(),
                         document.getId()
                 )).toList();
     }
