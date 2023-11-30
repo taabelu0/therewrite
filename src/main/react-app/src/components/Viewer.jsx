@@ -44,8 +44,8 @@ function PDFViewer() {
 
     return (
         <div>
-            <Core></Core>
-            <Noteboard
+            <Core pdfName={pdfName}></Core>
+            <Noteboard pdfName={pdfName}
             ></Noteboard>
         </div>
     );

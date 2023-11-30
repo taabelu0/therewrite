@@ -4,7 +4,7 @@ import '../style/annotations.scss';
 import ParagraphSideBar from "./annotations/ParagraphSideBar";
 import {annotationAPI} from "../apis/annotationAPI";
 
-function Noteboard() {
+function Noteboard( { pdfName }) {
     const [creatingPostIt, setCreatingPostIt] = useState(false);
     const [selectedColor, setSelectedColor] = useState("");
     const [postIts, setPostIts] = useState([]);
@@ -18,9 +18,14 @@ function Noteboard() {
     }, []);
 
     async function loadAnnotations() {
-        let newAnnotations = await annotationAPI.getList();
+        let newAnnotations = await annotationAPI.getList(pdfName);
         console.log("ANNOTATION", newAnnotations, typeof newAnnotations)
-        setPostIts([...newAnnotations.map(a => JSON.parse(a['annotationDetail']))]);
+        setPostIts([...newAnnotations.map(a => {
+            let obj = JSON.parse(a['annotationDetail']);
+            obj.id = a['idAnnotation'];
+            obj.annotationText = a['annotationText'];
+            return obj;
+        })]);
     }
 
     function handleDocumentMouseDown(event) {
@@ -70,15 +75,16 @@ function Noteboard() {
         setAnnotations(prevAnnotations => [...prevAnnotations, props]);
     }
 
-    function addPostIt(color, x, y) {
+    async function addPostIt(color, x, y) {
         const newPostIt = {
             color: color,
             dataX: x,
             dataY: y,
             text: "",
         };
-        annotationAPI.savePostItPositionToDatabase(newPostIt).then((data) => {
+        await annotationAPI.savePostItPositionToDatabase(newPostIt, pdfName).then((data) => {
             newPostIt.id = data;
+            console.log("NEW POSTIT ID", newPostIt.id)
             setPostIts([...postIts, newPostIt]);
         });
     }
@@ -138,8 +144,9 @@ function Noteboard() {
                         {postIts.map((postIt, index) => (
                             <PostIt
                                 key={`postIt_${index}`}
+                                id={postIt.id}
                                 color={postIt.color}
-                                text={postIt.text}
+                                text={postIt.annotationText}
                                 dataX={postIt.dataX}
                                 dataY={postIt.dataY}
                             />

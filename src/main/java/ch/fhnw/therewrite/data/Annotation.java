@@ -26,8 +26,8 @@ public class Annotation {
     private User userCreator;
 
     @ManyToOne
-    @JoinColumn(name = "document_id")
-    private Document document;
+    @JoinColumn(name = "documentId")
+    private Document documentId;
 
     private Timestamp timeCreated = new Timestamp(System.currentTimeMillis());
 
@@ -63,10 +63,10 @@ public class Annotation {
     }
 
     public Document getDocument() {
-        return document;
+        return documentId;
     }
     public void setDocument(Document document) {
-        this.document = document;
+        this.documentId = document;
     }
 
     public User getUserCreator() {

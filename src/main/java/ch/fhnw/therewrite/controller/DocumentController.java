@@ -17,7 +17,6 @@ import java.util.stream.Stream;
 @Controller
 public class DocumentController {
     private final StorageService storageService;
-    private Document currentDocument;
     private final DocumentService documentService;
     private static final Gson gson = new Gson();
 
