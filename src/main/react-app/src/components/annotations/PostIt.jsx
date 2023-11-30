@@ -9,6 +9,7 @@ import {api} from "../../apis/config/axiosConfig";
 export default function PostIt({ id, color, dataX, dataY, text }) {
     const [postitText, setPostitText] = useState(text);
     const postitRef = useRef(null);
+    console.log("I AM A POSTIT", dataX, dataY, color);
 
     useEffect(() => {
         interact(postitRef.current).draggable({
@@ -23,21 +24,6 @@ export default function PostIt({ id, color, dataX, dataY, text }) {
             }
         });
     }, []);
-
-    useEffect(() => {
-        fetchPostItDataFromDatabase();
-    }, []);
-
-    async function fetchPostItDataFromDatabase() {
-        try {
-            const response = await api.get(`/api/getAnnotations`);
-            const { data } = response;
-
-            setPostitText(data.annotationText);
-        } catch (error) {
-            console.error('Error fetching post-it data:', error);
-        }
-    }
 
     function enableTextEdit(event) {
         let textArea = event.target;

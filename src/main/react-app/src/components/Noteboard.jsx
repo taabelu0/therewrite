@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import PostIt from "./annotations/PostIt";
 import '../style/annotations.scss';
 import ParagraphSideBar from "./annotations/ParagraphSideBar";
+import {annotationAPI} from "../apis/annotationAPI";
 
 function Noteboard() {
     const [creatingPostIt, setCreatingPostIt] = useState(false);
@@ -10,6 +11,17 @@ function Noteboard() {
     const [annotations, setAnnotations] = useState([]);
     let width = useRef("100%");
     let height = useRef("100%");
+
+    //ONLOAD:
+    useEffect(() => {
+       loadAnnotations();
+    }, []);
+
+    async function loadAnnotations() {
+        let newAnnotations = await annotationAPI.getList();
+        console.log("ANNOTATION", newAnnotations, typeof newAnnotations)
+        setPostIts([...newAnnotations.map(a => JSON.parse(a['annotationDetail']))]);
+    }
 
     function handleDocumentMouseDown(event) {
         if (creatingPostIt) {
@@ -65,7 +77,10 @@ function Noteboard() {
             dataY: y,
             text: "",
         };
-        setPostIts([...postIts, newPostIt]);
+        annotationAPI.savePostItPositionToDatabase(newPostIt).then((data) => {
+            newPostIt.id = data;
+            setPostIts([...postIts, newPostIt]);
+        });
     }
 
     function setPostItMeta(color) {

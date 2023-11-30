@@ -10,7 +10,7 @@ import java.util.List;
 
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/annotation")
 public class AnnotationController {
     private final AnnotationService annotationService;
 
@@ -19,12 +19,16 @@ public class AnnotationController {
         this.annotationService = annotationService;
     }
 
-    @GetMapping("/getAnnotations")
+    @GetMapping("/list")
     public List<Annotation> getAllAnnotations() {
         return annotationService.getAllAnnotations();
     }
+    //    @GetMapping("/annotation/list")
+    //    public String getAllAnnotations() {
+    //        return gson.toJson(annotationService.getAllAnnotations());
+    //    }
 
-    @PostMapping("/saveAnnotation")
+    @PostMapping("/save")
     public String saveAnnotation(@RequestBody Annotation annotation) {
         annotationService.saveAnnotation(annotation);
         return annotation.getIdAnnotation().toString();

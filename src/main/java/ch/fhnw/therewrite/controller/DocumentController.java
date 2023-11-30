@@ -19,8 +19,7 @@ public class DocumentController {
     private final StorageService storageService;
     private Document currentDocument;
     private final DocumentService documentService;
-
-    private final Gson gson = new Gson();
+    private static final Gson gson = new Gson();
 
     public DocumentController(StorageService storageService, DocumentService documentService) {
         this.storageService = storageService;
