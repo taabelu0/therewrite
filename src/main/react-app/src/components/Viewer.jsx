@@ -43,8 +43,7 @@ function PDFViewer() {
     return (
         <div>
             <Core></Core>
-            <Noteboard
-            ></Noteboard>
+            <Noteboard></Noteboard>
         </div>
     );
 }
