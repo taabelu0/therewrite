@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import PostIt from "./annotations/PostIt";
 import '../style/annotations.scss';
 import ParagraphSideBar from "./annotations/ParagraphSideBar";
+import ParagraphCustom from "./annotations/ParagraphCustom";
 import HighlightAnnotation from "./annotations/HighlightAnnotation";
 import {annotationAPI} from "../apis/annotationAPI";
 import Annotation from "./annotations/Annotation";
@@ -60,7 +61,7 @@ function Noteboard( {highlight} ) {
     }, [creatingPostIt, selectedColor]);
 
     useEffect(() => {
-        document.addEventListener("keydown", addParagraphAnnotation, true);
+        document.addEventListener("keydown", addParagraphCustomAnnotation, true);
     }, []);
 
     function addParagraphAnnotation() {
@@ -68,6 +69,14 @@ function Noteboard( {highlight} ) {
         if (selection.rangeCount < 1) return;
         let scroll = {x: window.scrollX, y: window.scrollY};
         const props = {selection: selection, category: null, scroll, annotation: "ParagraphSideBar"};
+        setAnnotations(prevAnnotations => [...prevAnnotations, props]);
+    }
+
+    function addParagraphCustomAnnotation() {
+        let selection = window.getSelection();
+        if(selection.rangeCount < 1) return;
+        let scroll = { x: window.scrollX, y: window.scrollY };
+        const props = {selection: selection, category: null, scroll, annotation: ParagraphCustom};
         setAnnotations(prevAnnotations => [...prevAnnotations, props]);
     }
 
