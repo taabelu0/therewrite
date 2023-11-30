@@ -29,6 +29,6 @@ export default class Annotation extends React.Component {
     }
 
     render() {
-        return <div/>;
+        return null;
     }
 }

@@ -5,8 +5,7 @@ export const annotationAPI = {
         const response = await api.request({
             url: `/annotation/list`,
             method: "GET",
-        })
-        console.log(response);
+        });
         return response.data
     },
     savePostItPositionToDatabase: async function (postIt) {

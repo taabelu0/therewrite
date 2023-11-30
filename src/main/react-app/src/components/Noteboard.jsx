@@ -1,31 +1,30 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, {useEffect, useRef, useState} from "react";
 import PostIt from "./annotations/PostIt";
 import '../style/annotations.scss';
 import ParagraphSideBar from "./annotations/ParagraphSideBar";
 import {annotationAPI} from "../apis/annotationAPI";
+import Annotation from "./annotations/Annotation";
+const ANNOTATION_COMPONENTS = {'ParagraphSideBar': ParagraphSideBar, 'PostIt': PostIt}; // define Annotation components here
 
 function Noteboard() {
     const [creatingPostIt, setCreatingPostIt] = useState(false);
     const [selectedColor, setSelectedColor] = useState("");
-    const [postIts, setPostIts] = useState([]);
     const [annotations, setAnnotations] = useState([]);
     let width = useRef("100%");
     let height = useRef("100%");
 
-    //ONLOAD:
     useEffect(() => {
-       loadAnnotations();
+        loadAnnotations();
     }, []);
 
     async function loadAnnotations() {
         let newAnnotations = await annotationAPI.getList();
-        console.log("ANNOTATION", newAnnotations, typeof newAnnotations)
-        setPostIts([...newAnnotations.map(a => JSON.parse(a['annotationDetail']))]);
+        setAnnotations([...newAnnotations.map(a => JSON.parse(a['annotationDetail']))]);
     }
 
     function handleDocumentMouseDown(event) {
         if (creatingPostIt) {
-            const { clientX, clientY } = event;
+            const {clientX, clientY} = event;
             const noteboard = document.getElementById("noteboard");
             const rect = noteboard.getBoundingClientRect();
 
@@ -64,9 +63,9 @@ function Noteboard() {
 
     function addParagraphAnnotation() {
         let selection = window.getSelection();
-        if(selection.rangeCount < 1) return;
-        let scroll = { x: window.scrollX, y: window.scrollY };
-        const props = {selection: selection, category: null, scroll, annotation: ParagraphSideBar};
+        if (selection.rangeCount < 1) return;
+        let scroll = {x: window.scrollX, y: window.scrollY};
+        const props = {selection: selection, category: null, scroll, annotation: "ParagraphSideBar"};
         setAnnotations(prevAnnotations => [...prevAnnotations, props]);
     }
 
@@ -76,10 +75,11 @@ function Noteboard() {
             dataX: x,
             dataY: y,
             text: "",
+            annotation: "PostIt"
         };
         annotationAPI.savePostItPositionToDatabase(newPostIt).then((data) => {
             newPostIt.id = data;
-            setPostIts([...postIts, newPostIt]);
+            setAnnotations([...annotations, newPostIt]);
         });
     }
 
@@ -123,27 +123,21 @@ function Noteboard() {
                 <div id={"annotation-absolute"}>
                     <div id={"annotation-container"}>
                         {annotations.map((annotation, index) => {
-                            const SpecificAnnotation = annotation.annotation;
-                            return <SpecificAnnotation
-                                key={`annotation_${index}`}
-                                selection={annotation.selection}
-                                category={annotation.category}
-                                scroll={annotation.scroll}
-                            />;
+                            if (annotation.annotation) {
+                                const SpecificAnnotation = ANNOTATION_COMPONENTS[annotation.annotation] || Annotation;
+                                return <SpecificAnnotation
+                                    id={annotation.id}
+                                    key={`annotation_${index}`}
+                                    selection={annotation.selection}
+                                    category={annotation.category}
+                                    scroll={annotation.scroll}
+                                    text={annotation.text}
+                                    color={annotation.color}
+                                    dataX={annotation.dataX}
+                                    dataY={annotation.dataY}
+                                />;
+                            } else return null;
                         })}
-                    </div>
-                </div>
-                <div id={"post-it-absolute"}>
-                    <div className={"post-it-wrapper"}>
-                        {postIts.map((postIt, index) => (
-                            <PostIt
-                                key={`postIt_${index}`}
-                                color={postIt.color}
-                                text={postIt.text}
-                                dataX={postIt.dataX}
-                                dataY={postIt.dataY}
-                            />
-                        ))}
                     </div>
                 </div>
             </div>

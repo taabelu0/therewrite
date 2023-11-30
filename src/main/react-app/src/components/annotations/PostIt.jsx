@@ -9,7 +9,6 @@ import {api} from "../../apis/config/axiosConfig";
 export default function PostIt({ id, color, dataX, dataY, text }) {
     const [postitText, setPostitText] = useState(text);
     const postitRef = useRef(null);
-    console.log("I AM A POSTIT", dataX, dataY, color);
 
     useEffect(() => {
         interact(postitRef.current).draggable({
