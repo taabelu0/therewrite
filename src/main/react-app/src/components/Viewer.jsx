@@ -11,6 +11,7 @@ import '../style/basic.scss';
 import '../style/list.scss';
 import '../style/viewer.scss';
 import '../style/react-viewer.scss';
+import '../style/addComment.scss';
 import {useParams} from "react-router-dom";
 import Noteboard from "./Noteboard";
 import {pdfAPI} from "../apis/pdfAPI";
