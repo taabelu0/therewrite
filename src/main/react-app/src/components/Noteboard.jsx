@@ -179,42 +179,42 @@ function Noteboard({pdfName}) {
                         id="add-post-it-green"
                         onClick={addHighlightAnnotation}
                     >
-                        h
+                        ✎
+                    </div>
+                    <div
+                        className="tool add-post-it"
+                        id="add-post-it-red"
+                        onClick={addParagraphAnnotation}
+                    >
+                        🖌
                     </div>
                     <div
                         className="tool add-post-it"
                         id="add-post-it-yellow"
-                        onClick={addParagraphAnnotation}
-                    >
-                        p
-                    </div>
-                    <div
-                        className="tool add-post-it"
-                        id="add-post-it-red"
                         onClick={() => setCreatingComponent("ParagraphSideBar")}
                     >
-                        c
+                        |
                     </div>
                     <div
                         className="tool add-post-it"
-                        id="add-post-it-red"
+                        id="add-post-it-green"
                         onClick={addUnderlineAnnotation}
                     >
-                        u
+                        ⎁
                     </div>
                     <div
                         className="tool add-post-it"
                         id="add-post-it-red"
                         onClick={() => setCreatingComponent("PostIt")}
                     >
-                        P
+                        🗅
                     </div>
                     <div
                         className="tool add-post-it"
-                        id="add-post-it-red"
+                        id="add-post-it-yellow"
                         onClick={() => setCreatingComponent("TinyText")}
                     >
-                        T
+                        Ƭ
                     </div>
                 </div>
                 <div id="category-selection">
