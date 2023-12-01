@@ -1,8 +1,9 @@
 import React, {useState, useRef, useEffect} from 'react';
 import '../../style/tiny-text.scss';
 import interact from 'interactjs';
+import {annotationAPI} from "../../apis/annotationAPI";
 
-export default function TinyText({ category, dataX, dataY, text }) {
+export default function TinyText({ id, category, dataX, dataY, text }) {
     const [tinyText, setTinyText] = useState(text);
     const tinyTextRef = useRef(null);
 
@@ -10,7 +11,6 @@ export default function TinyText({ category, dataX, dataY, text }) {
         interact(tinyTextRef.current).draggable({
             modifiers: [
                 interact.modifiers.restrictRect({
-                    restriction: 'parent',
                     endOnly: true
                 })
             ],
@@ -28,17 +28,23 @@ export default function TinyText({ category, dataX, dataY, text }) {
         textArea.classList.add("tiny-text-input-selected");
     }
 
-    function disableTextEdit(event) {
+    async function disableTextEdit(event) {
         let textArea = event.target;
         textArea.readOnly = true;
         textArea.style.userSelect = false;
         textArea.classList.remove("tiny-text-input-selected");
+
+        await updateTinyText(id, textArea.value);
     }
-    function dragMoveListener(event) {
+    async function dragMoveListener(event) {
         const target = event.target;
         dataX += event.dx;
         dataY += event.dy;
         target.style.transform = `translate(${dataX}px, ${dataY}px)`;
+
+        if (event.button === 0) {
+            updateTinyTextDetails(id, dataX, dataY, tinyText);
+        }
     }
 
     function rescaleTinyText(event) {
@@ -48,6 +54,14 @@ export default function TinyText({ category, dataX, dataY, text }) {
         event.target.parentElement.appendChild(fake);
         event.target.style.width = `${fake.clientWidth + 20}px`;
 
+    }
+
+    async function updateTinyTextDetails(id, x, y, text) {
+        await annotationAPI.updateAnnotationDetails(id, x, y, "", text, "TinyText", category);
+    }
+
+    async function updateTinyText(id, text) {
+        await annotationAPI.updateAnnotationText(id, text);
     }
 
     return (

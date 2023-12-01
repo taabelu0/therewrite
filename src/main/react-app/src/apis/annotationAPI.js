@@ -9,10 +9,9 @@ export const annotationAPI = {
         return response.data
     },
 
-    saveAnnotation: async function (postIt, documentId) {
+    saveAnnotation: async function (annotationDetails, documentId) {
         const annotation = {
-            annotationType: "post-it",
-            annotationDetail: JSON.stringify(postIt),
+            annotationDetail: JSON.stringify(annotationDetails),
         };
         return api.post(`/annotation/save/${documentId}`,
             annotation
@@ -22,10 +21,16 @@ export const annotationAPI = {
                 console.error('Error:', error);
             });
     },
-    updateAnnotationDetails: function (id, x, y, color, text, type) {
+    updateAnnotationDetails: function (id, x, y, color, text, type, category) {
         const annotation = {
             annotationText: text,
-            annotationDetail: JSON.stringify({"text": text, "color": color, "dataX": x, "dataY": y, "annotation": type})
+            annotationDetail: JSON.stringify({"text": text,
+                "color": color,
+                "dataX": x,
+                "dataY": y,
+                "annotation": type,
+                "category": category
+            })
         };
 
         return api.put(`/annotation/update/${id}`,
