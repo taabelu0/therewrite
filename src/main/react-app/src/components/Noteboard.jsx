@@ -18,12 +18,19 @@ const ANNOTATION_COMPONENTS = {
 }; // define Annotation components here
 
 function Noteboard({pdfName}) {
-    const [creatingPostIt, setCreatingPostIt] = useState(false);
+    const [creatingComponent, setCreatingComponent] = useState(null);
     const [annotations, setAnnotations] = useState([]);
     let width = useRef("100%");
     let height = useRef("100%");
     const [selectedCategory, setSelectedCategory] = useState("Definition");
     const currentCategory = useRef(selectedCategory);
+
+    const ADDING_COMPONENT = {
+        "ParagraphSideBar": addParagraphAnnotation,
+        "PostIt": addPostIt,
+        "TinyText": addTinyText
+    }
+
 
     useEffect(() => {
         currentCategory.current = selectedCategory;
@@ -44,7 +51,7 @@ function Noteboard({pdfName}) {
     }
 
     function handleDocumentMouseDown(event) {
-        if (creatingPostIt) {
+        if (creatingComponent !== null) {
             const {clientX, clientY} = event;
             const noteboard = document.getElementById("noteboard");
             const rect = noteboard.getBoundingClientRect();
@@ -52,8 +59,8 @@ function Noteboard({pdfName}) {
             const x = clientX - rect.left;
             const y = clientY - rect.top;
 
-            addPostIt(null, x, y);
-            setCreatingPostIt(false);
+            ADDING_COMPONENT[creatingComponent](selectedCategory, x, y);
+            setCreatingComponent(null);
         }
     }
 
@@ -67,7 +74,7 @@ function Noteboard({pdfName}) {
     });
 
     useEffect(() => {
-        if (creatingPostIt) {
+        if (creatingComponent != null) {
             document.addEventListener("mousedown", handleDocumentMouseDown);
         } else {
             document.removeEventListener("mousedown", handleDocumentMouseDown);
@@ -76,7 +83,7 @@ function Noteboard({pdfName}) {
         return () => {
             document.removeEventListener("mousedown", handleDocumentMouseDown);
         };
-    }, [creatingPostIt, selectedCategory]);
+    }, [creatingComponent, selectedCategory]);
 
 
     async function addParagraphAnnotation() {
@@ -130,11 +137,13 @@ function Noteboard({pdfName}) {
 
 
     async function addTinyText(category, x, y) {
+        console.log('Im stupid');
         const newTinyText = {
             category: category,
             dataX: x,
             dataY: y,
             text: "",
+            annotation: "TinyText"
         };
         await annotationAPI.saveAnnotation(newTinyText, pdfName).then((data) => {
             newTinyText.id = data;
@@ -183,7 +192,7 @@ function Noteboard({pdfName}) {
                     <div
                         className="tool add-post-it"
                         id="add-post-it-red"
-                        onClick={addParagraphCustomAnnotation}
+                        onClick={() => setCreatingComponent("ParagraphSideBar")}
                     >
                         c
                     </div>
@@ -197,14 +206,14 @@ function Noteboard({pdfName}) {
                     <div
                         className="tool add-post-it"
                         id="add-post-it-red"
-                        onClick={() => setCreatingPostIt(true)}
+                        onClick={() => setCreatingComponent("PostIt")}
                     >
                         P
                     </div>
                     <div
                         className="tool add-post-it"
                         id="add-post-it-red"
-                        //onClick={() => addTinyText(selectedCategory, 0, 0)}
+                        onClick={() => setCreatingComponent("TinyText")}
                     >
                         T
                     </div>
