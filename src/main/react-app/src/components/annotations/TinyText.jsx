@@ -57,7 +57,7 @@ export default function TinyText({ id, category, dataX, dataY, text }) {
     }
 
     async function updateTinyTextDetails(id, x, y, text) {
-        await annotationAPI.updateAnnotationDetails(id, x, y, "", text, "TinyText", category);
+        await annotationAPI.updateAnnotationDetails(id, x, y, text, "TinyText", category);
     }
 
     async function updateTinyText(id, text) {

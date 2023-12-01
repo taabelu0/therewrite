@@ -34,15 +34,6 @@ function Noteboard({pdfName}) {
         'Underline': addUnderlineAnnotation
     }
 
-    useEffect(() => {
-        document.addEventListener("keydown",(e) => {
-            if(e.key == "ArrowUp") addParagraphAnnotation();
-        }, true);
-        document.addEventListener("keyup", (e) => {
-            if(e.key == "ArrowDown") addParagraphCustomAnnotation();
-        }, true);
-    }, []);
-
 
     useEffect(() => {
         currentCategory.current = selectedCategory;
@@ -257,7 +248,7 @@ function Noteboard({pdfName}) {
                         {annotations.map((annotation, index) => {
                             if (annotation.annotation) {
                                 const SpecificAnnotation = ANNOTATION_COMPONENTS[annotation.annotation] || Annotation;
-                               return <SpecificAnnotation
+                                return <SpecificAnnotation
                                     id={annotation.id}
                                     key={`annotation_${index}`}
                                     selection={annotation.selection}
