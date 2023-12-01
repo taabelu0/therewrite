@@ -3,22 +3,28 @@ import PostIt from "./annotations/PostIt";
 import TinyText from "./annotations/TinyText";
 import '../style/annotations.scss';
 import ParagraphSideBar from "./annotations/ParagraphSideBar";
+import ParagraphCustom from "./annotations/ParagraphCustom";
 import HighlightAnnotation from "./annotations/HighlightAnnotation";
 import {annotationAPI} from "../apis/annotationAPI";
 import UnderlineAnnotation from "./annotations/UnderlineAnnotation";
+import Annotation from "./annotations/Annotation";
+const ANNOTATION_COMPONENTS = {'ParagraphCustom': ParagraphCustom, 'ParagraphSideBar': ParagraphSideBar, 'PostIt': PostIt}; // define Annotation components here
 
 function Noteboard( { pdfName }) {
     const [creatingPostIt, setCreatingPostIt] = useState(false);
     const [selectedColor, setSelectedColor] = useState("");
-    const [postIts, setPostIts] = useState([]);
     const [annotations, setAnnotations] = useState([]);
     let width = useRef("100%");
     let height = useRef("100%");
     const [selectedCategory, setSelectedCategory] = useState("Definition");
+    const currentCategory = useRef(selectedCategory);
 
-    //ONLOAD:
     useEffect(() => {
-       loadAnnotations();
+        currentCategory.current = selectedCategory;
+    }, [selectedCategory]);
+
+    useEffect(() => {
+        loadAnnotations();
     }, []);
 
     async function loadAnnotations() {
@@ -67,15 +73,20 @@ function Noteboard( { pdfName }) {
         };
     }, [creatingPostIt, selectedColor]);
 
-    useEffect(() => {
-        document.addEventListener("keydown", addParagraphAnnotation, true);
-    }, []);
 
     function addParagraphAnnotation() {
         let selection = window.getSelection();
+        if (selection.rangeCount < 1) return;
+        let scroll = {x: window.scrollX, y: window.scrollY};
+        const props = {selection: selection, category: currentCategory.current, scroll, annotation: "ParagraphSideBar"};
+        setAnnotations(prevAnnotations => [...prevAnnotations, props]);
+    }
+
+    function addParagraphCustomAnnotation() {
+        let selection = window.getSelection();
         if(selection.rangeCount < 1) return;
         let scroll = { x: window.scrollX, y: window.scrollY };
-        const props = {selection: selection, category: null, scroll, annotation: ParagraphSideBar};
+        const props = {selection: selection, category: currentCategory.current, scroll, annotation: "ParagraphCustom"};
         setAnnotations(prevAnnotations => [...prevAnnotations, props]);
     }
 
@@ -96,7 +107,7 @@ function Noteboard( { pdfName }) {
         let selection = window.getSelection();
         if(selection.rangeCount < 1) return;
         let scroll = { x: window.scrollX, y: window.scrollY };
-        const props = {selection: selection, category: null, scroll, annotation: HighlightAnnotation};
+        const props = {selection: selection, category: currentCategory.current, scroll, annotation: HighlightAnnotation};
 
         setAnnotations(prevAnnotations => [...prevAnnotations, props]);
     };
@@ -118,11 +129,11 @@ function Noteboard( { pdfName }) {
             dataX: x,
             dataY: y,
             text: "",
+            annotation: "PostIt"
         };
         await annotationAPI.savePostItPositionToDatabase(newPostIt, pdfName).then((data) => {
             newPostIt.id = data;
-            console.log("NEW POSTIT ID", newPostIt.id)
-            setPostIts([...postIts, newPostIt]);
+            setAnnotations([...annotations, newPostIt]);
         });
     }
 
@@ -175,29 +186,21 @@ function Noteboard( { pdfName }) {
                 <div id={"annotation-absolute"}>
                     <div id={"annotation-container"}>
                         {annotations.map((annotation, index) => {
-                            const SpecificAnnotation = annotation.annotation;
-                            return <SpecificAnnotation
-                                key={`annotation_${index}`}
-                                selection={annotation.selection}
-                                category={annotation.category}
-                                scroll={annotation.scroll}
-                            />;
+                            if (annotation.annotation) {
+                                const SpecificAnnotation = ANNOTATION_COMPONENTS[annotation.annotation] || Annotation;
+                                return <SpecificAnnotation
+                                    id={annotation.id}
+                                    key={`annotation_${index}`}
+                                    selection={annotation.selection}
+                                    category={annotation.category}
+                                    scroll={annotation.scroll}
+                                    text={annotation.text}
+                                    color={annotation.color}
+                                    dataX={annotation.dataX}
+                                    dataY={annotation.dataY}
+                                />;
+                            } else return null;
                         })}
-
-                    </div>
-                </div>
-                <div id={"post-it-absolute"}>
-                    <div className={"post-it-wrapper"}>
-                        {postIts.map((postIt, index) => (
-                            <PostIt
-                                key={`postIt_${index}`}
-                                id={postIt.id}
-                                color={postIt.color}
-                                text={postIt.annotationText}
-                                dataX={postIt.dataX}
-                                dataY={postIt.dataY}
-                            />
-                        ))}
                     </div>
                 </div>
             </div>

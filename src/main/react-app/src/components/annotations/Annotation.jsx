@@ -5,6 +5,7 @@ export default class Annotation extends React.Component {
         if(!props.selection) {
             throw new Error("No selection available");
         }
+        if(props.selection.rangeCount < 1) throw new Error("No selection available");
         let range = props.selection.getRangeAt(0);
 
         let bound = range.getBoundingClientRect();
@@ -30,6 +31,6 @@ export default class Annotation extends React.Component {
     }
 
     render() {
-        return <div/>;
+        return null;
     }
 }

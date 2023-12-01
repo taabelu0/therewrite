@@ -5,8 +5,7 @@ export const annotationAPI = {
         const response = await api.request({
             url: `/annotation/list/${documentId}`,
             method: "GET",
-        })
-        console.log(response);
+        });
         return response.data
     },
 

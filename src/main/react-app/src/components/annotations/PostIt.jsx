@@ -43,7 +43,6 @@ export default function PostIt({ id, color, dataX, dataY, text }) {
     }
 
     async function dragMoveListener(event) {
-        console.log("dragging");
         const target = event.target;
 
         setPostitPosition((prevPosition) => {
