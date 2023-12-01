@@ -21,11 +21,11 @@ export const annotationAPI = {
                 console.error('Error:', error);
             });
     },
-    updateAnnotationDetails: function (id, x, y, color, text, type, category) {
+    updateAnnotationDetails: function (id, x, y, text, type, category) {
         const annotation = {
             annotationText: text,
             annotationDetail: JSON.stringify({"text": text,
-                "color": color,
+                "color": "",
                 "dataX": x,
                 "dataY": y,
                 "annotation": type,
