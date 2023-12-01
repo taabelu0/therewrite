@@ -9,7 +9,7 @@ export const annotationAPI = {
         return response.data
     },
 
-    savePostItPositionToDatabase: async function (postIt, documentId) {
+    saveAnnotation: async function (postIt, documentId) {
         const annotation = {
             annotationType: "post-it",
             annotationDetail: JSON.stringify(postIt),
@@ -22,7 +22,7 @@ export const annotationAPI = {
                 console.error('Error:', error);
             });
     },
-    updatePostItDetails: function (id, x, y, color, text) {
+    updateAnnotationDetails: function (id, x, y, color, text) {
         const annotation = {
             annotationText: text,
             annotationDetail: JSON.stringify({"text": text, "color": color, "dataX": x, "dataY": y})
@@ -35,7 +35,7 @@ export const annotationAPI = {
                 console.error('Error:', error);
             });
     },
-    updatePostItText: function (id, text) {
+    updateAnnotationText: function (id, text) {
         const annotation = {
             annotationText: text,
         };

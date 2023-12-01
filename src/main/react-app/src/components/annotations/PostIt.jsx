@@ -59,11 +59,11 @@ export default function PostIt({ id, color, dataX, dataY, text }) {
     }
 
     async function updatePostItDetails(id, x, y, color, text) {
-        await annotationAPI.updatePostItDetails(id, x, y, color, text);
+        await annotationAPI.updateAnnotationDetails(id, x, y, color, text);
     }
 
     async function updatePostItText(id, text) {
-        await annotationAPI.updatePostItText(id, text);
+        await annotationAPI.updateAnnotationText(id, text);
     }
 
     const postitImages = {

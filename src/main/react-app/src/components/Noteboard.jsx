@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, {useEffect, useRef, useState} from "react";
 import PostIt from "./annotations/PostIt";
 import TinyText from "./annotations/TinyText";
 import '../style/annotations.scss';
@@ -8,11 +8,17 @@ import HighlightAnnotation from "./annotations/HighlightAnnotation";
 import {annotationAPI} from "../apis/annotationAPI";
 import UnderlineAnnotation from "./annotations/UnderlineAnnotation";
 import Annotation from "./annotations/Annotation";
-const ANNOTATION_COMPONENTS = {'ParagraphCustom': ParagraphCustom, 'ParagraphSideBar': ParagraphSideBar, 'PostIt': PostIt}; // define Annotation components here
 
-function Noteboard( { pdfName }) {
+const ANNOTATION_COMPONENTS = {
+    'HighlightAnnotation': HighlightAnnotation,
+    'TinyText': TinyText,
+    'ParagraphCustom': ParagraphCustom,
+    'ParagraphSideBar': ParagraphSideBar,
+    'PostIt': PostIt
+}; // define Annotation components here
+
+function Noteboard({pdfName}) {
     const [creatingPostIt, setCreatingPostIt] = useState(false);
-    const [selectedColor, setSelectedColor] = useState("");
     const [annotations, setAnnotations] = useState([]);
     let width = useRef("100%");
     let height = useRef("100%");
@@ -29,8 +35,7 @@ function Noteboard( { pdfName }) {
 
     async function loadAnnotations() {
         let newAnnotations = await annotationAPI.getList(pdfName);
-        console.log("ANNOTATION", newAnnotations, typeof newAnnotations)
-        setPostIts([...newAnnotations.map(a => {
+        setAnnotations([...newAnnotations.map(a => {
             let obj = JSON.parse(a['annotationDetail']);
             obj.id = a['idAnnotation'];
             obj.annotationText = a['annotationText'];
@@ -40,14 +45,14 @@ function Noteboard( { pdfName }) {
 
     function handleDocumentMouseDown(event) {
         if (creatingPostIt) {
-            const { clientX, clientY } = event;
+            const {clientX, clientY} = event;
             const noteboard = document.getElementById("noteboard");
             const rect = noteboard.getBoundingClientRect();
 
             const x = clientX - rect.left;
             const y = clientY - rect.top;
 
-            addPostIt(selectedColor, x, y);
+            addPostIt(null, x, y);
             setCreatingPostIt(false);
         }
     }
@@ -71,67 +76,81 @@ function Noteboard( { pdfName }) {
         return () => {
             document.removeEventListener("mousedown", handleDocumentMouseDown);
         };
-    }, [creatingPostIt, selectedColor]);
+    }, [creatingPostIt, selectedCategory]);
 
 
-    function addParagraphAnnotation() {
+    async function addParagraphAnnotation() {
         let selection = window.getSelection();
         if (selection.rangeCount < 1) return;
         let scroll = {x: window.scrollX, y: window.scrollY};
         const props = {selection: selection, category: currentCategory.current, scroll, annotation: "ParagraphSideBar"};
-        setAnnotations(prevAnnotations => [...prevAnnotations, props]);
+        await annotationAPI.saveAnnotation(props, pdfName).then((data) => {
+            props.id = data;
+            setAnnotations([...annotations, props]);
+        });
     }
 
-    function addParagraphCustomAnnotation() {
+    async function addParagraphCustomAnnotation() {
         let selection = window.getSelection();
-        if(selection.rangeCount < 1) return;
-        let scroll = { x: window.scrollX, y: window.scrollY };
+        if (selection.rangeCount < 1) return;
+        let scroll = {x: window.scrollX, y: window.scrollY};
         const props = {selection: selection, category: currentCategory.current, scroll, annotation: "ParagraphCustom"};
-        setAnnotations(prevAnnotations => [...prevAnnotations, props]);
+        await annotationAPI.saveAnnotation(props, pdfName).then((data) => {
+            props.id = data;
+            setAnnotations([...annotations, props]);
+        });
     }
 
-    function addUnderlineAnnotation() {
+    async function addUnderlineAnnotation() {
         let selection = window.getSelection();
-        if(selection.rangeCount < 1) return;
-        let scroll = { x: window.scrollX, y: window.scrollY };
-        const props = {selection: selection, category: null, scroll, annotation: UnderlineAnnotation};
-        setAnnotations(prevAnnotations => [...prevAnnotations, props]);
+        if (selection.rangeCount < 1) return;
+        let scroll = {x: window.scrollX, y: window.scrollY};
+        const props = {selection: selection, category: null, scroll, annotation: "UnderlineAnnotation"};
+        await annotationAPI.saveAnnotation(props, pdfName).then((data) => {
+            props.id = data;
+            setAnnotations([...annotations, props]);
+        });
     }
 
-    useEffect(() => {
-        addHighlightAnnotation();
-    }, [highlight]);
-
-    const addHighlightAnnotation = () => {
-        console.log("Adding highlight annotation:", highlight);
+    async function addHighlightAnnotation() {
         let selection = window.getSelection();
-        if(selection.rangeCount < 1) return;
-        let scroll = { x: window.scrollX, y: window.scrollY };
-        const props = {selection: selection, category: currentCategory.current, scroll, annotation: HighlightAnnotation};
+        if (selection.rangeCount < 1) return;
+        let scroll = {x: window.scrollX, y: window.scrollY};
+        const props = {
+            selection: selection,
+            category: currentCategory.current,
+            scroll,
+            annotation: "HighlightAnnotation"
+        };
+        await annotationAPI.saveAnnotation(props, pdfName).then((data) => {
+            props.id = data;
+            setAnnotations([...annotations, props]);
+        });
+    }
 
-        setAnnotations(prevAnnotations => [...prevAnnotations, props]);
-    };
 
-
-    function addTinyText(category, x, y) {
+    async function addTinyText(category, x, y) {
         const newTinyText = {
             category: category,
             dataX: x,
             dataY: y,
             text: "",
         };
-        setTinyTexts([...tinyTexts, newTinyText]);
+        await annotationAPI.saveAnnotation(newTinyText, pdfName).then((data) => {
+            newTinyText.id = data;
+            setAnnotations([...annotations, newTinyText]);
+        });
     }
 
-   async function addPostIt(category, x, y) {
+    async function addPostIt(category, x, y) {
         const newPostIt = {
-            color: color,
+            color: "green",
             dataX: x,
             dataY: y,
             text: "",
             annotation: "PostIt"
         };
-        await annotationAPI.savePostItPositionToDatabase(newPostIt, pdfName).then((data) => {
+        await annotationAPI.saveAnnotation(newPostIt, pdfName).then((data) => {
             newPostIt.id = data;
             setAnnotations([...annotations, newPostIt]);
         });
@@ -150,23 +169,44 @@ function Noteboard( { pdfName }) {
                     <div
                         className="tool add-post-it"
                         id="add-post-it-green"
-                        onClick={() => setPostItMeta("green")}
+                        onClick={addHighlightAnnotation}
                     >
-                        +
+                        h
                     </div>
                     <div
                         className="tool add-post-it"
                         id="add-post-it-yellow"
-                        onClick={() => setPostItMeta("yellow")}
+                        onClick={addParagraphAnnotation}
                     >
-                        +
+                        p
                     </div>
                     <div
                         className="tool add-post-it"
                         id="add-post-it-red"
-                        onClick={() => setPostItMeta("red")}
+                        onClick={addParagraphCustomAnnotation}
                     >
-                        +
+                        c
+                    </div>
+                    <div
+                        className="tool add-post-it"
+                        id="add-post-it-red"
+                        onClick={addUnderlineAnnotation}
+                    >
+                        u
+                    </div>
+                    <div
+                        className="tool add-post-it"
+                        id="add-post-it-red"
+                        onClick={() => setCreatingPostIt(true)}
+                    >
+                        P
+                    </div>
+                    <div
+                        className="tool add-post-it"
+                        id="add-post-it-red"
+                        //onClick={() => addTinyText(selectedCategory, 0, 0)}
+                    >
+                        T
                     </div>
                 </div>
                 <div id="category-selection">
@@ -194,7 +234,7 @@ function Noteboard( { pdfName }) {
                                     selection={annotation.selection}
                                     category={annotation.category}
                                     scroll={annotation.scroll}
-                                    text={annotation.text}
+                                    text={annotation.annotationText}
                                     color={annotation.color}
                                     dataX={annotation.dataX}
                                     dataY={annotation.dataY}
