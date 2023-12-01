@@ -8,6 +8,9 @@ services:
     database:
         container_name: postgresCont
         image: postgres:latest
+        environment:
+            - POSTGRES_USER=postgres
+            - POSTGRES_PASSWORD=password
         volumes:
             - /var/lib/docker/volumes/postgres-volume/_data
         ports:
