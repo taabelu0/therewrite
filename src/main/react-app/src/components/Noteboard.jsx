@@ -26,6 +26,7 @@ function Noteboard({pdfName}) {
     const currentCategory = useRef(selectedCategory);
 
     const ADDING_COMPONENT = {
+        "ParagraphSideBar": addParagraphAnnotation,
         "PostIt": addPostIt,
         "TinyText": addTinyText
     }
@@ -191,7 +192,7 @@ function Noteboard({pdfName}) {
                     <div
                         className="tool add-post-it"
                         id="add-post-it-red"
-                        onClick={addParagraphCustomAnnotation}
+                        onClick={() => setCreatingComponent("ParagraphSideBar")}
                     >
                         c
                     </div>
