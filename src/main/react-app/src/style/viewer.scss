@@ -242,6 +242,7 @@
     margin-bottom: 0.5rem;
     border-radius: 0.25rem;
     overflow: hidden;
+    background-color: $c-dark-secondary;
 
     &:last-of-type {
         margin: 0;
@@ -250,16 +251,11 @@
 
 .add-post-it:hover {
     cursor: pointer;
+    background-color: darkgrey;
 }
 
-#add-post-it {
-    &-green {
-        background-color: $c-workspace-post-it-green;
-    }
-    &-yellow {
-        background-color: $c-workspace-post-it-yellow;
-    }
-    &-red {
-        background-color: $c-workspace-post-it-red;
-    }
+.add-tool-active {
+    background-color: darkgrey;
 }
+
+

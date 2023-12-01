@@ -194,35 +194,31 @@ function Noteboard({pdfName}) {
                         ✎
                     </div>
                     <div
-                        className="tool add-post-it"
-                        id="add-post-it-red"
-                        onClick={addParagraphAnnotation}
+                        className={`tool add-post-it ${creatingComponent === "ParagraphCustom" ? "add-tool-active" : ""}`}
+                        onClick={() => setCreatingComponent("ParagraphCustom")}
                     >
                         🖌
                     </div>
                     <div
-                        className="tool add-post-it"
-                        id="add-post-it-yellow"
+                        className={`tool add-post-it ${creatingComponent === "ParagraphSideBar" ? "add-tool-active" : ""}`}
                         onClick={() => setCreatingComponent("ParagraphSideBar")}
                     >
                         |
                     </div>
                     <div
                         className="tool add-post-it"
-                        id="add-post-it-green"
                         onClick={addUnderlineAnnotation}
                     >
                         ⎁
                     </div>
                     <div
-                        className="tool add-post-it"
-                        id="add-post-it-red"
+                        className={`tool add-post-it ${creatingComponent === "PostIt" ? "add-tool-active" : ""}`}
                         onClick={() => setCreatingComponent("PostIt")}
                     >
                         🗅
                     </div>
                     <div
-                        className="tool add-post-it"
+                        className={`tool add-post-it ${creatingComponent === "TinyText" ? "add-tool-active" : ""}`}
                         id="add-post-it-yellow"
                         onClick={() => setCreatingComponent("TinyText")}
                     >
