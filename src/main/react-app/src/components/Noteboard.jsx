@@ -29,7 +29,7 @@ function Noteboard( {highlight} ) {
     }
 
     useEffect(() => {
-        document.addEventListener("keydown", addUnderlineAnnotation, true)
+        document.addEventListener("keyup", addUnderlineAnnotation, true)
     }, []);
 
     useEffect(() => {
