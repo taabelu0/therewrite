@@ -189,44 +189,44 @@ function Noteboard({pdfName}) {
                     <div
                         className="tool add-post-it"
                         id="add-post-it-green"
-                        onClick={() => setCreatingComponent("HighlightAnnotation")}
+                        onClick={addHighlightAnnotation}
                     >
-                        h
+                        ✎
+                    </div>
+                    <div
+                        className="tool add-post-it"
+                        id="add-post-it-red"
+                        onClick={addParagraphAnnotation}
+                    >
+                        🖌
                     </div>
                     <div
                         className="tool add-post-it"
                         id="add-post-it-yellow"
                         onClick={() => setCreatingComponent("ParagraphSideBar")}
                     >
-                        p
+                        |
                     </div>
                     <div
                         className="tool add-post-it"
-                        id="add-post-it-red"
-                        onClick={() => setCreatingComponent("ParagraphCustom")}
+                        id="add-post-it-green"
+                        onClick={addUnderlineAnnotation}
                     >
-                        c
-                    </div>
-                    <div
-                        className="tool add-post-it"
-                        id="add-post-it-red"
-                        onClick={() => setCreatingComponent("Underline")}
-                    >
-                        u
+                        ⎁
                     </div>
                     <div
                         className="tool add-post-it"
                         id="add-post-it-red"
                         onClick={() => setCreatingComponent("PostIt")}
                     >
-                        P
+                        🗅
                     </div>
                     <div
                         className="tool add-post-it"
-                        id="add-post-it-red"
+                        id="add-post-it-yellow"
                         onClick={() => setCreatingComponent("TinyText")}
                     >
-                        T
+                        Ƭ
                     </div>
                 </div>
                 <div id="category-selection">
