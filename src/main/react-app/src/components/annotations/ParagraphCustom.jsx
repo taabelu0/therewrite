@@ -1,18 +1,12 @@
-import Annotation from './Annotation.jsx';
+import {Annotation} from './Annotation.jsx';
 import Wave from './paragraphSquiggly/Wave';
 import { renderToStaticMarkup } from 'react-dom/server';
 import CategoryMapping from "./CategoryMapping";
+import {AnnotationCalc} from "./Annotation.jsx";
 
-export default class ParagraphCustom extends Annotation {
-    offset = 0;
-    widthProportion = 0.4;
-
+export class ParagraphCustom extends Annotation {
     constructor(props) {
         super(props);
-        this.state.currentWidth = this.state.currentBound.width + this.offset * 2;
-        this.state.currentHeight = this.state.currentBound.height;
-        this.state.currentWaveWidth = this.widthProportion * this.state.currentHeight;
-        this.state.currentWaveHeight = this.state.currentHeight;
         const color = CategoryMapping[this.state.currentCategory.toLowerCase()];
         const svgString = renderToStaticMarkup(<Wave stroke={color} />);
         this.state.currentSVG = `data:image/svg+xml;base64,${window.btoa(decodeURIComponent(encodeURIComponent(svgString)))}`;
@@ -20,8 +14,8 @@ export default class ParagraphCustom extends Annotation {
 
     render() {
         return (<div style={{
-            top: this.state.currentTop + this.state.currentScrollY,
-            left: this.state.currentLeft + this.state.currentScrollX - this.offset,
+            top: this.state.currentTop,
+            left: this.state.currentLeft,
             height: this.state.currentHeight,
             width: this.state.currentWidth
         }} className={"paragraph-custom annotation"}>

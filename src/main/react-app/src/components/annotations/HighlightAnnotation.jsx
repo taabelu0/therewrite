@@ -1,4 +1,4 @@
-import Annotation from './Annotation.jsx';
+import {Annotation} from './Annotation.jsx';
 
 class HighlightAnnotation extends Annotation {
     offset = 10;

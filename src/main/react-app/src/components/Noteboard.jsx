@@ -2,12 +2,12 @@ import React, {useEffect, useRef, useState} from "react";
 import PostIt from "./annotations/PostIt";
 import TinyText from "./annotations/TinyText";
 import '../style/annotations.scss';
-import ParagraphSideBar from "./annotations/ParagraphSideBar";
-import ParagraphCustom from "./annotations/ParagraphCustom";
+import {ParagraphSideBar} from "./annotations/ParagraphSideBar";
+import {ParagraphCustom} from "./annotations/ParagraphCustom";
 import HighlightAnnotation from "./annotations/HighlightAnnotation";
 import {annotationAPI} from "../apis/annotationAPI";
 import UnderlineAnnotation from "./annotations/UnderlineAnnotation";
-import Annotation from "./annotations/Annotation";
+import {Annotation, ParagraphCustomCalc, ParagraphSideBarCalc} from "./annotations/Annotation";
 
 const ANNOTATION_COMPONENTS = {
     'HighlightAnnotation': HighlightAnnotation,
@@ -28,8 +28,20 @@ function Noteboard({pdfName}) {
     const ADDING_COMPONENT = {
         "ParagraphSideBar": addParagraphAnnotation,
         "PostIt": addPostIt,
-        "TinyText": addTinyText
+        "TinyText": addTinyText,
+        'HighlightAnnotation': addHighlightAnnotation,
+        'ParagraphCustom': addParagraphCustomAnnotation,
+        'Underline': addUnderlineAnnotation
     }
+
+    useEffect(() => {
+        document.addEventListener("keydown",(e) => {
+            if(e.key == "ArrowUp") addParagraphAnnotation();
+        }, true);
+        document.addEventListener("keyup", (e) => {
+            if(e.key == "ArrowDown") addParagraphCustomAnnotation();
+        }, true);
+    }, []);
 
 
     useEffect(() => {
@@ -59,8 +71,10 @@ function Noteboard({pdfName}) {
             const x = clientX - rect.left;
             const y = clientY - rect.top;
 
-            ADDING_COMPONENT[creatingComponent](selectedCategory, x, y);
-            setCreatingComponent(null);
+            setTimeout(async () => {
+                ADDING_COMPONENT[creatingComponent](selectedCategory, x, y);
+                setCreatingComponent(null);
+            }, 50);
         }
     }
 
@@ -75,26 +89,32 @@ function Noteboard({pdfName}) {
 
     useEffect(() => {
         if (creatingComponent != null) {
-            document.addEventListener("mousedown", handleDocumentMouseDown);
+            document.addEventListener("mouseup", handleDocumentMouseDown);
         } else {
-            document.removeEventListener("mousedown", handleDocumentMouseDown);
+            document.removeEventListener("mouseup", handleDocumentMouseDown);
         }
 
         return () => {
-            document.removeEventListener("mousedown", handleDocumentMouseDown);
+            document.removeEventListener("mouseup", handleDocumentMouseDown);
         };
     }, [creatingComponent, selectedCategory]);
 
 
     async function addParagraphAnnotation() {
-        let selection = window.getSelection();
-        if (selection.rangeCount < 1) return;
-        let scroll = {x: window.scrollX, y: window.scrollY};
-        const props = {selection: selection, category: currentCategory.current, scroll, annotation: "ParagraphSideBar"};
-        await annotationAPI.saveAnnotation(props, pdfName).then((data) => {
-            props.id = data;
-            setAnnotations([...annotations, props]);
-        });
+            let selection = window.getSelection();
+            if (selection.rangeCount < 1) return;
+            let scroll = {x: window.scrollX, y: window.scrollY};
+            let props = {
+                selection: selection,
+                category: currentCategory.current,
+                scroll,
+                annotation: "ParagraphSideBar"
+            };
+            ParagraphSideBarCalc(props);
+            await annotationAPI.saveAnnotation(props, pdfName).then((data) => {
+                props.id = data;
+                setAnnotations([...annotations, props]);
+            });
     }
 
     async function addParagraphCustomAnnotation() {
@@ -102,6 +122,7 @@ function Noteboard({pdfName}) {
         if (selection.rangeCount < 1) return;
         let scroll = {x: window.scrollX, y: window.scrollY};
         const props = {selection: selection, category: currentCategory.current, scroll, annotation: "ParagraphCustom"};
+        ParagraphCustomCalc(props);
         await annotationAPI.saveAnnotation(props, pdfName).then((data) => {
             props.id = data;
             setAnnotations([...annotations, props]);
@@ -177,28 +198,28 @@ function Noteboard({pdfName}) {
                     <div
                         className="tool add-post-it"
                         id="add-post-it-green"
-                        onClick={addHighlightAnnotation}
+                        onClick={() => setCreatingComponent("HighlightAnnotation")}
                     >
                         h
                     </div>
                     <div
                         className="tool add-post-it"
                         id="add-post-it-yellow"
-                        onClick={addParagraphAnnotation}
+                        onClick={() => setCreatingComponent("ParagraphSideBar")}
                     >
                         p
                     </div>
                     <div
                         className="tool add-post-it"
                         id="add-post-it-red"
-                        onClick={() => setCreatingComponent("ParagraphSideBar")}
+                        onClick={() => setCreatingComponent("ParagraphCustom")}
                     >
                         c
                     </div>
                     <div
                         className="tool add-post-it"
                         id="add-post-it-red"
-                        onClick={addUnderlineAnnotation}
+                        onClick={() => setCreatingComponent("Underline")}
                     >
                         u
                     </div>
@@ -236,7 +257,7 @@ function Noteboard({pdfName}) {
                         {annotations.map((annotation, index) => {
                             if (annotation.annotation) {
                                 const SpecificAnnotation = ANNOTATION_COMPONENTS[annotation.annotation] || Annotation;
-                                return <SpecificAnnotation
+                               return <SpecificAnnotation
                                     id={annotation.id}
                                     key={`annotation_${index}`}
                                     selection={annotation.selection}
@@ -247,6 +268,12 @@ function Noteboard({pdfName}) {
                                     color={annotation.color}
                                     dataX={annotation.dataX}
                                     dataY={annotation.dataY}
+                                    top={annotation.top}
+                                    left={annotation.left}
+                                    width={annotation.width}
+                                    height={annotation.height}
+                                    scollX={annotation.scrollX}
+                                    scrollY={annotation.scrollY}
                                 />;
                             } else return null;
                         })}
