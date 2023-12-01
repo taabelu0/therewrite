@@ -22,10 +22,10 @@ export const annotationAPI = {
                 console.error('Error:', error);
             });
     },
-    updateAnnotationDetails: function (id, x, y, color, text) {
+    updateAnnotationDetails: function (id, x, y, color, text, type) {
         const annotation = {
             annotationText: text,
-            annotationDetail: JSON.stringify({"text": text, "color": color, "dataX": x, "dataY": y})
+            annotationDetail: JSON.stringify({"text": text, "color": color, "dataX": x, "dataY": y, "type": type})
         };
 
         return api.put(`/annotation/update/${id}`,
