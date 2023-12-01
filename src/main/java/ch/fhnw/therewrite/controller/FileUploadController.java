@@ -1,29 +1,38 @@
 package ch.fhnw.therewrite.controller;
 
+import ch.fhnw.therewrite.data.Document;
+import ch.fhnw.therewrite.repository.DocumentRepository;
+import ch.fhnw.therewrite.service.DocumentService;
+import ch.fhnw.therewrite.storage.FileSystemStorageService;
 import ch.fhnw.therewrite.storage.StorageFileNotFoundException;
 import ch.fhnw.therewrite.storage.StorageService;
 import org.apache.commons.io.FilenameUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.MimeType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Controller
 public class FileUploadController {
 
-    private final StorageService storageService;
+    private final FileSystemStorageService storageService;
+    private final DocumentRepository documentRepository;
 
-    public FileUploadController(StorageService storageService) {
+    public FileUploadController(FileSystemStorageService storageService, DocumentRepository documentRepository) {
         this.storageService = storageService;
+        this.documentRepository = documentRepository;
     }
 
     @GetMapping("/upload")
@@ -48,7 +57,6 @@ public class FileUploadController {
             "attachment; filename=\"" + file.getFilename() + "\"").body(file);
     }
 
-    @CrossOrigin(origins="http://localhost:3000")
     @PostMapping("/file/upload")
     public String handleFileUpload(@RequestParam("file") MultipartFile file,
                                    RedirectAttributes redirectAttributes) {
@@ -57,7 +65,25 @@ public class FileUploadController {
             redirectAttributes.addFlashAttribute("message",
                 "Please upload only files with the pdf extension");
         }else {
-            storageService.store(file);
+            Document document = new Document();
+
+            document.setDocumentName(file.getOriginalFilename());
+            documentRepository.save(document);
+            String fileName = document.getId().toString() + ".pdf";
+            String filePath = Paths.get(fileName).toString();
+            document.setPath(filePath);
+            documentRepository.save(document);
+            try {
+                MultipartFile storeFile = new MockMultipartFile(fileName,
+                        fileName,
+                        "application/pdf",
+                        file.getInputStream());
+                // MultipartFile storeFile = new MockMultipartFile(document.getId().toString() + ".pdf", file.getBytes());
+                storageService.store(storeFile);
+            }
+            catch(IOException exception) {
+                // TODO: log
+            }
             redirectAttributes.addFlashAttribute("message",
                 "You successfully uploaded " + file.getOriginalFilename() + "!");
         }

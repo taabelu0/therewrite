@@ -4,16 +4,18 @@ import interact from 'interactjs';
 import GreenPostIt from "./postits/post-it-green.png";
 import RedPostIt from "./postits/post-it-red.png";
 import YellowPostIt from "./postits/post-it-yellow.png";
+import {api} from "../../apis/config/axiosConfig";
+import {annotationAPI} from "../../apis/annotationAPI";
 
-export default function PostIt({ color, dataX, dataY, text }) {
+export default function PostIt({ id, color, dataX, dataY, text }) {
     const [postitText, setPostitText] = useState(text);
     const postitRef = useRef(null);
+    const [postitPosition, setPostitPosition] = useState({ dataX, dataY });
 
     useEffect(() => {
         interact(postitRef.current).draggable({
             modifiers: [
                 interact.modifiers.restrictRect({
-                    restriction: 'parent',
                     endOnly: true
                 })
             ],
@@ -31,17 +33,38 @@ export default function PostIt({ color, dataX, dataY, text }) {
         textArea.classList.add("post-it-input-selected");
     }
 
-    function disableTextEdit(event) {
+    async function disableTextEdit(event) {
         let textArea = event.target;
         textArea.readOnly = true;
         textArea.style.userSelect = false;
         textArea.classList.remove("post-it-input-selected");
+
+        await updatePostItText(id, textArea.value);
     }
-    function dragMoveListener(event) {
+
+    async function dragMoveListener(event) {
+        console.log("dragging");
         const target = event.target;
-        dataX += event.dx;
-        dataY += event.dy;
-        target.style.transform = `translate(${dataX}px, ${dataY}px)`;
+
+        setPostitPosition((prevPosition) => {
+            const newX = prevPosition.dataX + event.dx;
+            const newY = prevPosition.dataY + event.dy;
+            target.style.transform = `translate(${newX}px, ${newY}px)`;
+
+            if (event.button === 0) {
+                updatePostItDetails(id, newX, newY, color, postitText);
+            }
+
+            return { dataX: newX, dataY: newY };
+        });
+    }
+
+    async function updatePostItDetails(id, x, y, color, text) {
+        await annotationAPI.updatePostItDetails(id, x, y, color, text);
+    }
+
+    async function updatePostItText(id, text) {
+        await annotationAPI.updatePostItText(id, text);
     }
 
     const postitImages = {

@@ -11,6 +11,8 @@ import '../style/basic.scss';
 import '../style/list.scss';
 import '../style/viewer.scss';
 import '../style/react-viewer.scss';
+import { v4 as uuidv4 } from 'uuid';
+import { IHighlight, NewHighlight } from "react-pdf-highlighter";
 import {useParams} from "react-router-dom";
 import Noteboard from "./Noteboard";
 import {pdfAPI} from "../apis/pdfAPI";
@@ -42,26 +44,16 @@ function PDFViewer() {
     let { pdfName } = useParams();
     initialUrl.url = pdfAPI.getUrl(pdfName);
 
-    const [highlightsForNoteboard, setHighlightsForNoteboard] = useState([]);
-
-    const addHighlightToNoteboard = (highlight) => {
-        console.log("Adding highlight to Noteboard:", highlight);
-        setHighlightsForNoteboard([highlight]);
-    };
-
     return (
         <div>
-            <Core onAddHighlightToNoteboard={addHighlightToNoteboard} />
-            <Noteboard highlight={highlightsForNoteboard} />
+            <Core pdfName={pdfName}></Core>
+            <Noteboard pdfName={pdfName}
+            ></Noteboard>
         </div>
     );
 }
 
 class Core extends Component<> {
-
-    constructor(props) {
-        super(props);
-    }
 
     state = {
         url: initialUrl.url,
@@ -102,8 +94,6 @@ class Core extends Component<> {
         const { highlights } = this.state;
 
         console.log("Saving highlight", highlight);
-
-        this.props.onAddHighlightToNoteboard(highlight);
 
         this.setState({
             highlights: [{ ...highlight, id: getNextId() }, ...highlights],

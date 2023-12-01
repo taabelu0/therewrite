@@ -4,25 +4,34 @@ import TinyText from "./annotations/TinyText";
 import '../style/annotations.scss';
 import ParagraphSideBar from "./annotations/ParagraphSideBar";
 import HighlightAnnotation from "./annotations/HighlightAnnotation";
+import {annotationAPI} from "../apis/annotationAPI";
 
-function Noteboard( {highlight} ) {
-    const [addingElement, setAddingElement] = useState(0);
+function Noteboard( { pdfName }) {
+    const [creatingPostIt, setCreatingPostIt] = useState(false);
+    const [selectedColor, setSelectedColor] = useState("");
     const [postIts, setPostIts] = useState([]);
-    const [tinyTexts, setTinyTexts] = useState([]);
     const [annotations, setAnnotations] = useState([]);
     let width = useRef("100%");
     let height = useRef("100%");
-    const [selectedCategory, setSelectedCategory] = useState("Definition");
 
-    const ADDING_STATUS = {
-        EMPTY: 0,
-        POSTIT: 1,
-        TINYTEXT: 2
+    //ONLOAD:
+    useEffect(() => {
+       loadAnnotations();
+    }, []);
+
+    async function loadAnnotations() {
+        let newAnnotations = await annotationAPI.getList(pdfName);
+        console.log("ANNOTATION", newAnnotations, typeof newAnnotations)
+        setPostIts([...newAnnotations.map(a => {
+            let obj = JSON.parse(a['annotationDetail']);
+            obj.id = a['idAnnotation'];
+            obj.annotationText = a['annotationText'];
+            return obj;
+        })]);
     }
 
     function handleDocumentMouseDown(event) {
-        if(addingElement !== ADDING_STATUS.EMPTY ) {
-
+        if (creatingPostIt) {
             const { clientX, clientY } = event;
             const noteboard = document.getElementById("noteboard");
             const rect = noteboard.getBoundingClientRect();
@@ -30,15 +39,8 @@ function Noteboard( {highlight} ) {
             const x = clientX - rect.left;
             const y = clientY - rect.top;
 
-            switch(addingElement) {
-                case ADDING_STATUS.TINYTEXT:
-                    addTinyText(selectedCategory, x, y);
-                    break;
-                case ADDING_STATUS.POSTIT:
-                    addPostIt(selectedCategory, x, y);
-                    break;
-            }
-            setAddingElement(ADDING_STATUS.EMPTY);
+            addPostIt(selectedColor, x, y);
+            setCreatingPostIt(false);
         }
     }
 
@@ -52,7 +54,7 @@ function Noteboard( {highlight} ) {
     });
 
     useEffect(() => {
-        if (addingElement) {
+        if (creatingPostIt) {
             document.addEventListener("mousedown", handleDocumentMouseDown);
         } else {
             document.removeEventListener("mousedown", handleDocumentMouseDown);
@@ -61,8 +63,11 @@ function Noteboard( {highlight} ) {
         return () => {
             document.removeEventListener("mousedown", handleDocumentMouseDown);
         };
-    }, [addingElement, selectedCategory]);
+    }, [creatingPostIt, selectedColor]);
 
+    useEffect(() => {
+        document.addEventListener("keydown", addParagraphAnnotation, true);
+    }, []);
 
     function addParagraphAnnotation() {
         let selection = window.getSelection();
@@ -97,14 +102,18 @@ function Noteboard( {highlight} ) {
         setTinyTexts([...tinyTexts, newTinyText]);
     }
 
-    function addPostIt(category, x, y) {
+   async function addPostIt(category, x, y) {
         const newPostIt = {
-            color: "green",
+            color: color,
             dataX: x,
             dataY: y,
             text: "",
         };
-        setPostIts([...postIts, newPostIt]);
+        await annotationAPI.savePostItPositionToDatabase(newPostIt, pdfName).then((data) => {
+            newPostIt.id = data;
+            console.log("NEW POSTIT ID", newPostIt.id)
+            setPostIts([...postIts, newPostIt]);
+        });
     }
 
     return (
@@ -156,15 +165,13 @@ function Noteboard( {highlight} ) {
                 <div id={"annotation-absolute"}>
                     <div id={"annotation-container"}>
                         {annotations.map((annotation, index) => {
-                            let SpecificAnnotation = annotation.annotation;
-                            return (
-                                <SpecificAnnotation
-                                    key={`annotation_${index}`}
-                                    selection={annotation.selection}
-                                    category={annotation.category}
-                                    scroll={annotation.scroll}
-                                />
-                            );
+                            const SpecificAnnotation = annotation.annotation;
+                            return <SpecificAnnotation
+                                key={`annotation_${index}`}
+                                selection={annotation.selection}
+                                category={annotation.category}
+                                scroll={annotation.scroll}
+                            />;
                         })}
 
                     </div>
@@ -174,19 +181,11 @@ function Noteboard( {highlight} ) {
                         {postIts.map((postIt, index) => (
                             <PostIt
                                 key={`postIt_${index}`}
+                                id={postIt.id}
                                 color={postIt.color}
-                                text={postIt.text}
+                                text={postIt.annotationText}
                                 dataX={postIt.dataX}
                                 dataY={postIt.dataY}
-                            />
-                        ))}
-                        {tinyTexts.map((tinyText, index) => (
-                            <TinyText
-                                key={`tinyText_${index}`}
-                                category={tinyText.category}
-                                text={tinyText.text}
-                                dataX={tinyText.dataX}
-                                dataY={tinyText.dataY}
                             />
                         ))}
                     </div>
