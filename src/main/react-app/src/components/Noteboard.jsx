@@ -235,6 +235,7 @@ function Noteboard({pdfName}) {
                                     category={annotation.category}
                                     scroll={annotation.scroll}
                                     text={annotation.annotationText}
+                                    type={annotation.annotation}
                                     color={annotation.color}
                                     dataX={annotation.dataX}
                                     dataY={annotation.dataY}
