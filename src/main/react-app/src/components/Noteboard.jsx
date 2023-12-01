@@ -137,7 +137,6 @@ function Noteboard({pdfName}) {
 
 
     async function addTinyText(category, x, y) {
-        console.log('Im stupid');
         const newTinyText = {
             category: category,
             dataX: x,
