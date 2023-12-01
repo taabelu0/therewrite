@@ -5,6 +5,7 @@ import '../style/annotations.scss';
 import ParagraphSideBar from "./annotations/ParagraphSideBar";
 import HighlightAnnotation from "./annotations/HighlightAnnotation";
 import {annotationAPI} from "../apis/annotationAPI";
+import UnderlineAnnotation from "./annotations/UnderlineAnnotation";
 
 function Noteboard( { pdfName }) {
     const [creatingPostIt, setCreatingPostIt] = useState(false);
@@ -13,6 +14,7 @@ function Noteboard( { pdfName }) {
     const [annotations, setAnnotations] = useState([]);
     let width = useRef("100%");
     let height = useRef("100%");
+    const [selectedCategory, setSelectedCategory] = useState("Definition");
 
     //ONLOAD:
     useEffect(() => {
@@ -77,6 +79,14 @@ function Noteboard( { pdfName }) {
         setAnnotations(prevAnnotations => [...prevAnnotations, props]);
     }
 
+    function addUnderlineAnnotation() {
+        let selection = window.getSelection();
+        if(selection.rangeCount < 1) return;
+        let scroll = { x: window.scrollX, y: window.scrollY };
+        const props = {selection: selection, category: null, scroll, annotation: UnderlineAnnotation};
+        setAnnotations(prevAnnotations => [...prevAnnotations, props]);
+    }
+
     useEffect(() => {
         addHighlightAnnotation();
     }, [highlight]);
@@ -129,21 +139,21 @@ function Noteboard( { pdfName }) {
                     <div
                         className="tool add-post-it"
                         id="add-post-it-green"
-                        onClick={() => {setAddingElement(ADDING_STATUS.TINYTEXT)}}
+                        onClick={() => setPostItMeta("green")}
                     >
                         +
                     </div>
                     <div
                         className="tool add-post-it"
                         id="add-post-it-yellow"
-                        onClick={() => {setAddingElement(ADDING_STATUS.POSTIT)}}
+                        onClick={() => setPostItMeta("yellow")}
                     >
                         +
                     </div>
                     <div
                         className="tool add-post-it"
                         id="add-post-it-red"
-                        onClick={() => {setAddingElement(ADDING_STATUS.EMPTY)}}
+                        onClick={() => setPostItMeta("red")}
                     >
                         +
                     </div>

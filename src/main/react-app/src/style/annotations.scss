@@ -5,3 +5,10 @@
   width: 10px;
   z-index: 100;
 }
+
+
+.underline {
+  position: absolute;
+  border-bottom: 1px solid red; /* Adjust color as needed */
+  height: 50px;
+}
