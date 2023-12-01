@@ -6,7 +6,7 @@ import ParagraphCustom from "./annotations/ParagraphCustom";
 import HighlightAnnotation from "./annotations/HighlightAnnotation";
 import {annotationAPI} from "../apis/annotationAPI";
 import Annotation from "./annotations/Annotation";
-const ANNOTATION_COMPONENTS = {'ParagraphSideBar': ParagraphSideBar, 'PostIt': PostIt}; // define Annotation components here
+const ANNOTATION_COMPONENTS = {'ParagraphCustom': ParagraphCustom, 'ParagraphSideBar': ParagraphSideBar, 'PostIt': PostIt}; // define Annotation components here
 
 function Noteboard( {highlight} ) {
     const [creatingPostIt, setCreatingPostIt] = useState(false);
@@ -15,6 +15,11 @@ function Noteboard( {highlight} ) {
     let width = useRef("100%");
     let height = useRef("100%");
     const [selectedCategory, setSelectedCategory] = useState("Definition");
+    const currentCategory = useRef(selectedCategory);
+
+    useEffect(() => {
+        currentCategory.current = selectedCategory;
+    }, [selectedCategory]);
 
     useEffect(() => {
         loadAnnotations();
@@ -61,14 +66,19 @@ function Noteboard( {highlight} ) {
     }, [creatingPostIt, selectedColor]);
 
     useEffect(() => {
-        document.addEventListener("keydown", addParagraphCustomAnnotation, true);
+        document.addEventListener("keydown",(e) => {
+            if(e.key == "ArrowUp") addParagraphAnnotation();
+            }, true);
+        document.addEventListener("keyup", (e) => {
+            if(e.key == "ArrowDown") addParagraphCustomAnnotation();
+            }, true);
     }, []);
 
     function addParagraphAnnotation() {
         let selection = window.getSelection();
         if (selection.rangeCount < 1) return;
         let scroll = {x: window.scrollX, y: window.scrollY};
-        const props = {selection: selection, category: null, scroll, annotation: "ParagraphSideBar"};
+        const props = {selection: selection, category: currentCategory.current, scroll, annotation: "ParagraphSideBar"};
         setAnnotations(prevAnnotations => [...prevAnnotations, props]);
     }
 
@@ -76,7 +86,7 @@ function Noteboard( {highlight} ) {
         let selection = window.getSelection();
         if(selection.rangeCount < 1) return;
         let scroll = { x: window.scrollX, y: window.scrollY };
-        const props = {selection: selection, category: null, scroll, annotation: ParagraphCustom};
+        const props = {selection: selection, category: currentCategory.current, scroll, annotation: "ParagraphCustom"};
         setAnnotations(prevAnnotations => [...prevAnnotations, props]);
     }
 
@@ -89,7 +99,7 @@ function Noteboard( {highlight} ) {
         let selection = window.getSelection();
         if(selection.rangeCount < 1) return;
         let scroll = { x: window.scrollX, y: window.scrollY };
-        const props = {selection: selection, category: null, scroll, annotation: HighlightAnnotation};
+        const props = {selection: selection, category: currentCategory.current, scroll, annotation: HighlightAnnotation};
 
         setAnnotations(prevAnnotations => [...prevAnnotations, props]);
     };

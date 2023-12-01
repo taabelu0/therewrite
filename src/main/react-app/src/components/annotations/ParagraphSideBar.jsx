@@ -12,6 +12,6 @@ export default class ParagraphSideBar extends Annotation {
         left: this.state.currentLeft + this.state.currentScrollX - this.state.currentWidth - this.offset,
         height: this.state.currentHeight,
         width: this.state.currentWidth
-    }} className={"paragraph-sidebar annotation"}>
+    }} className={`paragraph-sidebar paragraph-sidebar-${this.state.currentCategory.toLowerCase()} annotation`}>
     </div>)};
 }
