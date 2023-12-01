@@ -1,10 +1,13 @@
 version: '3.5'
 services:
     app:
+        container_name: therewrite-app
         image: cr.gitlab.fhnw.ch/ip34-23vt/ip34-23vt_therewrite/therewrite/frontend:latest
         restart: always
         ports:
             - "8080:80"
+        networks:
+            - therewrite
     database:
         container_name: postgresCont
         image: postgres:latest
