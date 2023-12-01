@@ -1,4 +1,4 @@
-import Annotation from './Annotation.jsx';
+import {Annotation} from './Annotation.jsx';
 
 export default class UnderlineAnnotation extends Annotation {
     offset = 10;

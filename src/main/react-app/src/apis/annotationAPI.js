@@ -9,10 +9,10 @@ export const annotationAPI = {
         return response.data
     },
 
-    saveAnnotation: async function (postIt, documentId) {
+    saveAnnotation: async function (props, documentId) {
         const annotation = {
-            annotationType: "post-it",
-            annotationDetail: JSON.stringify(postIt),
+            annotationType: props.annotation,
+            annotationDetail: JSON.stringify(props),
         };
         return api.post(`/annotation/save/${documentId}`,
             annotation
