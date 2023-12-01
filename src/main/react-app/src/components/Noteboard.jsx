@@ -153,7 +153,7 @@ function Noteboard({pdfName}) {
 
     async function addPostIt(category, x, y) {
         const newPostIt = {
-            color: "green",
+            category: category,
             dataX: x,
             dataY: y,
             text: "",

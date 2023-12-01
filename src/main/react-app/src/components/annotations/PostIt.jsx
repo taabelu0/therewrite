@@ -7,10 +7,10 @@ import YellowPostIt from "./postits/post-it-yellow.png";
 import {api} from "../../apis/config/axiosConfig";
 import {annotationAPI} from "../../apis/annotationAPI";
 
-export default function PostIt({ id, color, dataX, dataY, text }) {
+export default function PostIt({id, category, dataX, dataY, text}) {
     const [postitText, setPostitText] = useState(text);
     const postitRef = useRef(null);
-    const [postitPosition, setPostitPosition] = useState({ dataX, dataY });
+    const [postitPosition, setPostitPosition] = useState({dataX, dataY});
 
     useEffect(() => {
         interact(postitRef.current).draggable({
@@ -51,44 +51,37 @@ export default function PostIt({ id, color, dataX, dataY, text }) {
             target.style.transform = `translate(${newX}px, ${newY}px)`;
 
             if (event.button === 0) {
-                updatePostItDetails(id, newX, newY, color, postitText);
+                updatePostItDetails(id, newX, newY, null, postitText, category);
             }
 
-            return { dataX: newX, dataY: newY };
+            return {dataX: newX, dataY: newY};
         });
     }
 
-    async function updatePostItDetails(id, x, y, color, text) {
-        await annotationAPI.updateAnnotationDetails(id, x, y, color, text, "PostIt");
+    async function updatePostItDetails(id, x, y, color, text, category) {
+        await annotationAPI.updateAnnotationDetails(id, x, y, color, text, category);
     }
 
     async function updatePostItText(id, text) {
         await annotationAPI.updateAnnotationText(id, text);
     }
 
-    const postitImages = {
-        green: GreenPostIt,
-        red: RedPostIt,
-        yellow: YellowPostIt,
-    };
-
-    const postitImage = postitImages[color];
-
     return (
-        <div className="post-it" ref={postitRef} style={{
+        <div className={`post-it post-it-${category.toLowerCase()}`} ref={postitRef} style={{
             transform: `translate(${dataX}px, ${dataY}px)`
         }}>
-            <div className={"post-it-inner"}>
-                <img src={postitImage} alt={`${color} post-it`} className="post-it-png" />
+            <div className="post-it-inner">
+                <div className="post-it-card" />
                 <textarea
                     className="post-it-input"
                     readOnly={true}
                     value={postitText}
                     onDoubleClick={enableTextEdit}
                     onBlur={disableTextEdit}
-                    onChange={event => setPostitText(event.target.value)}
+                    onChange={event => setPostitText(event.target.value)}// Add appropriate label
                 />
             </div>
+            <div className="post-it-username">username</div>
         </div>
     );
 }
