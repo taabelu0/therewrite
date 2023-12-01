@@ -25,7 +25,7 @@ export const annotationAPI = {
     updateAnnotationDetails: function (id, x, y, color, text, type) {
         const annotation = {
             annotationText: text,
-            annotationDetail: JSON.stringify({"text": text, "color": color, "dataX": x, "dataY": y, "type": type})
+            annotationDetail: JSON.stringify({"text": text, "color": color, "dataX": x, "dataY": y, "annotation": type})
         };
 
         return api.put(`/annotation/update/${id}`,
