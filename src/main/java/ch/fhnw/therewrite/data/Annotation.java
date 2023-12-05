@@ -25,8 +25,8 @@ public class Annotation {
     @JoinColumn(name = "idUserCreator")
     private User userCreator;
 
-    @ManyToOne
-    @JoinColumn(name = "documentId")
+    @ManyToOne(targetEntity = Document.class)
+    @JoinColumn(name = "documentId", nullable = false)
     private Document documentId;
 
     private Timestamp timeCreated = new Timestamp(System.currentTimeMillis());

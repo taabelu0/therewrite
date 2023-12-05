@@ -45,6 +45,7 @@ function Noteboard({pdfName}) {
 
     async function loadAnnotations() {
         let newAnnotations = await annotationAPI.getList(pdfName);
+        console.log(newAnnotations)
         setAnnotations([...newAnnotations.map(a => {
             let obj = JSON.parse(a['annotationDetail']);
             obj.id = a['idAnnotation'];

@@ -51,13 +51,13 @@ public class DocumentController {
             try {
                 Resource resource = storageService.loadAsResource(d.getPath());
                 InputStream in = resource.getInputStream();
-                return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(in.readAllBytes());
+                return ResponseEntity.status(HttpStatus.OK).body(in.readAllBytes());
             } catch (IOException exception) {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
             }
 
         }
-        return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(null);
+        return new ResponseEntity(HttpStatus.EXPECTATION_FAILED);
     }
 
     @GetMapping("/all")

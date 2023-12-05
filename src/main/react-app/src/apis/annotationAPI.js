@@ -3,7 +3,7 @@ import {api, baseURL} from "./config/axiosConfig"
 export const annotationAPI = {
     getList: async function (documentId) {
         const response = await api.request({
-            url: `/annotation/list/${documentId}`,
+            url: `/api/annotation/all/${documentId}`,
             method: "GET",
         });
         return response.data
@@ -12,8 +12,9 @@ export const annotationAPI = {
     saveAnnotation: async function (annotationDetails, documentId) {
         const annotation = {
             annotationDetail: JSON.stringify(annotationDetails),
+            documentId: documentId
         };
-        return api.post(`/annotation/save/${documentId}`,
+        return api.post(`/api/annotation`,
             annotation
         )
             .then(response => response.data)
@@ -23,6 +24,7 @@ export const annotationAPI = {
     },
     updateAnnotationDetails: function (id, x, y, text, type, category) {
         const annotation = {
+            documentId: id,
             annotationText: text,
             annotationDetail: JSON.stringify({"text": text,
                 "color": "",
@@ -33,7 +35,7 @@ export const annotationAPI = {
             })
         };
 
-        return api.put(`/annotation/update/${id}`,
+        return api.patch(`/api/annotation`,
             annotation
         )
             .catch((error) => {
@@ -43,16 +45,17 @@ export const annotationAPI = {
     updateAnnotationText: function (id, text) {
         const annotation = {
             annotationText: text,
+            documentId: id
         };
 
-        return api.put(`/annotation/updateText/${id}`,
+        return api.patch(`/api/annotation/`,
             annotation
         )
             .catch((error) => {
                 console.error('Error:', error);
             });
     },
-    getUrl(id) {
-        return `${baseURL}/annotation/get/${id}`;
+    getUrl() {
+        return `${baseURL}/api/annotation/`;
     }
 }

@@ -32,14 +32,14 @@ public class AnnotationController {
         UUID dId = UUID.fromString(documentId);
         Optional<Document> d = documentRepository.findById(dId);
         if(d.isPresent()) {
-            List<Annotation> allAnno = annotationRepository.findAllByDocument(d.get());
-            return ResponseEntity.status(HttpStatus.OK).body(allAnno);
+            return ResponseEntity.status(HttpStatus.OK).body(d.get().getAnnotations());
         }
         return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(null);
     }
 
     @PostMapping("")
     public Annotation saveAnnotation(@RequestBody Annotation annotation) {
+        System.out.println(annotation.getDocument());
         return annotationRepository.save(annotation);
     }
 
