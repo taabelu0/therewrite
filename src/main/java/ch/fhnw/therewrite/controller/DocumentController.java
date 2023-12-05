@@ -1,66 +1,124 @@
 package ch.fhnw.therewrite.controller;
-import ch.fhnw.therewrite.AppConfigProperties;
+
 import ch.fhnw.therewrite.data.Document;
-import ch.fhnw.therewrite.service.DocumentService;
+import ch.fhnw.therewrite.data.User;
+import ch.fhnw.therewrite.repository.DocumentRepository;
+import ch.fhnw.therewrite.repository.UserRepository;
+import ch.fhnw.therewrite.storage.StorageFileNotFoundException;
 import ch.fhnw.therewrite.storage.StorageService;
-import com.google.gson.Gson;
+import org.apache.commons.io.FilenameUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.stereotype.Controller;
+import org.springframework.http.ResponseEntity;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Paths;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Stream;
 
-@Controller
+
+@RestController
+@RequestMapping("/api/document")
 public class DocumentController {
+    private final DocumentRepository documentRepository;
+    private final UserRepository userRepository;
     private final StorageService storageService;
-    private final DocumentService documentService;
-    private static final Gson gson = new Gson();
 
-    public DocumentController(StorageService storageService, DocumentService documentService) {
+    @Autowired
+    public DocumentController(DocumentRepository documentRepository, UserRepository userRepository, StorageService storageService) {
+        this.documentRepository = documentRepository;
+        this.userRepository = userRepository;
         this.storageService = storageService;
-        this.documentService = documentService;
-    }
-    @GetMapping("/")
-    public String index() {
-        return "index";
-    }
-
-    @GetMapping("/view/{pdfName}")
-    public String pdfView(@PathVariable("pdfName") String pdfName) {
-        return "index";
-    }
-
-    @GetMapping(value="/pdf/list", produces="application/json")
-    public @ResponseBody String getPDFList() {
-        return gson.toJson(getAllPDFs());
-    }
-
-    private List getAllPDFs() {
-        Stream<Document> pdfs = documentService.getAllPDF().stream();
-        return pdfs.map(
-                document -> List.of(
-                        document.getDocumentName(),
-                        document.getId()
-                )).toList();
     }
 
     @GetMapping(
-            value = "/pdf/get/{uuid}",
+            value = "/{documentId}",
             produces = MediaType.APPLICATION_PDF_VALUE
     )
-    public @ResponseBody byte[] getPDF(@PathVariable(value="uuid") String uuid) {
-        try {
-            String pdfPath = documentService.getDocument(UUID.fromString(uuid)).getPath();
-            Resource resource = storageService.loadAsResource(pdfPath);
-            InputStream in = resource.getInputStream();
-            return in.readAllBytes();
-        } catch (IOException exception) {
-            // TODO: log exception
-            return new byte[0];
+    public ResponseEntity<byte[]> getDocument(@PathVariable String documentId) {
+        UUID dId = UUID.fromString(documentId);
+        Optional<Document> optionalDocument = documentRepository.findById(dId);
+        if(optionalDocument.isPresent()) {
+            Document d = optionalDocument.get();
+            try {
+                Resource resource = storageService.loadAsResource(d.getPath());
+                InputStream in = resource.getInputStream();
+                return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(in.readAllBytes());
+            } catch (IOException exception) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+            }
+
         }
+        return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(null);
+    }
+
+    @GetMapping("/all")
+    public List<Document> getDocumentList() {
+        return documentRepository.findAll();
+    }
+
+    @GetMapping("/all/{userId}")
+    public ResponseEntity<List<Document>> getDocumentListByUser(@PathVariable String userId) {
+        /*System.out.println(userId);
+        UUID uId = UUID.fromString(userId);
+        Optional<User> optionalUser = userRepository.findById(uId);
+        if(optionalUser.isPresent()) {
+            List<Document> allDoc = documentRepository.findAllByUser(optionalUser.get());
+            return ResponseEntity.status(HttpStatus.OK).body(allDoc);
+        }
+        return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(null);*/
+        return null;
+    }
+
+    @PostMapping("")
+    public String saveDocument(@RequestParam("file") MultipartFile file, RedirectAttributes redirectAttributes) {
+        String extension = FilenameUtils.getExtension(file.getOriginalFilename());
+        if(!Objects.equals(extension, "pdf")){
+            redirectAttributes.addFlashAttribute("message",
+                    "Please upload only files with the pdf extension");
+        }
+        else {
+            Document document = new Document();
+
+            document.setDocumentName(file.getOriginalFilename());
+            documentRepository.save(document);
+            String fileName = document.getId().toString() + ".pdf";
+            String filePath = Paths.get(fileName).toString();
+            document.setPath(filePath);
+            documentRepository.save(document);
+            try {
+                MultipartFile storeFile = new MockMultipartFile(fileName,
+                        fileName,
+                        "application/pdf",
+                        file.getInputStream());
+                // MultipartFile storeFile = new MockMultipartFile(document.getId().toString() + ".pdf", file.getBytes());
+                storageService.store(storeFile);
+            }
+            catch(IOException exception) {
+                // TODO: log
+            }
+            redirectAttributes.addFlashAttribute("message",
+                    "You successfully uploaded " + file.getOriginalFilename() + "!");
+        }
+        return "redirect:/";
+    }
+
+    @DeleteMapping("/{documentId}")
+    public void deleteDocument(@PathVariable(value="documentId") String documentId) {
+        UUID dId = UUID.fromString(documentId);
+        documentRepository.deleteById(dId);
+    }
+
+    @ExceptionHandler(StorageFileNotFoundException.class)
+    public ResponseEntity<?> handleStorageFileNotFound() {
+        return ResponseEntity.notFound().build();
     }
 }

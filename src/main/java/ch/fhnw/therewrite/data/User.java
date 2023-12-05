@@ -1,7 +1,10 @@
 package ch.fhnw.therewrite.data;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Table;
+import org.hibernate.annotations.GenericGenerator;
 import org.springframework.data.annotation.Id;
 
 import java.util.UUID;
@@ -10,10 +13,12 @@ import java.util.UUID;
 @Table(name = "RewriteUser")
 public class User {
 
-    @Id
-    private UUID idUser = UUID.randomUUID();
     @jakarta.persistence.Id
-    private Long id;
+    @GeneratedValue(generator = "uuid2")
+    @GenericGenerator(name = "uuid2", strategy = "uuid2")
+    @Column(name = "id")
+    private UUID idUser;
+
 
     public UUID getIdUser() {
         return idUser;
@@ -23,11 +28,11 @@ public class User {
         this.idUser = idUser;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setId(UUID id) {
+        this.idUser= id;
     }
 
-    public Long getId() {
-        return id;
+    public UUID getId() {
+        return idUser;
     }
 }

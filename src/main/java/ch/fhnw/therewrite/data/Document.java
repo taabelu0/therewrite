@@ -1,5 +1,6 @@
 package ch.fhnw.therewrite.data;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -17,7 +18,12 @@ public class Document {
 
     private String documentName;
 
+    @JsonIgnore
     private String path;
+
+    @ManyToOne
+    @JoinColumn(name = "userId")
+    private User userId;
 
     public void setId(UUID id) {
         this.id = id;
