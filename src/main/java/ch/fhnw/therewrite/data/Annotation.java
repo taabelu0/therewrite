@@ -31,7 +31,7 @@ public class Annotation {
 
     private Timestamp timeCreated = new Timestamp(System.currentTimeMillis());
 
-    private String annotationType = "text";
+    private String annotationType;
 
     @ManyToOne
     @JoinColumn(name = "idUserLastEditor")
@@ -123,5 +123,14 @@ public class Annotation {
 
     public void setAnnotationDetail(String annotationDetail) {
         this.annotationDetail = annotationDetail;
+    }
+
+    public void patch(Annotation update) {
+        // id, creator, document, type, timeCreated cannot change
+        if(update.annotationDetail != null) this.setAnnotationDetail(update.annotationDetail);
+        if(update.annotationText != null) this.setAnnotationText(update.annotationText);
+
+        this.setUserLastEditor(update.userLastEditor);
+        this.setTimeLastEdited(update.timeLastEdited);
     }
 }

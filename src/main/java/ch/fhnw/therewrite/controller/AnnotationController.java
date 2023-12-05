@@ -1,61 +1,63 @@
 package ch.fhnw.therewrite.controller;
 
 import ch.fhnw.therewrite.data.Annotation;
-import ch.fhnw.therewrite.service.AnnotationService;
-import ch.fhnw.therewrite.service.DocumentService;
+import ch.fhnw.therewrite.data.Document;
+import ch.fhnw.therewrite.repository.AnnotationRepository;
+import ch.fhnw.therewrite.repository.DocumentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 
 @RestController
-@RequestMapping("/annotation")
+@RequestMapping("/api/annotation")
 public class AnnotationController {
-    private final AnnotationService annotationService;
-    private final DocumentService documentService;
+    private final AnnotationRepository annotationRepository;
+    private final DocumentRepository documentRepository;
 
     @Autowired
-    public AnnotationController(AnnotationService annotationService, DocumentService documentService) {
-        this.annotationService = annotationService;
-        this.documentService = documentService;
+    public AnnotationController(AnnotationRepository annotationRepository, DocumentRepository documentRepository) {
+        this.annotationRepository = annotationRepository;
+        this.documentRepository = documentRepository;
     }
 
-    @GetMapping("/list")
-    public List<Annotation> getAllAnnotations() {
-        return annotationService.getAllAnnotations();
+    @GetMapping("/{documentId}")
+    public ResponseEntity<List<Annotation>> getAnnotationsByDocumentId(@PathVariable String documentId) {
+        UUID dId = UUID.fromString(documentId);
+        Optional<Document> d = documentRepository.findById(dId);
+        if(d.isPresent()) {
+            List<Annotation> allAnno = annotationRepository.findAllByDocument(d.get());
+            return ResponseEntity.status(HttpStatus.OK).body(allAnno);
+        }
+        return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(null);
     }
 
-    @GetMapping("/list/{uuid}")
-    public List<Annotation> getAnnotationsByDocumentId(@PathVariable String uuid) {
-        UUID documentId = UUID.fromString(uuid);
-        return annotationService.getAnnotationsByDocumentId(documentId);
-    }
-
-    //    @GetMapping("/annotation/list")
-    //    public String getAllAnnotations() {
-    //        return gson.toJson(annotationService.getAllAnnotations());
-    //    }
-
-    @PostMapping("/save/{documentId}")
-    public String saveAnnotation(@RequestBody Annotation annotation, @PathVariable String documentId) {
-        annotation.setDocument(documentService.getDocument(UUID.fromString(documentId)));
-        annotationService.saveAnnotation(annotation);
-        return annotation.getIdAnnotation().toString();
+    @PostMapping("")
+    public Annotation saveAnnotation(@RequestBody Annotation annotation) {
+        return annotationRepository.save(annotation);
     }
 
     @Modifying
-    @PutMapping("/update/{id}")
-    public void updateAnnotation(@RequestBody Annotation annotation, @PathVariable String id) {
-        annotationService.updateAnnotation(annotation, id);
+    @PatchMapping("")
+    public ResponseEntity<Annotation> patchAnnotation(@RequestBody Annotation update) {
+        Optional<Annotation> optionalAnno = annotationRepository.findById(update.getIdAnnotation());
+        if(optionalAnno.isPresent()) {
+            Annotation anno = optionalAnno.get();
+            anno.patch(update);
+            annotationRepository.save(anno);
+            return ResponseEntity.status(HttpStatus.OK).body(anno);
+        }
+        return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(null);
     }
 
-    @Modifying
-    @PutMapping("/updateText/{id}")
-    public void updateAnnotationText(@RequestBody Annotation annotation, @PathVariable String id) {
-        annotationService.updateAnnotationText(annotation, id);
+    @DeleteMapping("")
+    public void deleteAnnotation(@RequestBody Annotation annotation) {
+        annotationRepository.delete(annotation);
     }
-
 }
