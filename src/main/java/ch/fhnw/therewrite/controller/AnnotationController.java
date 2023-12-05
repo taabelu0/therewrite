@@ -27,7 +27,7 @@ public class AnnotationController {
         this.documentRepository = documentRepository;
     }
 
-    @GetMapping("/{documentId}")
+    @GetMapping("/all/{documentId}")
     public ResponseEntity<List<Annotation>> getAnnotationsByDocumentId(@PathVariable String documentId) {
         UUID dId = UUID.fromString(documentId);
         Optional<Document> d = documentRepository.findById(dId);
