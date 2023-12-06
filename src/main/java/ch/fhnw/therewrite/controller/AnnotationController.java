@@ -39,7 +39,6 @@ public class AnnotationController {
 
     @PostMapping("")
     public Annotation saveAnnotation(@RequestBody Annotation annotation) {
-        System.out.println(annotation.getDocument());
         return annotationRepository.save(annotation);
     }
 

@@ -29,13 +29,11 @@ import java.util.UUID;
 @RequestMapping("/api/document")
 public class DocumentController {
     private final DocumentRepository documentRepository;
-    private final UserRepository userRepository;
     private final StorageService storageService;
 
     @Autowired
-    public DocumentController(DocumentRepository documentRepository, UserRepository userRepository, StorageService storageService) {
+    public DocumentController(DocumentRepository documentRepository, StorageService storageService) {
         this.documentRepository = documentRepository;
-        this.userRepository = userRepository;
         this.storageService = storageService;
     }
 

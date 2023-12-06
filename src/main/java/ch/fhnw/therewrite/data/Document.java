@@ -12,6 +12,7 @@ import java.util.UUID;
 @Table(name = "Document")
 public class Document {
     @OneToMany(mappedBy = "documentId", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Annotation> annotations = new ArrayList<>();
     @jakarta.persistence.Id
     @GeneratedValue(generator = "uuid2")
