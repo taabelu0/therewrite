@@ -6,7 +6,7 @@ import {ParagraphSideBar} from "./annotations/ParagraphSideBar";
 import {ParagraphCustom} from "./annotations/ParagraphCustom";
 import HighlightAnnotation from "./annotations/HighlightAnnotation";
 import {annotationAPI} from "../apis/annotationAPI";
-import UnderlineAnnotation from "./annotations/UnderlineAnnotation";
+import UnderlineAnnotation, {UnderlineCalc} from "./annotations/UnderlineAnnotation";
 import {Annotation, ParagraphCustomCalc, ParagraphSideBarCalc} from "./annotations/Annotation";
 
 const ANNOTATION_COMPONENTS = {
@@ -14,7 +14,8 @@ const ANNOTATION_COMPONENTS = {
     'TinyText': TinyText,
     'ParagraphCustom': ParagraphCustom,
     'ParagraphSideBar': ParagraphSideBar,
-    'PostIt': PostIt
+    'PostIt': PostIt,
+    'Underline': UnderlineAnnotation
 }; // define Annotation components here
 
 function Noteboard({pdfName}) {
@@ -121,10 +122,12 @@ function Noteboard({pdfName}) {
     }
 
     async function addUnderlineAnnotation() {
+        console.log("add underline");
         let selection = window.getSelection();
         if (selection.rangeCount < 1) return;
         let scroll = {x: window.scrollX, y: window.scrollY};
-        const props = {selection: selection, category: null, scroll, annotation: "UnderlineAnnotation"};
+        const props = {selection: selection, category: null, scroll, annotation: "Underline"};
+        UnderlineCalc(props);
         await annotationAPI.saveAnnotation(props, pdfName).then((data) => {
             props.id = data;
             setAnnotations([...annotations, props]);
@@ -207,7 +210,7 @@ function Noteboard({pdfName}) {
                     </div>
                     <div
                         className="tool add-post-it"
-                        onClick={addUnderlineAnnotation}
+                        onClick={() => setCreatingComponent("Underline")}
                     >
                         ⎁
                     </div>
@@ -246,7 +249,7 @@ function Noteboard({pdfName}) {
                                 const SpecificAnnotation = ANNOTATION_COMPONENTS[annotation.annotation] || Annotation;
                                 return <SpecificAnnotation
                                     id={annotation.id}
-                                    key={`annotation_${index}`}
+                                    key={`annotation_${annotation.id}`}
                                     selection={annotation.selection}
                                     category={annotation.category}
                                     scroll={annotation.scroll}
@@ -261,6 +264,7 @@ function Noteboard({pdfName}) {
                                     height={annotation.height}
                                     scollX={annotation.scrollX}
                                     scrollY={annotation.scrollY}
+                                    rects={annotation.rects}
                                 />;
                             } else return null;
                         })}
