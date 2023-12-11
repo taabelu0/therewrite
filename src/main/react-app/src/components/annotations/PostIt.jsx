@@ -59,7 +59,8 @@ export default function PostIt({id, category, dataX, dataY, text}) {
     }
 
     async function updatePostItDetails(id, x, y, color, text, category) {
-        await annotationAPI.updateAnnotationDetails(id, x, y, text);
+
+        await annotationAPI.updateAnnotation(id, {x, y, text});
     }
 
     async function updatePostItText(id, text) {

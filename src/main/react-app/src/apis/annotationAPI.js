@@ -12,7 +12,9 @@ export const annotationAPI = {
     saveAnnotation: async function (annotationDetails, documentId) {
         const annotation = {
             annotationDetail: JSON.stringify(annotationDetails),
-            documentId: documentId
+            document: {
+                id: documentId
+            }
         };
         return api.post(`/api/annotation`,
             annotation
@@ -41,7 +43,7 @@ export const annotationAPI = {
             annotationText: text
         };
 
-        return api.patch(`/api/annotation/`,
+        return api.patch(`/api/annotation`,
             annotation
         )
             .catch((error) => {

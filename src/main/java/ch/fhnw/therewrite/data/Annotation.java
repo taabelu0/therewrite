@@ -1,7 +1,4 @@
 package ch.fhnw.therewrite.data;
-
-import ch.fhnw.therewrite.data.deserialize.CustomDocumentDeserializer;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import jakarta.persistence.*;
 import org.hibernate.annotations.ColumnTransformer;
 import org.hibernate.annotations.GenericGenerator;
@@ -29,7 +26,6 @@ public class Annotation {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "documentId", nullable = false)
-    @JsonDeserialize(using = CustomDocumentDeserializer.class)
     private Document documentId;
 
     private Timestamp timeCreated = new Timestamp(System.currentTimeMillis());

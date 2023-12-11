@@ -10,7 +10,7 @@ function Home() {
     const [pdfs, setPdfs] = useState([["", ""]]);
     useEffect(() => {
         async function fetchData() {
-            const resp = await pdfAPI.getList().catch(e => { setPdfs({})});
+            const resp = await pdfAPI.getList().catch(e => { setPdfs( [])});
             if(resp) setPdfs(resp);
         }
 
