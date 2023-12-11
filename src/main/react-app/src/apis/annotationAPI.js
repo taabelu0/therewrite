@@ -22,17 +22,10 @@ export const annotationAPI = {
                 console.error('Error:', error);
             });
     },
-    updateAnnotationDetails: function (id, x, y, text, type, category) {
+    updateAnnotationDetails: function (id, x, y, text) {
         const annotation = {
-            documentId: id,
-            annotationText: text,
-            annotationDetail: JSON.stringify({"text": text,
-                "color": "",
-                "dataX": x,
-                "dataY": y,
-                "annotation": type,
-                "category": category
-            })
+            idAnnotation: id,
+            annotationText: text
         };
 
         return api.patch(`/api/annotation`,
@@ -44,8 +37,8 @@ export const annotationAPI = {
     },
     updateAnnotationText: function (id, text) {
         const annotation = {
-            annotationText: text,
-            documentId: id
+            idAnnotation: id,
+            annotationText: text
         };
 
         return api.patch(`/api/annotation/`,
