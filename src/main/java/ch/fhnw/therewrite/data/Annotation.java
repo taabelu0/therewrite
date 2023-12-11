@@ -1,4 +1,5 @@
 package ch.fhnw.therewrite.data;
+import com.fasterxml.jackson.annotation.JacksonAnnotation;
 import jakarta.persistence.*;
 import org.hibernate.annotations.ColumnTransformer;
 import org.hibernate.annotations.GenericGenerator;
@@ -46,19 +47,6 @@ public class Annotation {
 
     public void setIdAnnotation(UUID idAnnotation) {
         this.idAnnotation = idAnnotation;
-    }
-
-    public String toString() {
-        return "Annotation{" +
-                "idAnnotation=" + idAnnotation +
-                ", userCreator=" + userCreator +
-                ", timeCreated=" + timeCreated +
-                ", userLastEditor=" + userLastEditor +
-                ", timeLastEdited=" + timeLastEdited +
-                ", annotationText='" + annotationText + '\'' +
-                ", annotationType=" + annotationType +
-                ", annotationDetail='" + annotationDetail + '\'' +
-                '}';
     }
 
     public Document getDocument() {
@@ -131,5 +119,18 @@ public class Annotation {
 
         this.setUserLastEditor(update.userLastEditor);
         this.setTimeLastEdited(update.timeLastEdited);
+    }
+
+    public String toString() {
+        return "Annotation{" +
+                "idAnnotation=" + idAnnotation +
+                ", userCreator=" + userCreator +
+                ", timeCreated=" + timeCreated +
+                ", userLastEditor=" + userLastEditor +
+                ", timeLastEdited=" + timeLastEdited +
+                ", annotationText='" + annotationText + '\'' +
+                ", annotationType=" + annotationType +
+                ", annotationDetail='" + annotationDetail + '\'' +
+                '}';
     }
 }

@@ -24,23 +24,10 @@ export const annotationAPI = {
                 console.error('Error:', error);
             });
     },
-    updateAnnotationDetails: function (id, x, y, text) {
+    updateAnnotation: function (id, obj) {
         const annotation = {
             idAnnotation: id,
-            annotationText: text
-        };
-
-        return api.patch(`/api/annotation`,
-            annotation
-        )
-            .catch((error) => {
-                console.error('Error:', error);
-            });
-    },
-    updateAnnotationText: function (id, text) {
-        const annotation = {
-            idAnnotation: id,
-            annotationText: text
+            ...obj
         };
 
         return api.patch(`/api/annotation`,

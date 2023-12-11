@@ -49,7 +49,7 @@ function Noteboard({pdfName}) {
         setAnnotations([...newAnnotations.map(a => {
             let obj = JSON.parse(a['annotationDetail']);
             obj.id = a['idAnnotation'];
-            obj.annotationText = a['annotationText'];
+            // obj.annotationText = a['annotationText'];
             return obj;
         })]);
     }
@@ -251,7 +251,7 @@ function Noteboard({pdfName}) {
                                     selection={annotation.selection}
                                     category={annotation.category}
                                     scroll={annotation.scroll}
-                                    text={annotation.annotationText}
+                                    text={annotation.text}
                                     type={annotation.annotation}
                                     color={annotation.color}
                                     dataX={annotation.dataX}

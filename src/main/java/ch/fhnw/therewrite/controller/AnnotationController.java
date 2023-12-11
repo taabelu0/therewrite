@@ -50,7 +50,7 @@ public class AnnotationController {
             Annotation anno = optionalAnno.get();
             anno.patch(update);
             annotationRepository.save(anno);
-            return ResponseEntity.status(HttpStatus.OK).body(anno);
+            return ResponseEntity.status(HttpStatus.OK).body(null);
         }
         return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(null);
     }
