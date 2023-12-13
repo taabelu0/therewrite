@@ -29,6 +29,7 @@ stages:
 build-job:
   stage: build
   script:
+    - echo $MAVEN_CLI_OPTS
     - mvn $MAVEN_CLI_OPTS package
   coverage: '/Total.*?([0-9]{1,3})%/'
   artifacts:
