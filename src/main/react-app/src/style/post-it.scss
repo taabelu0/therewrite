@@ -1,6 +1,85 @@
 @import "variables";
 
 .post-it {
+  outline: $s-workspace-post-it;
+  height: calc($s-workspace-post-it - $s-workspace-post-it-border);
+  width: $s-workspace-post-it;
+  position: absolute;
+  box-shadow: -5px 5px 10px rgba(0, 0, 0, 0.2);
+  z-index: 20;
+
+  &-card {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: -1;
+  }
+
+  &-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+
+  &-username{
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    font-size: 12px;
+    color: #656565;
+    font-family: 'Arial', sans-serif;
+  }
+
+  &-input {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: flex;
+    text-align: center;
+    padding: 1rem;
+    width: 100%;
+    height: 100%;
+    background-color: transparent;
+    border: none;
+    resize: none;
+    font-family: 'Arial', sans-serif;
+    font-size: 16px;
+    cursor: grab;
+
+    &-selected {
+      outline: 0.5rem solid $c-selected;
+    }
+  }
+
+  &-definition {
+    background-color: $c-category-definition;
+  }
+
+  &-explosion {
+    background-color: $c-category-explosion;
+  }
+
+  &-deletion {
+    background-color: $c-category-deletion;
+  }
+
+  &-correction {
+    background-color: $c-category-correction;
+  }
+
+  &-speculation {
+    background-color: $c-category-speculation;
+  }
+
+  &-addition {
+    background-color: $c-category-addition;
+  }
+}
+
+
+/*.post-it {
   position: absolute;
   width: $s-workspace-post-it;
   height: calc($s-workspace-post-it - $s-workspace-post-it-border);
@@ -46,4 +125,6 @@
       outline: 0.5rem solid $c-selected;
     }
   }
-}
+}*/
+
+

@@ -9,18 +9,49 @@
   height: 50px;
   width: 10px;
   z-index: 100;
+  &-definition {
+    background-color: #69E0A8;
+  }
+  &-explosion {
+    background-color: #F1BD4C;
+  }
+  &-deletion {
+    background-color: #EB5683;
+  }
+  &-correction {
+    background-color: #3859A2;
+  }
+  &-speculation {
+    background-color: #EE7A30;
+  }
+  &-addition {
+    background-color: #7FA036;
+  }
 }
+
 
 .paragraph-custom {
   position: absolute;
   z-index: 100;
 }
-.squiggly-underline {
-  background-image: url('data:image/svg+xml;base64,CjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB3aWR0aD0iNDAiIGhlaWdodD0iMTAiPgogIDxwYXRoIGQ9Ik0wIDUgcTEwIDEwIDIwIDAgcTEwIC0xMCAyMCAwIiBzdHJva2U9ImJsYWNrIiBmaWxsPSJ0cmFuc3BhcmVudCIvPgo8L3N2Zz4K');
+.squiggly-paragraph {
   background-repeat: repeat;
   background-position: 0 0;
   background-size: 20px 40px; // default size
   width: 100%;
   height: 100%;
   opacity: 0.8;
+
+}
+
+.content-clipper {
+  overflow: hidden;
+  display: block;
+}
+
+
+.underline {
+  position: absolute;
+  border-bottom: 1px solid red; /* Adjust color as needed */
+  height: 50px;
 }

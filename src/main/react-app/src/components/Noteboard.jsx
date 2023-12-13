@@ -1,41 +1,72 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, {useEffect, useRef, useState} from "react";
 import PostIt from "./annotations/PostIt";
+import TinyText from "./annotations/TinyText";
 import '../style/annotations.scss';
-import ParagraphSideBar from "./annotations/ParagraphSideBar";
-import ParagraphCustom from "./annotations/ParagraphCustom";
+import {ParagraphSideBar} from "./annotations/ParagraphSideBar";
+import {ParagraphCustom} from "./annotations/ParagraphCustom";
 import HighlightAnnotation from "./annotations/HighlightAnnotation";
 import {annotationAPI} from "../apis/annotationAPI";
-import Annotation from "./annotations/Annotation";
-const ANNOTATION_COMPONENTS = {'ParagraphSideBar': ParagraphSideBar, 'PostIt': PostIt}; // define Annotation components here
+import UnderlineAnnotation from "./annotations/UnderlineAnnotation";
+import {Annotation, ParagraphCustomCalc, ParagraphSideBarCalc} from "./annotations/Annotation";
 
-function Noteboard( {highlight} ) {
-    const [creatingPostIt, setCreatingPostIt] = useState(false);
-    const [selectedColor, setSelectedColor] = useState("");
+const ANNOTATION_COMPONENTS = {
+    'HighlightAnnotation': HighlightAnnotation,
+    'TinyText': TinyText,
+    'ParagraphCustom': ParagraphCustom,
+    'ParagraphSideBar': ParagraphSideBar,
+    'PostIt': PostIt
+}; // define Annotation components here
+
+function Noteboard({pdfName}) {
+    const [creatingComponent, setCreatingComponent] = useState(null);
     const [annotations, setAnnotations] = useState([]);
     let width = useRef("100%");
     let height = useRef("100%");
     const [selectedCategory, setSelectedCategory] = useState("Definition");
+    const currentCategory = useRef(selectedCategory);
+
+    const ADDING_COMPONENT = {
+        "ParagraphSideBar": addParagraphAnnotation,
+        "PostIt": addPostIt,
+        "TinyText": addTinyText,
+        'HighlightAnnotation': addHighlightAnnotation,
+        'ParagraphCustom': addParagraphCustomAnnotation,
+        'Underline': addUnderlineAnnotation
+    }
+
+
+    useEffect(() => {
+        currentCategory.current = selectedCategory;
+    }, [selectedCategory]);
 
     useEffect(() => {
         loadAnnotations();
     }, []);
 
     async function loadAnnotations() {
-        let newAnnotations = await annotationAPI.getList();
-        setAnnotations([...newAnnotations.map(a => JSON.parse(a['annotationDetail']))]);
+        let newAnnotations = await annotationAPI.getList(pdfName);
+        console.log(newAnnotations)
+        setAnnotations([...newAnnotations.map(a => {
+            let obj = JSON.parse(a['annotationDetail']);
+            obj.id = a['idAnnotation'];
+            // obj.annotationText = a['annotationText'];
+            return obj;
+        })]);
     }
 
     function handleDocumentMouseDown(event) {
-        if (creatingPostIt) {
-            const { clientX, clientY } = event;
+        if (creatingComponent !== null) {
+            const {clientX, clientY} = event;
             const noteboard = document.getElementById("noteboard");
             const rect = noteboard.getBoundingClientRect();
 
             const x = clientX - rect.left;
             const y = clientY - rect.top;
 
-            addPostIt(selectedColor, x, y);
-            setCreatingPostIt(false);
+            setTimeout(async () => {
+                ADDING_COMPONENT[creatingComponent](selectedCategory, x, y);
+                setCreatingComponent(null);
+            }, 50);
         }
     }
 
@@ -49,69 +80,101 @@ function Noteboard( {highlight} ) {
     });
 
     useEffect(() => {
-        if (creatingPostIt) {
-            document.addEventListener("mousedown", handleDocumentMouseDown);
+        if (creatingComponent != null) {
+            document.addEventListener("mouseup", handleDocumentMouseDown);
         } else {
-            document.removeEventListener("mousedown", handleDocumentMouseDown);
+            document.removeEventListener("mouseup", handleDocumentMouseDown);
         }
 
         return () => {
-            document.removeEventListener("mousedown", handleDocumentMouseDown);
+            document.removeEventListener("mouseup", handleDocumentMouseDown);
         };
-    }, [creatingPostIt, selectedColor]);
+    }, [creatingComponent, selectedCategory]);
 
-    useEffect(() => {
-        document.addEventListener("keydown", addParagraphCustomAnnotation, true);
-    }, []);
 
-    function addParagraphAnnotation() {
+    async function addParagraphAnnotation() {
+            let selection = window.getSelection();
+            if (selection.rangeCount < 1) return;
+            let scroll = {x: window.scrollX, y: window.scrollY};
+            let props = {
+                selection: selection,
+                category: currentCategory.current,
+                scroll,
+                annotation: "ParagraphSideBar"
+            };
+            ParagraphSideBarCalc(props);
+            await annotationAPI.saveAnnotation(props, pdfName).then((data) => {
+                props.id = data;
+                setAnnotations([...annotations, props]);
+            });
+    }
+
+    async function addParagraphCustomAnnotation() {
         let selection = window.getSelection();
         if (selection.rangeCount < 1) return;
         let scroll = {x: window.scrollX, y: window.scrollY};
-        const props = {selection: selection, category: null, scroll, annotation: "ParagraphSideBar"};
-        setAnnotations(prevAnnotations => [...prevAnnotations, props]);
+        const props = {selection: selection, category: currentCategory.current, scroll, annotation: "ParagraphCustom"};
+        ParagraphCustomCalc(props);
+        await annotationAPI.saveAnnotation(props, pdfName).then((data) => {
+            props.id = data;
+            setAnnotations([...annotations, props]);
+        });
     }
 
-    function addParagraphCustomAnnotation() {
+    async function addUnderlineAnnotation() {
         let selection = window.getSelection();
-        if(selection.rangeCount < 1) return;
-        let scroll = { x: window.scrollX, y: window.scrollY };
-        const props = {selection: selection, category: null, scroll, annotation: ParagraphCustom};
-        setAnnotations(prevAnnotations => [...prevAnnotations, props]);
+        if (selection.rangeCount < 1) return;
+        let scroll = {x: window.scrollX, y: window.scrollY};
+        const props = {selection: selection, category: null, scroll, annotation: "UnderlineAnnotation"};
+        await annotationAPI.saveAnnotation(props, pdfName).then((data) => {
+            props.id = data;
+            setAnnotations([...annotations, props]);
+        });
     }
 
-    useEffect(() => {
-        addHighlightAnnotation();
-    }, [highlight]);
-
-    const addHighlightAnnotation = () => {
-        console.log("Adding highlight annotation:", highlight);
+    async function addHighlightAnnotation() {
         let selection = window.getSelection();
-        if(selection.rangeCount < 1) return;
-        let scroll = { x: window.scrollX, y: window.scrollY };
-        const props = {selection: selection, category: null, scroll, annotation: HighlightAnnotation};
+        if (selection.rangeCount < 1) return;
+        let scroll = {x: window.scrollX, y: window.scrollY};
+        const props = {
+            selection: selection,
+            category: currentCategory.current,
+            scroll,
+            annotation: "HighlightAnnotation"
+        };
+        await annotationAPI.saveAnnotation(props, pdfName).then((data) => {
+            props.id = data;
+            setAnnotations([...annotations, props]);
+        });
+    }
 
-        setAnnotations(prevAnnotations => [...prevAnnotations, props]);
-    };
 
+    async function addTinyText(category, x, y) {
+        const newTinyText = {
+            category: category,
+            dataX: x,
+            dataY: y,
+            text: "",
+            annotation: "TinyText"
+        };
+        await annotationAPI.saveAnnotation(newTinyText, pdfName).then((data) => {
+            newTinyText.id = data;
+            setAnnotations([...annotations, newTinyText]);
+        });
+    }
 
-    function addPostIt(color, x, y) {
+    async function addPostIt(category, x, y) {
         const newPostIt = {
-            color: color,
+            category: category,
             dataX: x,
             dataY: y,
             text: "",
             annotation: "PostIt"
         };
-        annotationAPI.savePostItPositionToDatabase(newPostIt).then((data) => {
+        await annotationAPI.saveAnnotation(newPostIt, pdfName).then((data) => {
             newPostIt.id = data;
             setAnnotations([...annotations, newPostIt]);
         });
-    }
-
-    function setPostItMeta(color) {
-        setSelectedColor(color);
-        setCreatingPostIt(true);
     }
 
     return (
@@ -127,29 +190,46 @@ function Noteboard( {highlight} ) {
                     <div
                         className="tool add-post-it"
                         id="add-post-it-green"
-                        onClick={() => setPostItMeta("green")}
+                        onClick={addHighlightAnnotation}
                     >
-                        +
+                        ✎
+                    </div>
+                    <div
+                        className={`tool add-post-it ${creatingComponent === "ParagraphCustom" ? "add-tool-active" : ""}`}
+                        onClick={() => setCreatingComponent("ParagraphCustom")}
+                    >
+                        🖌
+                    </div>
+                    <div
+                        className={`tool add-post-it ${creatingComponent === "ParagraphSideBar" ? "add-tool-active" : ""}`}
+                        onClick={() => setCreatingComponent("ParagraphSideBar")}
+                    >
+                        |
                     </div>
                     <div
                         className="tool add-post-it"
+                        onClick={addUnderlineAnnotation}
+                    >
+                        ⎁
+                    </div>
+                    <div
+                        className={`tool add-post-it ${creatingComponent === "PostIt" ? "add-tool-active" : ""}`}
+                        onClick={() => setCreatingComponent("PostIt")}
+                    >
+                        🗅
+                    </div>
+                    <div
+                        className={`tool add-post-it ${creatingComponent === "TinyText" ? "add-tool-active" : ""}`}
                         id="add-post-it-yellow"
-                        onClick={() => setPostItMeta("yellow")}
+                        onClick={() => setCreatingComponent("TinyText")}
                     >
-                        +
-                    </div>
-                    <div
-                        className="tool add-post-it"
-                        id="add-post-it-red"
-                        onClick={() => setPostItMeta("red")}
-                    >
-                        +
+                        Ƭ
                     </div>
                 </div>
                 <div id="category-selection">
                     {["Definition", "Explosion", "Deletion", "Correction", "Speculation", "Addition"].map((cat, key) => (
                         <div
-                            className={selectedCategory === cat ? `category category-${cat.toLowerCase()} category-active` : `category category-${cat.toLowerCase()}`}
+                            className={`category category-${cat.toLowerCase()} ${selectedCategory === cat ? "category-active" : ""}`}
                             key={key}
                             onClick={() => setSelectedCategory(`${cat}`)}
                         >
@@ -172,9 +252,16 @@ function Noteboard( {highlight} ) {
                                     category={annotation.category}
                                     scroll={annotation.scroll}
                                     text={annotation.text}
+                                    type={annotation.annotation}
                                     color={annotation.color}
                                     dataX={annotation.dataX}
                                     dataY={annotation.dataY}
+                                    top={annotation.top}
+                                    left={annotation.left}
+                                    width={annotation.width}
+                                    height={annotation.height}
+                                    scollX={annotation.scrollX}
+                                    scrollY={annotation.scrollY}
                                 />;
                             } else return null;
                         })}

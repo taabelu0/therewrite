@@ -10,7 +10,7 @@ function Home() {
     const [pdfs, setPdfs] = useState([["", ""]]);
     useEffect(() => {
         async function fetchData() {
-            const resp = await pdfAPI.getList().catch(e => { setPdfs([])});
+            const resp = await pdfAPI.getList().catch(e => { setPdfs( [])});
             if(resp) setPdfs(resp);
         }
 
@@ -33,8 +33,8 @@ function Home() {
 
                 <div className="list-container" id="list-of-pdf">
                     {pdfs.map((pdf, index) => (
-                        <a key={index} href={"/view/" + pdf[1]} className="list-item">
-                            {pdf[0]}
+                        <a key={index} href={"/view/" + pdf['id']} className="list-item">
+                            {pdf['documentName']}
                         </a>
                     ))}
                 </div>
