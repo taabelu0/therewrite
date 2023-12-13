@@ -104,7 +104,7 @@ function Noteboard({pdfName}) {
             };
             ParagraphSideBarCalc(props);
             await annotationAPI.saveAnnotation(props, pdfName).then((data) => {
-                props.id = data;
+                props.id = data.idAnnotation;
                 setAnnotations([...annotations, props]);
             });
     }
@@ -116,7 +116,7 @@ function Noteboard({pdfName}) {
         const props = {selection: selection, category: currentCategory.current, scroll, annotation: "ParagraphCustom"};
         ParagraphCustomCalc(props);
         await annotationAPI.saveAnnotation(props, pdfName).then((data) => {
-            props.id = data;
+            props.id = data.idAnnotation;
             setAnnotations([...annotations, props]);
         });
     }
@@ -127,7 +127,7 @@ function Noteboard({pdfName}) {
         let scroll = {x: window.scrollX, y: window.scrollY};
         const props = {selection: selection, category: null, scroll, annotation: "UnderlineAnnotation"};
         await annotationAPI.saveAnnotation(props, pdfName).then((data) => {
-            props.id = data;
+            props.id = data.idAnnotation;
             setAnnotations([...annotations, props]);
         });
     }
@@ -143,7 +143,7 @@ function Noteboard({pdfName}) {
             annotation: "HighlightAnnotation"
         };
         await annotationAPI.saveAnnotation(props, pdfName).then((data) => {
-            props.id = data;
+            props.id = data.idAnnotation;
             setAnnotations([...annotations, props]);
         });
     }
@@ -158,7 +158,7 @@ function Noteboard({pdfName}) {
             annotation: "TinyText"
         };
         await annotationAPI.saveAnnotation(newTinyText, pdfName).then((data) => {
-            newTinyText.id = data;
+            newTinyText.id = data.idAnnotation.idAnnotation;
             setAnnotations([...annotations, newTinyText]);
         });
     }
@@ -172,7 +172,7 @@ function Noteboard({pdfName}) {
             annotation: "PostIt"
         };
         await annotationAPI.saveAnnotation(newPostIt, pdfName).then((data) => {
-            newPostIt.id = data;
+            newPostIt.id = data.idAnnotation;
             setAnnotations([...annotations, newPostIt]);
         });
     }

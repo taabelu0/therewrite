@@ -3,7 +3,7 @@ import '../../style/tiny-text.scss';
 import interact from 'interactjs';
 import {annotationAPI} from "../../apis/annotationAPI";
 
-export default function TinyText({ id, category, dataX, dataY, text }) {
+export default function TinyText({id, category, dataX, dataY, text}) {
     const [tinyText, setTinyText] = useState(text);
     const tinyTextRef = useRef(null);
 
@@ -33,17 +33,15 @@ export default function TinyText({ id, category, dataX, dataY, text }) {
         textArea.readOnly = true;
         textArea.style.userSelect = false;
         textArea.classList.remove("tiny-text-input-selected");
-
-        await updateTinyText(id, textArea.value);
+        await updateTinyTextDetails(id, dataX, dataY, textArea.value, category);
     }
     async function dragMoveListener(event) {
         const target = event.target;
         dataX += event.dx;
         dataY += event.dy;
         target.style.transform = `translate(${dataX}px, ${dataY}px)`;
-
         if (event.button === 0) {
-            updateTinyTextDetails(id, dataX, dataY, tinyText);
+            await updateTinyTextDetails(id, dataX, dataY, tinyText, category);
         }
     }
 
@@ -53,15 +51,18 @@ export default function TinyText({ id, category, dataX, dataY, text }) {
         fake.innerText = event.target.value;
         event.target.parentElement.appendChild(fake);
         event.target.style.width = `${fake.clientWidth + 20}px`;
-
     }
 
-    async function updateTinyTextDetails(id, x, y, text) {
-        await annotationAPI.updateAnnotationDetails(id, x, y, text, "TinyText", category);
-    }
-
-    async function updateTinyText(id, text) {
-        await annotationAPI.updateAnnotationText(id, text);
+    async function updateTinyTextDetails(id, x, y, text, category) {
+        await annotationAPI.updateAnnotation(id, {
+            annotationDetail: JSON.stringify({
+                category: category,
+                dataX: x,
+                dataY: y,
+                text: text,
+                annotation: "TinyText"
+            })
+        });
     }
 
     return (
