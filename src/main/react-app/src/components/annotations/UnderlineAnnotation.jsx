@@ -8,24 +8,6 @@ export default class UnderlineAnnotation extends Annotation {
         this.state.currentRects = props.rects || [];
     }
 
- /*   componentDidMount() {
-        // Add event listener for scroll events
-        window.addEventListener('scroll', this.handleScroll);
-    }
-
-    componentWillUnmount() {
-        // Remove event listener when component is unmounted
-        window.removeEventListener('scroll', this.handleScroll);
-    }
-
-    handleScroll = () => {
-        // Update the state with the new scroll positions
-        this.setState({
-            scrollX: window.scrollX || window.pageXOffset || document.documentElement.scrollLeft,
-            scrollY: window.scrollY || window.pageYOffset || document.documentElement.scrollTop,
-        });
-    };*/
-
     render() {
         return (
             <div>
@@ -50,33 +32,50 @@ export default class UnderlineAnnotation extends Annotation {
 
 export function UnderlineCalc(props) {
     AnnotationCalc(props);
-    let rects = props.range.getClientRects();
+    const rects = props.range.getClientRects();
     console.log("RECTS", rects);
-    props.rects = [];
+
+    if (rects.length < 1) return;
+
+    const underlineRects = [];
     let prevTop = null;
-    if(rects.length < 1) return;
-    const underlineRects = Array.from(rects).map((rect, index) => {
-        const underlineRect = {};
+
+    Array.from(rects).forEach((rect, index) => {
         const isValidTop = Number.isFinite(rect.top);
         const isValidLeft = Number.isFinite(rect.left);
+
+        // Adjust the top and left positions based on the scroll positions and the rect's dimensions
+        const adjustedTop = isValidTop ? rect.top + window.scrollY : rect.top;
+        const adjustedLeft = isValidLeft ? rect.left + window.scrollX : rect.left;
+
+        console.log("Recttop , scrollY", rect.top, window.scrollY);
+        console.log(`Line ${index + 1} - isValidTop: ${isValidTop}, adjustedTop: ${adjustedTop}`);
 
         // Check if the current top position is similar to the previous one
         const isSameLine = isValidTop && prevTop !== null && Math.abs(rect.top - prevTop) < 5;
 
-        // Adjust the top and left positions based on the scroll positions and the rect's dimensions
-        const adjustedTop = isSameLine ? prevTop : (isValidTop ? rect.top + (props.scrollY ?? 0) : rect.top);
-        const adjustedLeft = isValidLeft ? rect.left + (props.scrollX ?? 0) : rect.left;
+        // Check if the line has already been underlined
+        const isLineUnderlined = underlineRects.some(
+            (underlineRect) =>
+                Math.abs(underlineRect.top - adjustedTop) < 5 &&
+                Math.abs(underlineRect.height - rect.height) < 5
+        );
 
-        console.log("Recttop , scrollY", rect.top, props.scrollY)
-        console.log(`Line ${index + 1} - isValidTop: ${isValidTop}, adjustedTop: ${adjustedTop}`);
+        // Add the underline only if it's not the same line and not already underlined
+        if (!isSameLine && !isLineUnderlined) {
+            const underlineRect = {
+                top: adjustedTop,
+                left: adjustedLeft,
+                width: rect.width,
+                height: rect.height,
+            };
+
+            underlineRects.push(underlineRect);
+        }
 
         // Update the previous top position for the next iteration
         prevTop = isValidTop ? rect.top : null;
-        underlineRect.top = adjustedTop
-        underlineRect.left = adjustedLeft
-        underlineRect.width = rect.width
-        underlineRect.height = rect.height
-        return underlineRect;
     });
+
     props.rects = underlineRects;
 }
