@@ -3,7 +3,8 @@ import '../../style/tiny-text.scss';
 import interact from 'interactjs';
 import {annotationAPI} from "../../apis/annotationAPI";
 
-export default function TinyText({id, category, dataX, dataY, text}) {
+export default function TinyText(props) {
+    let {id, category, dataX, dataY, text}  = props.annotation;
     const [tinyText, setTinyText] = useState(text);
     const tinyTextRef = useRef(null);
 

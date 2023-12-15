@@ -3,7 +3,8 @@ import '../../style/post-it.scss';
 import interact from 'interactjs';
 import {annotationAPI} from "../../apis/annotationAPI";
 
-export default function PostIt({id, category, dataX, dataY, text}) {
+export default function PostIt(props) {
+    let {id, category, dataX, dataY, text}  = props.annotation;
     const [postitText, setPostitText] = useState(text);
     const postitRef = useRef(null);
     const [postitPosition, setPostitPosition] = useState({dataX: Number(dataX) || 0, dataY: Number(dataY) || 0});

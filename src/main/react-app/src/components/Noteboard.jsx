@@ -2,12 +2,12 @@ import React, {useEffect, useRef, useState} from "react";
 import PostIt from "./annotations/PostIt";
 import TinyText from "./annotations/TinyText";
 import '../style/annotations.scss';
-import {ParagraphSideBar} from "./annotations/ParagraphSideBar";
-import {ParagraphCustom} from "./annotations/ParagraphCustom";
+import {ParagraphSideBar, ParagraphSideBarCalc} from "./annotations/ParagraphSideBar";
+import {ParagraphCustom, ParagraphCustomCalc} from "./annotations/ParagraphCustom";
 import HighlightAnnotation from "./annotations/HighlightAnnotation";
 import {annotationAPI} from "../apis/annotationAPI";
 import UnderlineAnnotation from "./annotations/UnderlineAnnotation";
-import {Annotation, ParagraphCustomCalc, ParagraphSideBarCalc} from "./annotations/Annotation";
+import {Annotation} from "./annotations/Annotation";
 import * as StompJs from "@stomp/stompjs";
 
 const ANNOTATION_COMPONENTS = {
@@ -72,7 +72,6 @@ function Noteboard({pdfName}) {
         setAnnotations([...newAnnotations.map(a => {
             let obj = JSON.parse(a['annotationDetail']);
             obj.id = a['idAnnotation'];
-            // obj.annotationText = a['annotationText'];
             return obj;
         })]);
     }
@@ -126,12 +125,10 @@ function Noteboard({pdfName}) {
     async function addParagraphAnnotation() {
             let selection = window.getSelection();
             if (selection.rangeCount < 1) return;
-            let scroll = {x: window.scrollX, y: window.scrollY};
             let props = {
                 selection: selection,
                 category: currentCategory.current,
-                scroll,
-                annotation: "ParagraphSideBar"
+                annotationType: "ParagraphSideBar"
             };
             ParagraphSideBarCalc(props);
             await annotationAPI.saveAnnotation(props, pdfName).then((data) => {
@@ -143,8 +140,7 @@ function Noteboard({pdfName}) {
     async function addParagraphCustomAnnotation() {
         let selection = window.getSelection();
         if (selection.rangeCount < 1) return;
-        let scroll = {x: window.scrollX, y: window.scrollY};
-        const props = {selection: selection, category: currentCategory.current, scroll, annotation: "ParagraphCustom"};
+        const props = {selection: selection, category: currentCategory.current, annotationType: "ParagraphCustom"};
         ParagraphCustomCalc(props);
         await annotationAPI.saveAnnotation(props, pdfName).then((data) => {
             props.id = data.idAnnotation;
@@ -156,7 +152,7 @@ function Noteboard({pdfName}) {
         let selection = window.getSelection();
         if (selection.rangeCount < 1) return;
         let scroll = {x: window.scrollX, y: window.scrollY};
-        const props = {selection: selection, category: null, scroll, annotation: "UnderlineAnnotation"};
+        const props = {selection: selection, category: null, scroll, annotationType: "UnderlineAnnotation"};
         await annotationAPI.saveAnnotation(props, pdfName).then((data) => {
             props.id = data.idAnnotation;
             setAnnotations([...annotations, props]);
@@ -171,7 +167,7 @@ function Noteboard({pdfName}) {
             selection: selection,
             category: currentCategory.current,
             scroll,
-            annotation: "HighlightAnnotation"
+            annotationType: "HighlightAnnotation"
         };
         await annotationAPI.saveAnnotation(props, pdfName).then((data) => {
             props.id = data.idAnnotation;
@@ -186,7 +182,7 @@ function Noteboard({pdfName}) {
             dataX: x,
             dataY: y,
             text: "",
-            annotation: "TinyText"
+            annotationType: "TinyText"
         };
         await annotationAPI.saveAnnotation(newTinyText, pdfName).then((data) => {
             newTinyText.id = data.idAnnotation.idAnnotation;
@@ -200,7 +196,7 @@ function Noteboard({pdfName}) {
             dataX: x,
             dataY: y,
             text: "",
-            annotation: "PostIt"
+            annotationType: "PostIt"
         };
         return await annotationAPI.saveAnnotation(newPostIt, pdfName).then((data) => {
             newPostIt.id = data.idAnnotation;
@@ -281,24 +277,10 @@ function Noteboard({pdfName}) {
                     <div id={"annotation-container"}>
                         {annotations.map((annotation, index) => {
                             if (annotation.annotation) {
-                                const SpecificAnnotation = ANNOTATION_COMPONENTS[annotation.annotation] || Annotation;
+                                const SpecificAnnotation = ANNOTATION_COMPONENTS[annotation.annotationType] || Annotation;
                                 return <SpecificAnnotation
-                                    id={annotation.id}
-                                    key={`annotation_${index}`}
-                                    selection={annotation.selection}
-                                    category={annotation.category}
-                                    scroll={annotation.scroll}
-                                    text={annotation.text}
-                                    type={annotation.annotation}
-                                    color={annotation.color}
-                                    dataX={annotation.dataX}
-                                    dataY={annotation.dataY}
-                                    top={annotation.top}
-                                    left={annotation.left}
-                                    width={annotation.width}
-                                    height={annotation.height}
-                                    scollX={annotation.scrollX}
-                                    scrollY={annotation.scrollY}
+                                    annotation={annotation}
+                                    key={annotation.id}
                                 />;
                             } else return null;
                         })}
