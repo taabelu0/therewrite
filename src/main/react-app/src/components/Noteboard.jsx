@@ -51,7 +51,15 @@ function Noteboard({pdfName}) {
         stompClient.onConnect = (frame) => {
             console.log('Connection: ' + frame);
             stompClient.subscribe(`/session/${pdfName}`, (message) => {
-                console.log(JSON.parse(message.body));
+                let msgAnnotation = JSON.parse(message.body).message;
+                if(!msgAnnotation) {
+                    console.error('Annotation in message is null or undefined:', msgAnnotation);
+                    return;
+                }
+                let patchAnnotation = JSON.parse(msgAnnotation['annotationDetail']);
+                patchAnnotation.id = msgAnnotation.idAnnotation;
+                console.log({annotations, ...patchAnnotation});
+                setAnnotations([...annotations, patchAnnotation]);
             });
         };
 
@@ -69,11 +77,18 @@ function Noteboard({pdfName}) {
 
     async function loadAnnotations() {
         let newAnnotations = await annotationAPI.getList(pdfName);
-        setAnnotations([...newAnnotations.map(a => {
+        let newAnnotationsObj = {};
+        // newAnnotations.map(a => {
+        //     let obj = JSON.parse(a['annotationDetail']);
+        //     obj.id = a['idAnnotation'];
+        //     newAnnotationsObj[a['idAnnotation']] = obj;
+        // });
+        // setAnnotations(newAnnotationsObj);
+        setAnnotations(newAnnotations.map(a => {
             let obj = JSON.parse(a['annotationDetail']);
             obj.id = a['idAnnotation'];
             return obj;
-        })]);
+        }))
     }
 
     function sendMessage(anno) {
@@ -93,7 +108,7 @@ function Noteboard({pdfName}) {
             const y = clientY - rect.top;
 
             setTimeout(async () => {
-                let newAnno = ADDING_COMPONENT[creatingComponent](selectedCategory, x, y)
+                let newAnno = await ADDING_COMPONENT[creatingComponent](selectedCategory, x, y)
                 sendMessage(newAnno);
                 setCreatingComponent(null);
             }, 50);
@@ -133,7 +148,7 @@ function Noteboard({pdfName}) {
             ParagraphSideBarCalc(props);
             await annotationAPI.saveAnnotation(props, pdfName).then((data) => {
                 props.id = data.idAnnotation;
-                setAnnotations([...annotations, props]);
+                setAnnotations({...annotations, [props['id']]: props});
             });
     }
 
@@ -144,7 +159,7 @@ function Noteboard({pdfName}) {
         ParagraphCustomCalc(props);
         await annotationAPI.saveAnnotation(props, pdfName).then((data) => {
             props.id = data.idAnnotation;
-            setAnnotations([...annotations, props]);
+            setAnnotations({...annotations, [props['id']]: props});
         });
     }
 
@@ -155,7 +170,7 @@ function Noteboard({pdfName}) {
         const props = {selection: selection, category: null, scroll, annotationType: "UnderlineAnnotation"};
         await annotationAPI.saveAnnotation(props, pdfName).then((data) => {
             props.id = data.idAnnotation;
-            setAnnotations([...annotations, props]);
+            setAnnotations({...annotations, [props['id']]: props});
         });
     }
 
@@ -171,7 +186,7 @@ function Noteboard({pdfName}) {
         };
         await annotationAPI.saveAnnotation(props, pdfName).then((data) => {
             props.id = data.idAnnotation;
-            setAnnotations([...annotations, props]);
+            setAnnotations({...annotations, [props['id']]: props});
         });
     }
 
@@ -186,7 +201,7 @@ function Noteboard({pdfName}) {
         };
         await annotationAPI.saveAnnotation(newTinyText, pdfName).then((data) => {
             newTinyText.id = data.idAnnotation.idAnnotation;
-            setAnnotations([...annotations, newTinyText]);
+            setAnnotations({...annotations, [newTinyText['id']]: newTinyText});
         });
     }
 
@@ -200,6 +215,7 @@ function Noteboard({pdfName}) {
         };
         return await annotationAPI.saveAnnotation(newPostIt, pdfName).then((data) => {
             newPostIt.id = data.idAnnotation;
+            // setAnnotations({...annotations, [newPostIt['id']]: newPostIt});
             setAnnotations([...annotations, newPostIt]);
             return data;
         });
@@ -275,8 +291,9 @@ function Noteboard({pdfName}) {
             <div id={"noteboard"}>
                 <div id={"annotation-absolute"}>
                     <div id={"annotation-container"}>
-                        {annotations.map((annotation, index) => {
-                            if (annotation.annotation) {
+                        {annotations.map(annotation => {
+                            // let annotation = annotations[key];
+                            if (annotation.annotationType) {
                                 const SpecificAnnotation = ANNOTATION_COMPONENTS[annotation.annotationType] || Annotation;
                                 return <SpecificAnnotation
                                     annotation={annotation}
