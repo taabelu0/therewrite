@@ -8,6 +8,7 @@ import HighlightAnnotation from "./annotations/HighlightAnnotation";
 import {annotationAPI} from "../apis/annotationAPI";
 import UnderlineAnnotation from "./annotations/UnderlineAnnotation";
 import {Annotation, ParagraphCustomCalc, ParagraphSideBarCalc} from "./annotations/Annotation";
+import * as StompJs from "@stomp/stompjs";
 
 const ANNOTATION_COMPONENTS = {
     'HighlightAnnotation': HighlightAnnotation,
@@ -17,12 +18,15 @@ const ANNOTATION_COMPONENTS = {
     'PostIt': PostIt
 }; // define Annotation components here
 
+let stompClient = new StompJs.Client({ brokerURL: 'ws://localhost:8080/ws' })
+
 function Noteboard({pdfName}) {
     const [creatingComponent, setCreatingComponent] = useState(null);
     const [annotations, setAnnotations] = useState([]);
     let width = useRef("100%");
     let height = useRef("100%");
     const [selectedCategory, setSelectedCategory] = useState("Definition");
+
     const currentCategory = useRef(selectedCategory);
 
     const ADDING_COMPONENT = {
@@ -34,24 +38,50 @@ function Noteboard({pdfName}) {
         'Underline': addUnderlineAnnotation
     }
 
-
     useEffect(() => {
         currentCategory.current = selectedCategory;
     }, [selectedCategory]);
 
     useEffect(() => {
+        initiateStompWS(pdfName);
         loadAnnotations();
     }, []);
 
+    function initiateStompWS(pdfName) {
+        stompClient.onConnect = (frame) => {
+            console.log('Connection: ' + frame);
+            stompClient.subscribe(`/session/${pdfName}`, (message) => {
+                console.log(JSON.parse(message.body));
+            });
+        };
+
+        stompClient.onWebSocketError = (error) => {
+            console.error('Error with websocket', error);
+        };
+
+        stompClient.onStompError = (frame) => {
+            console.error('Broker reported error: ' + frame.headers['message']);
+            console.error('Additional details: ' + frame.body);
+        };
+
+        stompClient.activate();
+    }
+
     async function loadAnnotations() {
         let newAnnotations = await annotationAPI.getList(pdfName);
-        console.log(newAnnotations)
         setAnnotations([...newAnnotations.map(a => {
             let obj = JSON.parse(a['annotationDetail']);
             obj.id = a['idAnnotation'];
             // obj.annotationText = a['annotationText'];
             return obj;
         })]);
+    }
+
+    function sendMessage(anno) {
+        stompClient.publish({
+            destination: `/app/${pdfName}`,
+            body: JSON.stringify({"message": anno})
+        });
     }
 
     function handleDocumentMouseDown(event) {
@@ -64,7 +94,8 @@ function Noteboard({pdfName}) {
             const y = clientY - rect.top;
 
             setTimeout(async () => {
-                ADDING_COMPONENT[creatingComponent](selectedCategory, x, y);
+                let newAnno = ADDING_COMPONENT[creatingComponent](selectedCategory, x, y)
+                sendMessage(newAnno);
                 setCreatingComponent(null);
             }, 50);
         }
@@ -171,9 +202,10 @@ function Noteboard({pdfName}) {
             text: "",
             annotation: "PostIt"
         };
-        await annotationAPI.saveAnnotation(newPostIt, pdfName).then((data) => {
+        return await annotationAPI.saveAnnotation(newPostIt, pdfName).then((data) => {
             newPostIt.id = data.idAnnotation;
             setAnnotations([...annotations, newPostIt]);
+            return data;
         });
     }
 
@@ -187,6 +219,11 @@ function Noteboard({pdfName}) {
         >
             <nav id="sidebar">
                 <div id="toolbar">
+                    <div
+                        className="tool add-post-it"
+                        id="add-post-it-green"
+                        onClick={() => {sendMessage({"message": "hello from js!"})}}
+                    >S</div>
                     <div
                         className="tool add-post-it"
                         id="add-post-it-green"

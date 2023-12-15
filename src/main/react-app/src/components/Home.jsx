@@ -4,54 +4,6 @@ import '../style/customDropZone.min.scss';
 import {useEffect, useRef, useState} from "react";
 import {pdfAPI} from "../apis/pdfAPI";
 import {baseURL} from "../apis/config/axiosConfig";
-import * as StompJs from "@stomp/stompjs";
-
-
-function Websocket() {
-    const stompClient = new StompJs.Client({
-        brokerURL: 'ws://localhost:8080/ws'
-    });
-
-    stompClient.onConnect = (frame) => {
-        console.log('Connection: ' + frame);
-        stompClient.subscribe('/session/123', (message) => {
-            console.log(JSON.parse(message.body));
-        });
-    };
-
-    stompClient.onWebSocketError = (error) => {
-        console.error('Error with websocket', error);
-    };
-
-    stompClient.onStompError = (frame) => {
-        console.error('Broker reported error: ' + frame.headers['message']);
-        console.error('Additional details: ' + frame.body);
-    };
-
-    function connect() {
-        stompClient.activate();
-    }
-
-    function disconnect() {
-        stompClient.deactivate().finally();
-        console.log("Disconnected");
-    }
-
-    function sendMessage() {
-        stompClient.publish({
-            destination: "/app/123",
-            //body: JSON.stringify({'message': 'HELLO THERE!'})
-            body: JSON.stringify({"message": "hello from js!"})
-        });
-    }
-
-    return(<div>
-        <button onClick={connect}>Connect</button>
-        <button onClick={sendMessage}>Send</button>
-        <button onClick={disconnect}>Disconnect</button>
-    </div>)
-}
-
 
 function Home() {
 
@@ -76,7 +28,6 @@ function Home() {
 
     return (
         <section id="content">
-            <Websocket></Websocket>
             <div className="App">
                 <form id="fileUpload" className="dropzone-custom">Drag & Drop your file here</form>
 
