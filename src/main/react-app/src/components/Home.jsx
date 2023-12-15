@@ -13,8 +13,8 @@ function Websocket() {
     });
 
     stompClient.onConnect = (frame) => {
-        console.log('Connected: ' + frame);
-        stompClient.subscribe('/topic/msg', (message) => {
+        console.log('Connection: ' + frame);
+        stompClient.subscribe('/session/123', (message) => {
             console.log(JSON.parse(message.body));
         });
     };
@@ -39,8 +39,9 @@ function Websocket() {
 
     function sendMessage() {
         stompClient.publish({
-            destination: "/app/hello",
-            body: JSON.stringify({'message': 'HELLO THERE!'})
+            destination: "/app/123",
+            //body: JSON.stringify({'message': 'HELLO THERE!'})
+            body: JSON.stringify({"message": "hello from js!"})
         });
     }
 

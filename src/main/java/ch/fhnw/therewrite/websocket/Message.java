@@ -1,13 +1,10 @@
 package ch.fhnw.therewrite.websocket;
 
-public class Message {
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import java.io.Serializable;
+
+public class Message implements Serializable {
+    @JsonProperty
     String message;
-
-    public Message(String message) {
-        this.message = message;
-    }
-
-    public String getMessage() {
-        return message;
-    }
 }
