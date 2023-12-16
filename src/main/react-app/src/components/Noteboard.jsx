@@ -18,7 +18,7 @@ const ANNOTATION_COMPONENTS = {
     'PostIt': PostIt
 }; // define Annotation components here
 
-let stompClient = new StompJs.Client({ brokerURL: 'ws://localhost:8080/ws' })
+let stompClient = new StompJs.Client({brokerURL: 'ws://localhost:8080/ws'})
 
 function Noteboard({pdfName}) {
     const [creatingComponent, setCreatingComponent] = useState(null);
@@ -48,7 +48,7 @@ function Noteboard({pdfName}) {
     }, []);
 
     function applyAnnotationChanges(msgAnnotation) {
-        if(!msgAnnotation) {
+        if (!msgAnnotation) {
             console.error('Annotation in message is null or undefined:', msgAnnotation);
             return;
         }
@@ -112,7 +112,7 @@ function Noteboard({pdfName}) {
         const y = clientY - rect.top;
 
         setTimeout(async () => {
-            let newAnno = await ADDING_COMPONENT[creatingComponent](selectedCategory, x, y)
+            let newAnno = await ADDING_COMPONENT[creatingComponent](selectedCategory, x, y);
             sendMessage(newAnno); // notifies websocket
             setCreatingComponent(null);
         }, 50);
@@ -141,18 +141,19 @@ function Noteboard({pdfName}) {
 
 
     async function addParagraphAnnotation() {
-            let selection = window.getSelection();
-            if (selection.rangeCount < 1) return;
-            let props = {
-                selection: selection,
-                category: currentCategory.current,
-                annotationType: "ParagraphSideBar"
-            };
-            ParagraphSideBarCalc(props);
-            await annotationAPI.saveAnnotation(props, pdfName).then((data) => {
-                props.id = data.idAnnotation;
-                setAnnotations({...annotations, [props['id']]: props});
-            });
+        let selection = window.getSelection();
+        if (selection.rangeCount < 1) return;
+        let props = {
+            selection: selection,
+            category: currentCategory.current,
+            annotationType: "ParagraphSideBar"
+        };
+        ParagraphSideBarCalc(props);
+        return await annotationAPI.saveAnnotation(props, pdfName).then((data) => {
+            props.id = data.idAnnotation;
+            setAnnotations({...annotations, [props['id']]: props});
+            return data;
+        });
     }
 
     async function addParagraphCustomAnnotation() {
@@ -160,9 +161,10 @@ function Noteboard({pdfName}) {
         if (selection.rangeCount < 1) return;
         const props = {selection: selection, category: currentCategory.current, annotationType: "ParagraphCustom"};
         ParagraphCustomCalc(props);
-        await annotationAPI.saveAnnotation(props, pdfName).then((data) => {
+        return await annotationAPI.saveAnnotation(props, pdfName).then((data) => {
             props.id = data.idAnnotation;
             setAnnotations({...annotations, [props['id']]: props});
+            return data;
         });
     }
 
@@ -171,9 +173,10 @@ function Noteboard({pdfName}) {
         if (selection.rangeCount < 1) return;
         let scroll = {x: window.scrollX, y: window.scrollY};
         const props = {selection: selection, category: null, scroll, annotationType: "UnderlineAnnotation"};
-        await annotationAPI.saveAnnotation(props, pdfName).then((data) => {
+        return await annotationAPI.saveAnnotation(props, pdfName).then((data) => {
             props.id = data.idAnnotation;
             setAnnotations({...annotations, [props['id']]: props});
+            return data
         });
     }
 
@@ -187,9 +190,10 @@ function Noteboard({pdfName}) {
             scroll,
             annotationType: "HighlightAnnotation"
         };
-        await annotationAPI.saveAnnotation(props, pdfName).then((data) => {
+        return await annotationAPI.saveAnnotation(props, pdfName).then((data) => {
             props.id = data.idAnnotation;
             setAnnotations({...annotations, [props['id']]: props});
+            return data;
         });
     }
 
@@ -202,9 +206,10 @@ function Noteboard({pdfName}) {
             text: "",
             annotationType: "TinyText"
         };
-        await annotationAPI.saveAnnotation(newTinyText, pdfName).then((data) => {
+        return await annotationAPI.saveAnnotation(newTinyText, pdfName).then((data) => {
             newTinyText.id = data.idAnnotation.idAnnotation;
             setAnnotations({...annotations, [newTinyText['id']]: newTinyText});
+            return data;
         });
     }
 
@@ -236,8 +241,11 @@ function Noteboard({pdfName}) {
                     <div
                         className="tool add-post-it"
                         id="add-post-it-green"
-                        onClick={() => {sendMessage({"message": "hello from js!"})}}
-                    >S</div>
+                        onClick={() => {
+                            sendMessage({"message": "hello from js!"})
+                        }}
+                    >S
+                    </div>
                     <div
                         className="tool add-post-it"
                         id="add-post-it-green"
