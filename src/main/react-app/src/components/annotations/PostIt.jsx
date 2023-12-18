@@ -6,6 +6,7 @@ import {annotationAPI} from "../../apis/annotationAPI";
 export default function PostIt(props) {
     let {id, category, dataX, dataY, text}  = props.annotation;
     const [postitText, setPostitText] = useState(text);
+    const postitTextRef = useRef(text);
     const postitRef = useRef(null);
     const [postitPosition, setPostitPosition] = useState({dataX: Number(dataX) || 0, dataY: Number(dataY) || 0});
 
@@ -22,6 +23,13 @@ export default function PostIt(props) {
         });
     }, []);
 
+    useEffect(() => {
+        setPostitText(text);
+    }, [props]);
+    useEffect(() => {
+        postitTextRef.current = postitText;
+    }, [postitText]);
+
     function enableTextEdit(event) {
         let textArea = event.target;
         textArea.readOnly = false;
@@ -35,7 +43,7 @@ export default function PostIt(props) {
         textArea.readOnly = true;
         textArea.style.userSelect = false;
         textArea.classList.remove("post-it-input-selected");
-        await updatePostItDetails(id, postitPosition.dataX, postitPosition.dataY, postitText, category);
+        await updatePostItDetails(id, postitPosition.dataX, postitPosition.dataY, postitTextRef.current, category);
     }
 
     async function dragMoveListener(event) {
@@ -46,7 +54,7 @@ export default function PostIt(props) {
             const newY = prevPosition.dataY + event.dy;
             target.style.transform = `translate(${newX}px, ${newY}px)`;
             if (event.button === 0) {
-                updatePostItDetails(id, newX, newY, postitText, category);
+                updatePostItDetails(id, newX, newY, postitTextRef.current, category);
             }
             return {dataX: newX, dataY: newY};
         });

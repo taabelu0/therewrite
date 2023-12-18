@@ -6,6 +6,7 @@ import {annotationAPI} from "../../apis/annotationAPI";
 export default function TinyText(props) {
     let {id, category, dataX, dataY, text}  = props.annotation;
     const [tinyText, setTinyText] = useState(text);
+    const tinyTextText = useRef(text);
     const tinyTextRef = useRef(null);
 
     useEffect(() => {
@@ -20,6 +21,13 @@ export default function TinyText(props) {
             }
         });
     }, []);
+
+    useEffect(() => {
+        setTinyText(text);
+    }, [props]);
+    useEffect(() => {
+        tinyTextText.current = tinyText;
+    }, [tinyText]);
 
     function enableTextEdit(event) {
         let textArea = event.target;
@@ -42,7 +50,7 @@ export default function TinyText(props) {
         dataY += event.dy;
         target.style.transform = `translate(${dataX}px, ${dataY}px)`;
         if (event.button === 0) {
-            await updateTinyTextDetails(id, dataX, dataY, tinyText, category);
+            await updateTinyTextDetails(id, dataX, dataY, tinyTextText.current, category);
         }
     }
 

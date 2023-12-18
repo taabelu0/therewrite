@@ -53,7 +53,6 @@ function Noteboard({pdfName}) {
             return;
         }
         let patchAnnotation = JSON.parse(msgAnnotation['annotationDetail']);
-        console.log("NEW TEXT", patchAnnotation.text)
         patchAnnotation.id = msgAnnotation.idAnnotation;
         setAnnotations(prevAnnotations => {
             return {...prevAnnotations, ...{[patchAnnotation.id]: patchAnnotation}}
