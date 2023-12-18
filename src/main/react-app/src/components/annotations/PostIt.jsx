@@ -35,7 +35,6 @@ export default function PostIt(props) {
         textArea.readOnly = true;
         textArea.style.userSelect = false;
         textArea.classList.remove("post-it-input-selected");
-
         await updatePostItDetails(id, postitPosition.dataX, postitPosition.dataY, postitText, category);
     }
 
@@ -54,7 +53,7 @@ export default function PostIt(props) {
     }
 
     async function updatePostItDetails(id, x, y, text, category) {
-        await annotationAPI.updateAnnotation(id, {
+        let postIt = await annotationAPI.updateAnnotation(id, {
             annotationDetail: JSON.stringify({
                 category: category,
                 dataX: x,
@@ -63,6 +62,7 @@ export default function PostIt(props) {
                 annotation: "PostIt"
             })
         });
+        props.onChange(postIt.data);
     }
 
     return (

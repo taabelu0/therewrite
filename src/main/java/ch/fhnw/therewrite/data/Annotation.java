@@ -29,7 +29,7 @@ public class Annotation implements Serializable {
     @JsonProperty
     private User userCreator;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER) // needs eager
     @JoinColumn(name = "documentId", nullable = false)
     @JsonProperty
     private Document documentId;

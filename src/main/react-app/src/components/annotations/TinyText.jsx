@@ -55,7 +55,7 @@ export default function TinyText(props) {
     }
 
     async function updateTinyTextDetails(id, x, y, text, category) {
-        await annotationAPI.updateAnnotation(id, {
+        let tinyText = await annotationAPI.updateAnnotation(id, {
             annotationDetail: JSON.stringify({
                 category: category,
                 dataX: x,
@@ -64,6 +64,7 @@ export default function TinyText(props) {
                 annotation: "TinyText"
             })
         });
+        props.onChange(tinyText.data);
     }
 
     return (

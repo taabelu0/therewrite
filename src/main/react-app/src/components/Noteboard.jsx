@@ -53,6 +53,7 @@ function Noteboard({pdfName}) {
             return;
         }
         let patchAnnotation = JSON.parse(msgAnnotation['annotationDetail']);
+        console.log("NEW TEXT", patchAnnotation.text)
         patchAnnotation.id = msgAnnotation.idAnnotation;
         setAnnotations(prevAnnotations => {
             return {...prevAnnotations, ...{[patchAnnotation.id]: patchAnnotation}}
@@ -146,7 +147,7 @@ function Noteboard({pdfName}) {
         let props = {
             selection: selection,
             category: currentCategory.current,
-            annotationType: "ParagraphSideBar"
+            annotation: "ParagraphSideBar"
         };
         ParagraphSideBarCalc(props);
         return await annotationAPI.saveAnnotation(props, pdfName).then((data) => {
@@ -159,7 +160,7 @@ function Noteboard({pdfName}) {
     async function addParagraphCustomAnnotation() {
         let selection = window.getSelection();
         if (selection.rangeCount < 1) return;
-        const props = {selection: selection, category: currentCategory.current, annotationType: "ParagraphCustom"};
+        const props = {selection: selection, category: currentCategory.current, annotation: "ParagraphCustom"};
         ParagraphCustomCalc(props);
         return await annotationAPI.saveAnnotation(props, pdfName).then((data) => {
             props.id = data.idAnnotation;
@@ -172,7 +173,7 @@ function Noteboard({pdfName}) {
         let selection = window.getSelection();
         if (selection.rangeCount < 1) return;
         let scroll = {x: window.scrollX, y: window.scrollY};
-        const props = {selection: selection, category: null, scroll, annotationType: "UnderlineAnnotation"};
+        const props = {selection: selection, category: null, scroll, annotation: "UnderlineAnnotation"};
         return await annotationAPI.saveAnnotation(props, pdfName).then((data) => {
             props.id = data.idAnnotation;
             setAnnotations({...annotations, [props['id']]: props});
@@ -188,7 +189,7 @@ function Noteboard({pdfName}) {
             selection: selection,
             category: currentCategory.current,
             scroll,
-            annotationType: "HighlightAnnotation"
+            annotation: "HighlightAnnotation"
         };
         return await annotationAPI.saveAnnotation(props, pdfName).then((data) => {
             props.id = data.idAnnotation;
@@ -204,7 +205,7 @@ function Noteboard({pdfName}) {
             dataX: x,
             dataY: y,
             text: "",
-            annotationType: "TinyText"
+            annotation: "TinyText"
         };
         return await annotationAPI.saveAnnotation(newTinyText, pdfName).then((data) => {
             newTinyText.id = data.idAnnotation.idAnnotation;
@@ -219,13 +220,17 @@ function Noteboard({pdfName}) {
             dataX: x,
             dataY: y,
             text: "",
-            annotationType: "PostIt"
+            annotation: "PostIt"
         };
         return await annotationAPI.saveAnnotation(newPostIt, pdfName).then((data) => {
             newPostIt.id = data.idAnnotation;
             setAnnotations({...annotations, [newPostIt['id']]: newPostIt});
             return data;
         });
+    }
+
+    function onAnnotationChange(annotation) {
+        sendMessage(annotation);
     }
 
     return (
@@ -303,11 +308,12 @@ function Noteboard({pdfName}) {
                     <div id={"annotation-container"}>
                         {Object.keys(annotations).map(key => {
                             let annotation = annotations[key];
-                            if (annotation.annotationType) {
-                                const SpecificAnnotation = ANNOTATION_COMPONENTS[annotation.annotationType] || Annotation;
+                            if (annotation.annotation) {
+                                const SpecificAnnotation = ANNOTATION_COMPONENTS[annotation.annotation] || Annotation;
                                 return <SpecificAnnotation
                                     annotation={annotation}
                                     key={annotation.id}
+                                    onChange={onAnnotationChange}
                                 />;
                             } else return null;
                         })}
