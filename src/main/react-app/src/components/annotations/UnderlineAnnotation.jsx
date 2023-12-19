@@ -33,36 +33,23 @@ export default class UnderlineAnnotation extends Annotation {
 export function UnderlineCalc(props) {
     AnnotationCalc(props);
     const rects = props.range.getClientRects();
-    console.log("RECTS", rects);
 
     if (rects.length < 1) return;
 
-    const underlineRects = [];
+    let underlineRects = [];
     let prevTop = null;
+    let maxTop = [];
+    let differenceMax = 25
 
     Array.from(rects).forEach((rect, index) => {
         const isValidTop = Number.isFinite(rect.top);
         const isValidLeft = Number.isFinite(rect.left);
 
-        // Adjust the top and left positions based on the scroll positions and the rect's dimensions
-        const adjustedTop = isValidTop ? rect.top + window.scrollY : rect.top;
-        const adjustedLeft = isValidLeft ? rect.left + window.scrollX : rect.left;
+        let adjustedTop = isValidTop ? rect.top + props.scrollY : rect.top;
+        let adjustedLeft = isValidLeft ? rect.left + props.scrollX : rect.left;
 
-        console.log("Recttop , scrollY", rect.top, window.scrollY);
-        console.log(`Line ${index + 1} - isValidTop: ${isValidTop}, adjustedTop: ${adjustedTop}`);
+        adjustedTop = Math.round(adjustedTop * 100) / 100
 
-        // Check if the current top position is similar to the previous one
-        const isSameLine = isValidTop && prevTop !== null && Math.abs(rect.top - prevTop) < 5;
-
-        // Check if the line has already been underlined
-        const isLineUnderlined = underlineRects.some(
-            (underlineRect) =>
-                Math.abs(underlineRect.top - adjustedTop) < 5 &&
-                Math.abs(underlineRect.height - rect.height) < 5
-        );
-
-        // Add the underline only if it's not the same line and not already underlined
-        if (!isSameLine && !isLineUnderlined) {
             const underlineRect = {
                 top: adjustedTop,
                 left: adjustedLeft,
@@ -71,11 +58,31 @@ export function UnderlineCalc(props) {
             };
 
             underlineRects.push(underlineRect);
-        }
 
-        // Update the previous top position for the next iteration
+            let isBigger = false
+            let isNeverSameLine = true
+            let lengthMaxTop = maxTop.length
+
+
+            console.log(typeof adjustedTop)
+            for(let i = 0; i < lengthMaxTop && !isBigger; i++) {
+                console.log("Adjustedtop - maxtop", adjustedTop, maxTop[i])
+
+                if (Math.abs(adjustedTop - maxTop[i]) < differenceMax) {
+                    isNeverSameLine = false
+                    isBigger = maxTop[i] < adjustedTop;
+                    maxTop[i] = isBigger ? (adjustedTop) : maxTop[i];
+                }
+            }
+
+            if(maxTop.length === 0 || isNeverSameLine){
+                maxTop.push(adjustedTop)
+            }
+
         prevTop = isValidTop ? rect.top : null;
     });
 
+    underlineRects = underlineRects.filter(rects => maxTop.some(mt => Math.abs(rects.top - mt) < 0.5))
     props.rects = underlineRects;
+    console.log(maxTop)
 }
