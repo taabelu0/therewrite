@@ -4,14 +4,15 @@ import TinyText from "./annotations/TinyText";
 import '../style/annotations.scss';
 import {ParagraphSideBar, ParagraphSideBarCalc} from "./annotations/ParagraphSideBar";
 import {ParagraphCustom, ParagraphCustomCalc} from "./annotations/ParagraphCustom";
-import HighlightAnnotation from "./annotations/HighlightAnnotation";
+import {HighlightAnnotation} from "./annotations/HighlightAnnotation";
 import {annotationAPI} from "../apis/annotationAPI";
-import UnderlineAnnotation from "./annotations/UnderlineAnnotation";
-import {Annotation} from "./annotations/Annotation";
+import {UnderlineAnnotation} from "./annotations/UnderlineAnnotation";
+import {Annotation, BoundingBoxCalc} from "./annotations/Annotation";
 import * as StompJs from "@stomp/stompjs";
 
 const ANNOTATION_COMPONENTS = {
     'HighlightAnnotation': HighlightAnnotation,
+    'UnderlineAnnotation': UnderlineAnnotation,
     'TinyText': TinyText,
     'ParagraphCustom': ParagraphCustom,
     'ParagraphSideBar': ParagraphSideBar,
@@ -35,7 +36,7 @@ function Noteboard({pdfName}) {
         "TinyText": addTinyText,
         'HighlightAnnotation': addHighlightAnnotation,
         'ParagraphCustom': addParagraphCustomAnnotation,
-        'Underline': addUnderlineAnnotation
+        'UnderlineAnnotation': addUnderlineAnnotation
     }
 
     useEffect(() => {
@@ -171,8 +172,12 @@ function Noteboard({pdfName}) {
     async function addUnderlineAnnotation() {
         let selection = window.getSelection();
         if (selection.rangeCount < 1) return;
-        let scroll = {x: window.scrollX, y: window.scrollY};
-        const props = {selection: selection, category: null, scroll, annotation: "UnderlineAnnotation"};
+        const props = {
+            selection: selection,
+            category: currentCategory.current,
+            annotation: "UnderlineAnnotation"
+        };
+        BoundingBoxCalc(props);
         return await annotationAPI.saveAnnotation(props, pdfName).then((data) => {
             props.id = data.idAnnotation;
             setAnnotations({...annotations, [props['id']]: props});
@@ -183,13 +188,12 @@ function Noteboard({pdfName}) {
     async function addHighlightAnnotation() {
         let selection = window.getSelection();
         if (selection.rangeCount < 1) return;
-        let scroll = {x: window.scrollX, y: window.scrollY};
         const props = {
             selection: selection,
             category: currentCategory.current,
-            scroll,
             annotation: "HighlightAnnotation"
         };
+        BoundingBoxCalc(props);
         return await annotationAPI.saveAnnotation(props, pdfName).then((data) => {
             props.id = data.idAnnotation;
             setAnnotations({...annotations, [props['id']]: props});
@@ -253,7 +257,7 @@ function Noteboard({pdfName}) {
                     <div
                         className="tool add-post-it"
                         id="add-post-it-green"
-                        onClick={addHighlightAnnotation}
+                        onClick={() => setCreatingComponent("HighlightAnnotation")}
                     >
                         ✎
                     </div>
@@ -271,7 +275,7 @@ function Noteboard({pdfName}) {
                     </div>
                     <div
                         className="tool add-post-it"
-                        onClick={addUnderlineAnnotation}
+                        onClick={() => setCreatingComponent("UnderlineAnnotation")}
                     >
                         ⎁
                     </div>
