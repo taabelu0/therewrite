@@ -3,16 +3,17 @@ import React from "react";
 export class Annotation extends React.Component {
     constructor(props) {
         super(props);
+
         this.state = {
             count: 0,
-            currentSelection: props.selection,
-            currentCategory: props.category,
-            currentHeight: props.height,
-            currentWidth: props.width,
-            currentTop: props.top,
-            currentLeft: props.left,
-            currentScrollX: props.scrollX,
-            currentScrollY: props.scrollY,
+            currentSelection: props.annotation.selection,
+            currentCategory: props.annotation.category,
+            currentHeight: props.annotation.height,
+            currentWidth: props.annotation.width,
+            currentTop: props.annotation.top,
+            currentLeft: props.annotation.left,
+            currentScrollX: props.annotation.scrollX,
+            currentScrollY: props.annotation.scrollY,
         };
         this.incrementCount = this.incrementCount.bind(this)
     }
@@ -41,20 +42,54 @@ export function AnnotationCalc(props) {
     }
 }
 
-export function ParagraphSideBarCalc(props) {
-    const offset = 0;
+export function BoundingBoxCalc(props) {
     AnnotationCalc(props);
-    props.top = props.top || (props.bound.top + props.scrollY);
-    props.left = props.left || (props.bound.left + props.scrollX - offset);
-    props.width = props.width || 10;
-    props.height = props.height || props.bound.height;
-}
+    const rects = props.range.getClientRects();
 
-export function ParagraphCustomCalc(props) {
-    const offset = 0;
-    AnnotationCalc(props);
-    props.top = props.top || (props.bound.top + props.scrollY);
-    props.left = props.left || (props.bound.left + props.scrollX - offset);
-    props.width = props.width || (props.bound.width + offset * 2);
-    props.height = props.height || props.bound.height;
+    if (rects.length < 1) return;
+
+    let underlineRects = [];
+    let prevTop = null;
+    let maxTop = [];
+    let differenceMax = 25
+
+    Array.from(rects).forEach((rect, index) => {
+        const isValidTop = Number.isFinite(rect.top);
+        const isValidLeft = Number.isFinite(rect.left);
+
+        let adjustedTop = isValidTop ? rect.top + props.scrollY : rect.top;
+        let adjustedLeft = isValidLeft ? rect.left + props.scrollX : rect.left;
+
+        adjustedTop = Math.round(adjustedTop * 100) / 100
+
+        const underlineRect = {
+            top: adjustedTop,
+            left: adjustedLeft,
+            width: rect.width,
+            height: rect.height,
+        };
+
+        underlineRects.push(underlineRect);
+
+        let isBigger = false
+        let isNeverSameLine = true
+        let lengthMaxTop = maxTop.length
+
+        for(let i = 0; i < lengthMaxTop && !isBigger; i++) {
+            if (Math.abs(adjustedTop - maxTop[i]) < differenceMax) {
+                isNeverSameLine = false
+                isBigger = maxTop[i] < adjustedTop;
+                maxTop[i] = isBigger ? (adjustedTop) : maxTop[i];
+            }
+        }
+
+        if(maxTop.length === 0 || isNeverSameLine){
+            maxTop.push(adjustedTop)
+        }
+
+        prevTop = isValidTop ? rect.top : null;
+    });
+    underlineRects = underlineRects.filter(rects => maxTop.some(mt => Math.abs(rects.top - mt) < 0.5))
+    console.log(underlineRects)
+    props.rects = underlineRects;
 }

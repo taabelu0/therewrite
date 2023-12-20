@@ -53,5 +53,45 @@
 .underline {
   position: absolute;
   border-bottom: 1px solid red; /* Adjust color as needed */
-  height: 50px;
+  &-definition {
+    border-color: #69E0A8;
+  }
+  &-explosion {
+    border-color: #F1BD4C;
+  }
+  &-deletion {
+    border-color: #EB5683;
+  }
+  &-correction {
+    border-color: #3859A2;
+  }
+  &-speculation {
+    border-color: #EE7A30;
+  }
+  &-addition {
+    border-color: #7FA036;
+  }
+}
+
+.highlight {
+  position: absolute;
+  opacity: 0.5;
+  &-definition {
+    background-color: #69E0A8;
+  }
+  &-explosion {
+    background-color: #F1BD4C;
+  }
+  &-deletion {
+    background-color: #EB5683;
+  }
+  &-correction {
+    background-color: #3859A2;
+  }
+  &-speculation {
+    background-color: #EE7A30;
+  }
+  &-addition {
+    background-color: #7FA036;
+  }
 }

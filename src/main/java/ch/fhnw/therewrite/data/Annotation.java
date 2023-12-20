@@ -1,44 +1,54 @@
 package ch.fhnw.therewrite.data;
-import com.fasterxml.jackson.annotation.JacksonAnnotation;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import org.hibernate.annotations.ColumnTransformer;
 import org.hibernate.annotations.GenericGenerator;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.UUID;
 
 @Entity
 @Table(name = "Annotation")
-public class Annotation {
+public class Annotation implements Serializable {
 
     @jakarta.persistence.Id
     @GeneratedValue(generator = "uuid2")
     @GenericGenerator(name = "uuid2", strategy = "uuid2")
     @Column(name = "id")
+    @JsonProperty
     private UUID idAnnotation;
 
     @Column(columnDefinition = "jsonb")
     @ColumnTransformer(write = "?::jsonb")
+    @JsonProperty
     private String annotationDetail;
 
     @ManyToOne
     @JoinColumn(name = "idUserCreator")
+    @JsonProperty
     private User userCreator;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER) // needs eager
     @JoinColumn(name = "documentId", nullable = false)
+    @JsonProperty
     private Document documentId;
 
+    @JsonProperty
     private Timestamp timeCreated = new Timestamp(System.currentTimeMillis());
 
+    @JsonProperty
     private String annotationType;
 
     @ManyToOne
     @JoinColumn(name = "idUserLastEditor")
+    @JsonProperty
     private User userLastEditor;
 
+    @JsonProperty
     private Timestamp timeLastEdited = new Timestamp(System.currentTimeMillis());
 
+    @JsonProperty
     private String annotationText;
 
     public UUID getIdAnnotation() {

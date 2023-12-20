@@ -3,8 +3,10 @@ import '../../style/tiny-text.scss';
 import interact from 'interactjs';
 import {annotationAPI} from "../../apis/annotationAPI";
 
-export default function TinyText({id, category, dataX, dataY, text}) {
+export default function TinyText(props) {
+    let {id, category, dataX, dataY, text}  = props.annotation;
     const [tinyText, setTinyText] = useState(text);
+    const tinyTextText = useRef(text);
     const tinyTextRef = useRef(null);
 
     useEffect(() => {
@@ -19,6 +21,13 @@ export default function TinyText({id, category, dataX, dataY, text}) {
             }
         });
     }, []);
+
+    useEffect(() => {
+        setTinyText(text);
+    }, [props]);
+    useEffect(() => {
+        tinyTextText.current = tinyText;
+    }, [tinyText]);
 
     function enableTextEdit(event) {
         let textArea = event.target;
@@ -41,7 +50,7 @@ export default function TinyText({id, category, dataX, dataY, text}) {
         dataY += event.dy;
         target.style.transform = `translate(${dataX}px, ${dataY}px)`;
         if (event.button === 0) {
-            await updateTinyTextDetails(id, dataX, dataY, tinyText, category);
+            await updateTinyTextDetails(id, dataX, dataY, tinyTextText.current, category);
         }
     }
 
@@ -54,7 +63,7 @@ export default function TinyText({id, category, dataX, dataY, text}) {
     }
 
     async function updateTinyTextDetails(id, x, y, text, category) {
-        await annotationAPI.updateAnnotation(id, {
+        let tinyText = await annotationAPI.updateAnnotation(id, {
             annotationDetail: JSON.stringify({
                 category: category,
                 dataX: x,
@@ -63,6 +72,7 @@ export default function TinyText({id, category, dataX, dataY, text}) {
                 annotation: "TinyText"
             })
         });
+        props.onChange(tinyText.data);
     }
 
     return (
