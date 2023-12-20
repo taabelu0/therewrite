@@ -1,0 +1,62 @@
+// landingPage.scss
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
+
+body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  overflow-y: hidden;
+  font-family: 'Poppins', sans-serif;
+}
+
+.landing-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  height: 100vh;
+  background-color: #fff;
+}
+
+.landing-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding-left: 20px;
+  padding-right: 40px;
+}
+
+.landing-header h1 {
+  font-size: 2.5rem; /* Adjusted font size for the header */
+  color: #333;
+}
+
+.login-text {
+  font-size: 1.5rem;
+  color: #333;
+  cursor: pointer;
+  margin-right: 100px; /* Adjusted margin-left for the login text */
+}
+
+.landing-text {
+  max-width: 600px;
+  text-align: left;
+  font-size: 1.5rem;
+  line-height: 1.5;
+  margin-left: 150px;
+  margin-top: 150px;
+  color: #333;
+}
+
+.signup-button {
+  background-color: #000;
+  color: #fff !important;
+  padding: 15px 150px;
+  font-size: 1.5rem;
+  border: none;
+  cursor: pointer;
+  margin-top: 15px;
+  display: inline-block;
+  text-decoration: none; /* Remove default anchor tag underline */
+}
