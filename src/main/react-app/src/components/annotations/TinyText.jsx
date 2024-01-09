@@ -48,6 +48,15 @@ export default function TinyText(props) {
         const target = event.target;
         dataX += event.dx;
         dataY += event.dy;
+        props.onChange({
+            idAnnotation: id,
+            annotationDetail: JSON.stringify({
+                ...props.annotation,
+                dataX: dataX,
+                dataY: dataY,
+                text: tinyTextText.current,
+            })
+        });
         target.style.transform = `translate(${dataX}px, ${dataY}px)`;
         if (event.button === 0) {
             await updateTinyTextDetails(id, dataX, dataY, tinyTextText.current, category);
@@ -75,6 +84,17 @@ export default function TinyText(props) {
         props.onChange(tinyText.data);
     }
 
+    function valueChange(event) {
+        props.onChange({
+            idAnnotation: id,
+            annotationDetail: JSON.stringify({
+                ...props.annotation,
+                text: event.target.value,
+            })
+        });
+        setTinyText(event.target.value)
+    }
+
     return (
         <div className={`tiny-text tiny-text-${category.toLowerCase()}`} ref={tinyTextRef} style={{
             transform: `translate(${dataX}px, ${dataY}px)`
@@ -88,7 +108,7 @@ export default function TinyText(props) {
                     onInput={rescaleTinyText}
                     onDoubleClick={enableTextEdit}
                     onBlur={disableTextEdit}
-                    onChange={event => setTinyText(event.target.value)}
+                    onChange={valueChange}
                 />
             </div>
         </div>
