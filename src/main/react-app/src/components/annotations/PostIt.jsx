@@ -18,7 +18,7 @@ export default function PostIt(props) {
                 })
             ],
             listeners: {
-                move: dragMoveListener
+                move: dragMoveListener,
             }
         });
     }, []);
@@ -49,15 +49,25 @@ export default function PostIt(props) {
     async function dragMoveListener(event) {
         const target = event.target;
 
+
         setPostitPosition( (prevPosition) => {
             const newX = prevPosition.dataX + event.dx;
             const newY = prevPosition.dataY + event.dy;
+            props.onChange({
+                idAnnotation: id,
+                annotationDetail: JSON.stringify({
+                    ...props.annotation,
+                    dataX: newX,
+                    dataY: newY,
+                })
+            });
             target.style.transform = `translate(${newX}px, ${newY}px)`;
             if (event.button === 0) {
                 updatePostItDetails(id, newX, newY, postitTextRef.current, category);
             }
             return {dataX: newX, dataY: newY};
         });
+
     }
 
     async function updatePostItDetails(id, x, y, text, category) {
@@ -73,6 +83,17 @@ export default function PostIt(props) {
         props.onChange(postIt.data);
     }
 
+    function valueChange(event) {
+        props.onChange({
+            idAnnotation: id,
+            annotationDetail: JSON.stringify({
+                ...props.annotation,
+                text: event.target.value,
+            })
+        });
+        setPostitText(event.target.value)
+    }
+
     return (
         <div className={`post-it post-it-${category.toLowerCase()}`} ref={postitRef} style={{
             transform: `translate(${dataX}px, ${dataY}px)`
@@ -85,7 +106,7 @@ export default function PostIt(props) {
                     value={postitText}
                     onDoubleClick={enableTextEdit}
                     onBlur={disableTextEdit}
-                    onChange={event => setPostitText(event.target.value)}// Add appropriate label
+                    onChange={valueChange}// Add appropriate label
                 />
             </div>
             <div className="post-it-username">username</div>
