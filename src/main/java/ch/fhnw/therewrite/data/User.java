@@ -19,15 +19,6 @@ public class User {
     @Column(name = "id")
     private UUID idUser;
 
-
-    public UUID getIdUser() {
-        return idUser;
-    }
-
-    public void setIdUser(UUID idUser) {
-        this.idUser = idUser;
-    }
-
     public void setId(UUID id) {
         this.idUser= id;
     }
