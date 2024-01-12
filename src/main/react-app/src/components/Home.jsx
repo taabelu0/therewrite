@@ -4,6 +4,8 @@ import '../style/customDropZone.min.scss';
 import {useEffect, useRef, useState} from "react";
 import {pdfAPI} from "../apis/pdfAPI";
 import {baseURL} from "../apis/config/axiosConfig";
+import { Dropzone } from "dropzone";
+
 
 function Home() {
 
@@ -20,11 +22,27 @@ function Home() {
 
     const loaded = useRef(false);
     useEffect(() => {
-        if (!loaded.current && window.Dropzone && window.registerDropzone) {
+        if (!loaded.current && Dropzone) {
             loaded.current = true;
-            window.registerDropzone("#fileUpload", window.Dropzone, baseURL);
+            // window.registerDropzone("#fileUpload", window.Dropzone, baseURL);
+            registerDropzone("#fileUpload");
         }
     }, []);
+
+    function registerDropzone(id) {
+        let myDropzone = new Dropzone(id, {
+            url: baseURL + "/api/document",
+            method: "POST",
+            enctype: "multipart/form-data",
+            paramName: "file",
+        });
+        myDropzone.on("success", function (file, response) {
+            setTimeout(() => {
+                myDropzone.removeAllFiles();
+                // TODO: ADD FILE
+            }, 1200);
+        });
+    }
 
     return (
         <section id="content">

@@ -9,7 +9,7 @@ These instructions will get your copy of the project up and running on your loca
 - Java JDK 17
 - Apache Maven 3.9.1
 - Front-end build and development purposes: Node.js 20.9.0 -> npm 10.1.0
-- pgAdmin4: version 7.8 (PostgreSQL)
+- PostgreSQL: version 7.8 (pgAdmin4)
 
 ### Installing and Running the Full Application
 
@@ -46,18 +46,6 @@ Start the Spring Boot server with maven:
 
 4.**Access the Application**
 Available at `http://localhost:8080/`.
-
-### Deployment of Application
-
-Our GitLab pipeline is defined in the .gitlab-ci.yml file at the root of the repository. This pipeline automates the building, releasing (docker), and deployment of our application.
-
-**Key Stages of the Pipeline**
-- Build: This stage runs automated tests to ensure code quality.
-- Release: In this stage, the application is built.
-- Deploy: This final stage deploys the application to the designated server/environment.
-
-To get the production build running on your local machine follow these steps:
-- Get the newest docker image: TBD
 
 ### React Development
 
