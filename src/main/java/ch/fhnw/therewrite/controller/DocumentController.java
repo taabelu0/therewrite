@@ -1,5 +1,6 @@
 package ch.fhnw.therewrite.controller;
 
+import ch.fhnw.therewrite.data.Annotation;
 import ch.fhnw.therewrite.data.Document;
 import ch.fhnw.therewrite.data.User;
 import ch.fhnw.therewrite.repository.DocumentRepository;
@@ -77,11 +78,10 @@ public class DocumentController {
     }
 
     @PostMapping("")
-    public String saveDocument(@RequestParam("file") MultipartFile file, RedirectAttributes redirectAttributes) {
+    public ResponseEntity<Document> saveDocument(@RequestParam("file") MultipartFile file, RedirectAttributes redirectAttributes) {
         String extension = FilenameUtils.getExtension(file.getOriginalFilename());
         if(!Objects.equals(extension, "pdf")){
-            redirectAttributes.addFlashAttribute("message",
-                    "Please upload only files with the pdf extension");
+            return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE).body(null);
         }
         else {
             Document document = new Document();
@@ -103,10 +103,8 @@ public class DocumentController {
             catch(IOException exception) {
                 // TODO: log
             }
-            redirectAttributes.addFlashAttribute("message",
-                    "You successfully uploaded " + file.getOriginalFilename() + "!");
+            return ResponseEntity.status(HttpStatus.OK).body(document);
         }
-        return "redirect:/";
     }
 
     @DeleteMapping("/{documentId}")
