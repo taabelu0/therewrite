@@ -24,7 +24,6 @@ function Home() {
     useEffect(() => {
         if (!loaded.current && Dropzone) {
             loaded.current = true;
-            // window.registerDropzone("#fileUpload", window.Dropzone, baseURL);
             registerDropzone("#fileUpload");
         }
     }, []);
@@ -39,7 +38,8 @@ function Home() {
         myDropzone.on("success", function (file, response) {
             setTimeout(() => {
                 myDropzone.removeAllFiles();
-                // TODO: ADD FILE
+                let pdf = response;
+                setPdfs(prevState => [...prevState, pdf]);
             }, 1200);
         });
     }
@@ -50,15 +50,18 @@ function Home() {
                 <form id="fileUpload" className="dropzone-custom">Drag & Drop your file here</form>
 
                 <div className="list-container" id="list-of-pdf">
-                    {pdfs.map((pdf, index) => (
-                        <a key={index} href={"/view/" + pdf['id']} className="list-item">
-                            {pdf['documentName']}
-                        </a>
-                    ))}
+                    {pdfs.map(PDF)}
                 </div>
             </div>
         </section>
     );
+}
+
+function PDF(pdf, index) {
+    return(
+    <a key={index} href={"/view/" + pdf['id']} className="list-item">
+        {pdf['documentName']}
+    </a>);
 }
 
 export default Home;

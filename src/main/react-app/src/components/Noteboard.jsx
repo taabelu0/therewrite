@@ -246,14 +246,6 @@ function Noteboard({pdfName}) {
         >
             <nav id="sidebar">
                 <div id="toolbar">
-                    {/*<div*/}
-                    {/*    className="tool add-post-it"*/}
-                    {/*    id="add-post-it-green"*/}
-                    {/*    onClick={() => {*/}
-                    {/*        sendMessage({"message": "hello from js!"})*/}
-                    {/*    }}*/}
-                    {/*>S*/}
-                    {/*</div>*/}
                     <div
                         className={`tool add-post-it ${creatingComponent === "HighlightAnnotation" ? "add-tool-active" : ""}`}
                         id="add-post-it-green"
