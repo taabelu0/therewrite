@@ -14,17 +14,14 @@ variables:
 image: maven:3.9.0-eclipse-temurin-19-alpine
 
 before_script:
-  # Install yarn as outlined in (https://yarnpkg.com/lang/en/docs/install/#alternatives-stable)
-  - curl -o- -L https://yarnpkg.com/install.sh | bash
-  # Make available in the current terminal
-  - export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
-  - yarn install --cache-folder .yarn
+ - yarn install --cache-folder .yarn
 
 # Cache downloaded dependencies and plugins between builds.
 # To keep cache across branches add 'key: "$CI_JOB_NAME"'
 cache:
   paths:
     - .m2/repository
+    - node_modules/
     - .yarn
 
 stages:
