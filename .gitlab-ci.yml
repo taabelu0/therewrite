@@ -28,6 +28,9 @@ stages:
 
 build-job:
   stage: build
+  before_script:
+    - apk upgrade --no-cache 
+    - apk add --no-cache libgcc libstdc++ ncurses-libs
   script:
     - mvn $MAVEN_CLI_OPTS package
   coverage: '/Total.*?([0-9]{1,3})%/'
@@ -54,6 +57,7 @@ release-docker-job:
     - docker push $DOCKER_IMAGE_TAG
   only:
     - main
+    - feat/docker-react-app
 
 deploy-docker-job:
   stage: deploy
@@ -90,3 +94,4 @@ deploy-docker-job:
     - job: release-docker-job
   only:
     - main
+    - feat/docker-react-app

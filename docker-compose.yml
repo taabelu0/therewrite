@@ -1,20 +1,19 @@
 version: '3.5'
 services:
-    app:
-        image: cr.gitlab.fhnw.ch/ip34-23vt/ip34-23vt_therewrite/therewrite/frontend:latest
-        restart: always
-        ports:
-            - "8080:80"
-database:
-    container_name: postgresCont
-    image: postgres:latest
-    volumes:
-      - /var/lib/docker/volumes/postgres-volume/_data
-    ports:
-      - '5432:5432'
-    networks:
-      - therewrite
-
+  app:
+      image: cr.gitlab.fhnw.ch/ip34-23vt/ip34-23vt_therewrite/therewrite/frontend:latest
+      restart: always
+      ports:
+          - "8080:80"
+  database:
+      container_name: postgresCont
+      image: postgres:latest
+      volumes:
+        - /var/lib/docker/volumes/postgres-volume/_data
+      ports:
+        - '5432:5432'
+      networks:
+        - therewrite
 networks:
   therewrite:
     driver: bridge
