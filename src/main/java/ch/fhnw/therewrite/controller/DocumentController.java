@@ -2,6 +2,7 @@ package ch.fhnw.therewrite.controller;
 
 import ch.fhnw.therewrite.data.Annotation;
 import ch.fhnw.therewrite.data.Document;
+import ch.fhnw.therewrite.data.Guest;
 import ch.fhnw.therewrite.data.User;
 import ch.fhnw.therewrite.repository.DocumentRepository;
 import ch.fhnw.therewrite.repository.UserRepository;

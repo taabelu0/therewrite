@@ -3,25 +3,36 @@ package ch.fhnw.therewrite.data;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import org.hibernate.annotations.GenericGenerator;
+
+import java.time.LocalDateTime;
 import java.util.UUID;
 
+@Entity
+@Table(name = "Guest")
 public class Guest {
     @jakarta.persistence.Id
     @GeneratedValue(generator = "uuid2")
     @GenericGenerator(name = "uuid2")
     @Column(name = "id")
-    private UUID idGuest;
+    private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "documentId", nullable = false)
     @JsonProperty
     private Document documentId;
 
+    @Column(name = "name")
+    private String name;
+
     public void setId(UUID id) {
-        this.idGuest= id;
+        this.id = id;
     }
 
     public UUID getId() {
-        return idGuest;
+        return id;
+    }
+
+    public Document getDocumentId() {
+        return documentId;
     }
 }

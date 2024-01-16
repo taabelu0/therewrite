@@ -62,7 +62,7 @@ const isClientRectInsidePageRect = (clientRect, pageRect) => {
     return true;
 };
 
-const getClientRectsCustom = (range, pages, scroll, shouldOptimize = true) => {
+const getClientRectsCustom = (range, pages, scroll) => {
     const clientRects = Array.from(range.getClientRects());
     const rects = [];
     for (const clientRect of clientRects) {
@@ -84,11 +84,11 @@ const getClientRectsCustom = (range, pages, scroll, shouldOptimize = true) => {
             }
         }
     }
-    return shouldOptimize ? optimizeClientRects(rects) : rects;
+    return optimizeClientRects(rects);
 };
 
 export function BoundingBoxCalc(props) {
     AnnotationCalc(props);
     props.rects = getClientRectsCustom(props.range, getPagesFromRange(props.range),
-        {scrollX: props.scrollX, scrollY: props.scrollY}, true);
+        {scrollX: props.scrollX, scrollY: props.scrollY});
 }

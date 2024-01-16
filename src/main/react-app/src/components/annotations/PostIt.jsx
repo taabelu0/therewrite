@@ -59,6 +59,7 @@ export default function PostIt(props) {
                     ...props.annotation,
                     dataX: newX,
                     dataY: newY,
+                    text: postitTextRef.current
                 })
             });
             target.style.transform = `translate(${newX}px, ${newY}px)`;
@@ -84,6 +85,7 @@ export default function PostIt(props) {
     }
 
     function valueChange(event) {
+        setPostitText(event.target.value)
         props.onChange({
             idAnnotation: id,
             annotationDetail: JSON.stringify({
@@ -91,7 +93,6 @@ export default function PostIt(props) {
                 text: event.target.value,
             })
         });
-        setPostitText(event.target.value)
     }
 
     return (
