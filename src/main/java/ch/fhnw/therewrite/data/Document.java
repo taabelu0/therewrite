@@ -14,11 +14,11 @@ public class Document {
     @JsonIgnore
     private List<Annotation> annotations = new ArrayList<>();
 
-    @OneToMany(mappedBy = "guestId", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "documentId", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Guest> guests = new ArrayList<>();
 
-    @OneToMany(mappedBy = "accessTokenId", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "documentId", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JsonIgnore
     private List<DocumentAccessToken> accessTokens = new ArrayList<>();
     @jakarta.persistence.Id
