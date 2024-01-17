@@ -5,6 +5,8 @@ services:
       restart: always
       ports:
           - "8080:80"
+      networks:
+        - therewrite
   database:
       container_name: postgresCont
       image: postgres:latest
@@ -16,6 +18,8 @@ services:
         - /var/lib/docker/volumes/postgres-volume/_data
       ports:
         - '5432:5432'
+      expose:
+        - '5432'
       networks:
         - therewrite
 networks:
