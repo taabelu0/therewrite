@@ -27,3 +27,12 @@ export class ParagraphCustom extends Annotation {
         </div>)
     };
 }
+
+export function ParagraphCustomCalc(props) {
+    const offset = 0;
+    AnnotationCalc(props);
+    props.top = props.top || (props.bound.top + props.scrollY);
+    props.left = props.left || (props.bound.left + props.scrollX - offset);
+    props.width = props.width || (props.bound.width + offset * 2);
+    props.height = props.height || props.bound.height;
+}

@@ -1,48 +1,31 @@
 import {Annotation, AnnotationCalc} from './Annotation.jsx';
 
-export default class UnderlineAnnotation extends Annotation {
+export class UnderlineAnnotation extends Annotation {
     offset = 10;
 
     constructor(props) {
         super(props);
-        this.state.currentRects = props.rects || [];
+        this.state.currentRects = props.annotation.rects || [];
+        console.log('HELLO', props.annotation.rects)
     }
-
- /*   componentDidMount() {
-        // Add event listener for scroll events
-        window.addEventListener('scroll', this.handleScroll);
-    }
-
-    componentWillUnmount() {
-        // Remove event listener when component is unmounted
-        window.removeEventListener('scroll', this.handleScroll);
-    }
-
-    handleScroll = () => {
-        // Update the state with the new scroll positions
-        this.setState({
-            scrollX: window.scrollX || window.pageXOffset || document.documentElement.scrollLeft,
-            scrollY: window.scrollY || window.pageYOffset || document.documentElement.scrollTop,
-        });
-    };*/
 
     render() {
         return (
             <div>
                 {this.state.currentRects.map((rect, index) => {
-                        return (
-                            <div
-                                key={`underline_${index}`}
-                                style={{
-                                    top: rect.top,
-                                    left: rect.left,
-                                    height: rect.height,
-                                    width: rect.width,
-                                }}
-                                className={"underline"}
-                            ></div>
-                        );
-                    })}
+                    return (
+                        <div
+                            key={`underline_${index}`}
+                            style={{
+                                top: rect.top,
+                                left: rect.left,
+                                height: rect.height,
+                                width: rect.width,
+                            }}
+                            className={"underline underline-" + this.state.currentCategory.toLowerCase()}
+                        ></div>
+                    );
+                })}
             </div>
         );
     }

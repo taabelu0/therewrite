@@ -1,18 +1,22 @@
 import React from "react";
+import optimizeClientRects from "react-pdf-highlighter/dist/cjs/lib/optimize-client-rects";
+import {getPagesFromRange} from "react-pdf-highlighter/dist/cjs/lib/pdfjs-dom";
+
 
 export class Annotation extends React.Component {
     constructor(props) {
         super(props);
+
         this.state = {
             count: 0,
-            currentSelection: props.selection,
-            currentCategory: props.category,
-            currentHeight: props.height,
-            currentWidth: props.width,
-            currentTop: props.top,
-            currentLeft: props.left,
-            currentScrollX: props.scrollX,
-            currentScrollY: props.scrollY,
+            currentSelection: props.annotation.selection,
+            currentCategory: props.annotation.category,
+            currentHeight: props.annotation.height,
+            currentWidth: props.annotation.width,
+            currentTop: props.annotation.top,
+            currentLeft: props.annotation.left,
+            currentScrollX: props.annotation.scrollX,
+            currentScrollY: props.annotation.scrollY,
         };
         this.incrementCount = this.incrementCount.bind(this)
     }
@@ -42,20 +46,50 @@ export function AnnotationCalc(props) {
     }
 }
 
-export function ParagraphSideBarCalc(props) {
-    const offset = 0;
-    AnnotationCalc(props);
-    props.top = props.top || (props.bound.top + props.scrollY);
-    props.left = props.left || (props.bound.left + props.scrollX - offset);
-    props.width = props.width || 10;
-    props.height = props.height || props.bound.height;
-}
+const isClientRectInsidePageRect = (clientRect, pageRect) => {
+    if (clientRect.top < pageRect.top) {
+        return false;
+    }
+    if (clientRect.bottom > pageRect.bottom) {
+        return false;
+    }
+    if (clientRect.right > pageRect.right) {
+        return false;
+    }
+    if (clientRect.left < pageRect.left) {
+        return false;
+    }
 
-export function ParagraphCustomCalc(props) {
-    const offset = 0;
+    return true;
+};
+
+const getClientRectsCustom = (range, pages, scroll) => {
+    const clientRects = Array.from(range.getClientRects());
+    const rects = [];
+    for (const clientRect of clientRects) {
+        for (const page of pages) {
+            const pageRect = page.node.getBoundingClientRect();
+            if (isClientRectInsidePageRect(clientRect, pageRect) &&
+                clientRect.width > 0 &&
+                clientRect.height > 0 &&
+                clientRect.width < pageRect.width &&
+                clientRect.height < pageRect.height) {
+                const highlightedRect = {
+                    top: clientRect.top + scroll.scrollY,
+                    left: clientRect.left + scroll.scrollX,
+                    width: clientRect.width,
+                    height: clientRect.height,
+                    pageNumber: page.number,
+                };
+                rects.push(highlightedRect);
+            }
+        }
+    }
+    return optimizeClientRects(rects);
+};
+
+export function BoundingBoxCalc(props) {
     AnnotationCalc(props);
-    props.top = props.top || (props.bound.top + props.scrollY);
-    props.left = props.left || (props.bound.left + props.scrollX - offset);
-    props.width = props.width || (props.bound.width + offset * 2);
-    props.height = props.height || props.bound.height;
+    props.rects = getClientRectsCustom(props.range, getPagesFromRange(props.range),
+        {scrollX: props.scrollX, scrollY: props.scrollY});
 }
