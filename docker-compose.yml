@@ -8,6 +8,10 @@ services:
   database:
       container_name: postgresCont
       image: postgres:latest
+      environment:
+        POSTGRES_USER: postres
+        POSTGRES_PASSWORD: admin
+        POSTGRES_DB: TheRewrite
       volumes:
         - /var/lib/docker/volumes/postgres-volume/_data
       ports:
