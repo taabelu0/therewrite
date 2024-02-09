@@ -24,15 +24,19 @@ public class Guest {
     @Column(name = "name")
     private String name;
 
-    public void setId(UUID id) {
-        this.id = id;
-    }
-
     public UUID getId() {
         return id;
     }
 
     public Document getDocumentId() {
         return documentId;
+    }
+
+    public void setDocumentId(Document documentId) {
+        this.documentId = documentId;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }

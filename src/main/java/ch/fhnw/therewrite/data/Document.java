@@ -83,13 +83,11 @@ public class Document {
         this.guests = guests;
     }
 
-    // Helper method to add an annotation
     public void addAnnotation(Annotation annotation) {
         this.annotations.add(annotation);
         annotation.setDocument(this);
     }
 
-    // Helper method to remove an annotation
     public void removeAnnotation(Annotation annotation) {
         this.annotations.remove(annotation);
         annotation.setDocument(null);
