@@ -1,7 +1,7 @@
 import {Annotation} from './Annotation.jsx';
 import {AnnotationCalc} from "./Annotation.jsx";
 export class ParagraphSideBar extends Annotation {
-    offset = 10;
+    static offset = 10;
     constructor(props) {
         super(props);
     }
@@ -16,10 +16,9 @@ export class ParagraphSideBar extends Annotation {
 }
 
 export function ParagraphSideBarCalc(props) {
-    const offset = 0;
     AnnotationCalc(props);
     props.top = props.top || (props.bound.top + props.scrollY);
-    props.left = props.left || (props.bound.left + props.scrollX - offset);
+    props.left = props.left || (props.bound.left + props.scrollX - ParagraphSideBar.offset);
     props.width = props.width || 10;
     props.height = props.height || props.bound.height;
 }
