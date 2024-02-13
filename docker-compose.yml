@@ -24,4 +24,6 @@ services:
         - therewrite
 networks:
   therewrite:
+    name: therewrite
+    external: true
     driver: bridge
