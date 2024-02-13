@@ -5,13 +5,20 @@ import ch.fhnw.therewrite.data.Guest;
 import ch.fhnw.therewrite.repository.DocumentRepository;
 import ch.fhnw.therewrite.repository.GuestRepository;
 import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.util.matcher.NegatedRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+
+import java.io.IOException;
 import java.util.UUID;
 
 @Component
@@ -40,7 +47,7 @@ public class GuestFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication instanceof AnonymousAuthenticationToken) {
             String uri = request.getRequestURI();
@@ -50,10 +57,13 @@ public class GuestFilter extends OncePerRequestFilter {
                 response.setStatus(HttpServletResponse.SC_ACCEPTED);
                 return;
             }
-            else {
-
-            }
         }
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+    }
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        RequestMatcher matcher = new NegatedRequestMatcher(new AntPathRequestMatcher("**/view/**"));
+        return matcher.matches(request);
     }
 }
