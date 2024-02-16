@@ -125,7 +125,7 @@ public class Annotation implements Serializable {
     public void patch(Annotation update) {
         // id, creator, document, type, timeCreated cannot change
         if(update.annotationDetail != null) this.setAnnotationDetail(update.annotationDetail);
-        if(update.annotationText != null) this.setAnnotationText(update.annotationText);
+        if(update.annotationText != null) this.setAnnotationText(update.annotationText); // Remove the isEmpty check
 
         this.setUserLastEditor(update.userLastEditor);
         this.setTimeLastEdited(update.timeLastEdited);
