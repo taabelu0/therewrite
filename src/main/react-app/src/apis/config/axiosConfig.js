@@ -16,8 +16,17 @@ const errorHandler = (error) => {
     return Promise.reject(error)
 }
 
+export const csrfInterceptor = (config) => {
+    const csrfToken = document.cookie.split('; ').find(row => row.startsWith('XSRF-TOKEN='));
+    const csrfTokenValue = csrfToken?.split('=')[1];
+    if (csrfTokenValue) {
+        config.headers['X-XSRF-TOKEN'] = csrfTokenValue;
+    }
+    return config;
+}
+
+
+api.interceptors.request.use(csrfInterceptor);
 // registering the custom error handler to the
 // "api" axios instance
-api.interceptors.response.use(undefined, (error) => {
-    return errorHandler(error)
-})
+api.interceptors.response.use(undefined, errorHandler)

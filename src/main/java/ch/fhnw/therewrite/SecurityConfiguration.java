@@ -9,8 +9,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.DefaultSecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import org.springframework.security.web.util.matcher.NegatedRequestMatcher;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 @Configuration
 @EnableWebSecurity
@@ -26,10 +25,13 @@ public class SecurityConfiguration {
     @Bean
     public DefaultSecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(auth -> auth
-                    .requestMatchers("/api/public/**").permitAll()
-                    .requestMatchers(new NegatedRequestMatcher(new AntPathRequestMatcher("/view/**"))).permitAll()
-                    .anyRequest().authenticated()
+                    .requestMatchers("/view/**").authenticated()
+                    // TODO: on user management implementation change this to be secure!! (.anyRequest().authenticated())
+                    .anyRequest().permitAll()
             )
+            .csrf(csrf -> csrf
+                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()) // cookie-based CSRF token repository
+                )
             .sessionManagement((session) -> session
                     .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
             )

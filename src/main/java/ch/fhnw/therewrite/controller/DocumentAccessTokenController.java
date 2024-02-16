@@ -35,35 +35,12 @@ public class DocumentAccessTokenController {
         } catch(IllegalArgumentException exception) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
+        // TODO: verify ownership of document (needs user management)
         DocumentAccessToken dat = new DocumentAccessToken();
         Document document = documentRepository.getReferenceById(dId);
         dat.setDocumentId(document);
         documentAccessTokenRepository.save(dat);
         return ResponseEntity.status(HttpStatus.OK).body(dat.getToken().toString());
-    }
-
-
-    @PostMapping("/verify")
-    public ResponseEntity<Boolean> verifyToken(@RequestBody Map<String, String> requestBody, HttpSession session) {
-        String documentAccessToken = requestBody.get("documentAccessToken");
-        String documentId = requestBody.get("documentId");
-        UUID dId;
-        try {
-            dId = UUID.fromString(documentId);
-        }
-        catch(IllegalArgumentException exception) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-        }
-        Document document = documentRepository.getReferenceById(dId);
-        boolean valid = document.getAccessTokens().stream().map(dat -> dat.getToken().toString())
-                .anyMatch(t -> t.equals(documentAccessToken));
-        if(valid) {
-            // create new guest if the token is valid
-            GuestController gC = new GuestController(guestRepository, documentRepository);
-            Guest guest = gC.createGuest(document);
-            session.setAttribute("guestId", guest.getDocumentId());
-        }
-        return ResponseEntity.status(HttpStatus.OK).body(valid);
     }
 
 }

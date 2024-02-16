@@ -5,6 +5,7 @@ import ch.fhnw.therewrite.data.Document;
 import ch.fhnw.therewrite.data.Guest;
 import ch.fhnw.therewrite.data.User;
 import ch.fhnw.therewrite.repository.DocumentRepository;
+import ch.fhnw.therewrite.repository.GuestRepository;
 import ch.fhnw.therewrite.repository.UserRepository;
 import ch.fhnw.therewrite.storage.StorageFileNotFoundException;
 import ch.fhnw.therewrite.storage.StorageService;
@@ -32,11 +33,13 @@ import java.util.UUID;
 public class DocumentController {
     private final DocumentRepository documentRepository;
     private final StorageService storageService;
+    private final GuestController gc;
 
     @Autowired
-    public DocumentController(DocumentRepository documentRepository, StorageService storageService) {
+    public DocumentController(DocumentRepository documentRepository, StorageService storageService, GuestRepository guestRepository) {
         this.documentRepository = documentRepository;
         this.storageService = storageService;
+        this.gc = new GuestController(guestRepository, documentRepository);
     }
 
     @GetMapping(
@@ -92,6 +95,8 @@ public class DocumentController {
             String fileName = document.getId().toString() + ".pdf";
             String filePath = Paths.get(fileName).toString();
             document.setPath(filePath);
+            Guest guest = gc.createGuest(document);
+            document.addGuest(guest);
             documentRepository.save(document);
             try {
                 MultipartFile storeFile = new MockMultipartFile(fileName,

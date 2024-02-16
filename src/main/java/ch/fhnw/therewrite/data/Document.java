@@ -3,6 +3,7 @@ package ch.fhnw.therewrite.data;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import org.hibernate.annotations.GenericGenerator;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -59,6 +60,7 @@ public class Document {
     public void setPath(String path) {
         this.path = path;
     }
+
     public List<Annotation> getAnnotations() {
         return annotations;
     }
@@ -81,6 +83,10 @@ public class Document {
 
     public void setGuests(List<Guest> guests) {
         this.guests = guests;
+    }
+
+    public boolean addGuest(Guest guest) {
+        return this.guests.add(guest);
     }
 
     public void addAnnotation(Annotation annotation) {
