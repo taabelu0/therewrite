@@ -1,44 +1,54 @@
 package ch.fhnw.therewrite.data;
-
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import org.hibernate.annotations.ColumnTransformer;
 import org.hibernate.annotations.GenericGenerator;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.UUID;
 
 @Entity
 @Table(name = "Annotation")
-public class Annotation {
+public class Annotation implements Serializable {
 
     @jakarta.persistence.Id
     @GeneratedValue(generator = "uuid2")
     @GenericGenerator(name = "uuid2", strategy = "uuid2")
     @Column(name = "id")
+    @JsonProperty
     private UUID idAnnotation;
 
     @Column(columnDefinition = "jsonb")
     @ColumnTransformer(write = "?::jsonb")
+    @JsonProperty
     private String annotationDetail;
 
     @ManyToOne
     @JoinColumn(name = "idUserCreator")
+    @JsonProperty
     private User userCreator;
 
-    @ManyToOne
-    @JoinColumn(name = "documentId")
+    @ManyToOne(fetch = FetchType.EAGER) // needs eager
+    @JoinColumn(name = "documentId", nullable = false)
+    @JsonProperty
     private Document documentId;
 
+    @JsonProperty
     private Timestamp timeCreated = new Timestamp(System.currentTimeMillis());
 
-    private String annotationType = "text";
+    @JsonProperty
+    private String annotationType;
 
     @ManyToOne
     @JoinColumn(name = "idUserLastEditor")
+    @JsonProperty
     private User userLastEditor;
 
+    @JsonProperty
     private Timestamp timeLastEdited = new Timestamp(System.currentTimeMillis());
 
+    @JsonProperty
     private String annotationText;
 
     public UUID getIdAnnotation() {
@@ -47,19 +57,6 @@ public class Annotation {
 
     public void setIdAnnotation(UUID idAnnotation) {
         this.idAnnotation = idAnnotation;
-    }
-
-    public String toString() {
-        return "Annotation{" +
-                "idAnnotation=" + idAnnotation +
-                ", userCreator=" + userCreator +
-                ", timeCreated=" + timeCreated +
-                ", userLastEditor=" + userLastEditor +
-                ", timeLastEdited=" + timeLastEdited +
-                ", annotationText='" + annotationText + '\'' +
-                ", annotationType=" + annotationType +
-                ", annotationDetail='" + annotationDetail + '\'' +
-                '}';
     }
 
     public Document getDocument() {
@@ -123,5 +120,27 @@ public class Annotation {
 
     public void setAnnotationDetail(String annotationDetail) {
         this.annotationDetail = annotationDetail;
+    }
+
+    public void patch(Annotation update) {
+        // id, creator, document, type, timeCreated cannot change
+        if(update.annotationDetail != null) this.setAnnotationDetail(update.annotationDetail);
+        if(update.annotationText != null) this.setAnnotationText(update.annotationText);
+
+        this.setUserLastEditor(update.userLastEditor);
+        this.setTimeLastEdited(update.timeLastEdited);
+    }
+
+    public String toString() {
+        return "Annotation{" +
+                "idAnnotation=" + idAnnotation +
+                ", userCreator=" + userCreator +
+                ", timeCreated=" + timeCreated +
+                ", userLastEditor=" + userLastEditor +
+                ", timeLastEdited=" + timeLastEdited +
+                ", annotationText='" + annotationText + '\'' +
+                ", annotationType=" + annotationType +
+                ", annotationDetail='" + annotationDetail + '\'' +
+                '}';
     }
 }

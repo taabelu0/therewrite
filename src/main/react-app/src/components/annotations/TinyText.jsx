@@ -3,8 +3,10 @@ import '../../style/tiny-text.scss';
 import interact from 'interactjs';
 import {annotationAPI} from "../../apis/annotationAPI";
 
-export default function TinyText({ id, category, dataX, dataY, text }) {
+export default function TinyText(props) {
+    let {id, category, dataX, dataY, text}  = props.annotation;
     const [tinyText, setTinyText] = useState(text);
+    const tinyTextText = useRef(text);
     const tinyTextRef = useRef(null);
 
     useEffect(() => {
@@ -20,6 +22,13 @@ export default function TinyText({ id, category, dataX, dataY, text }) {
         });
     }, []);
 
+    useEffect(() => {
+        setTinyText(text);
+    }, [props]);
+    useEffect(() => {
+        tinyTextText.current = tinyText;
+    }, [tinyText]);
+
     function enableTextEdit(event) {
         let textArea = event.target;
         textArea.readOnly = false;
@@ -33,17 +42,24 @@ export default function TinyText({ id, category, dataX, dataY, text }) {
         textArea.readOnly = true;
         textArea.style.userSelect = false;
         textArea.classList.remove("tiny-text-input-selected");
-
-        await updateTinyText(id, textArea.value);
+        await updateTinyTextDetails(id, dataX, dataY, textArea.value, category);
     }
     async function dragMoveListener(event) {
         const target = event.target;
         dataX += event.dx;
         dataY += event.dy;
+        props.onChange({
+            idAnnotation: id,
+            annotationDetail: JSON.stringify({
+                ...props.annotation,
+                dataX: dataX,
+                dataY: dataY,
+                text: tinyTextText.current,
+            })
+        });
         target.style.transform = `translate(${dataX}px, ${dataY}px)`;
-
         if (event.button === 0) {
-            updateTinyTextDetails(id, dataX, dataY, tinyText);
+            await updateTinyTextDetails(id, dataX, dataY, tinyTextText.current, category);
         }
     }
 
@@ -53,15 +69,30 @@ export default function TinyText({ id, category, dataX, dataY, text }) {
         fake.innerText = event.target.value;
         event.target.parentElement.appendChild(fake);
         event.target.style.width = `${fake.clientWidth + 20}px`;
-
     }
 
-    async function updateTinyTextDetails(id, x, y, text) {
-        await annotationAPI.updateAnnotationDetails(id, x, y, text, "TinyText", category);
+    async function updateTinyTextDetails(id, x, y, text, category) {
+        let tinyText = await annotationAPI.updateAnnotation(id, {
+            annotationDetail: JSON.stringify({
+                category: category,
+                dataX: x,
+                dataY: y,
+                text: text,
+                annotation: "TinyText"
+            })
+        });
+        props.onChange(tinyText.data);
     }
 
-    async function updateTinyText(id, text) {
-        await annotationAPI.updateAnnotationText(id, text);
+    function valueChange(event) {
+        props.onChange({
+            idAnnotation: id,
+            annotationDetail: JSON.stringify({
+                ...props.annotation,
+                text: event.target.value,
+            })
+        });
+        setTinyText(event.target.value)
     }
 
     return (
@@ -77,7 +108,7 @@ export default function TinyText({ id, category, dataX, dataY, text }) {
                     onInput={rescaleTinyText}
                     onDoubleClick={enableTextEdit}
                     onBlur={disableTextEdit}
-                    onChange={event => setTinyText(event.target.value)}
+                    onChange={valueChange}
                 />
             </div>
         </div>

@@ -1,16 +1,14 @@
 import React, {useState, useRef, useEffect} from 'react';
 import '../../style/post-it.scss';
 import interact from 'interactjs';
-import GreenPostIt from "./postits/post-it-green.png";
-import RedPostIt from "./postits/post-it-red.png";
-import YellowPostIt from "./postits/post-it-yellow.png";
-import {api} from "../../apis/config/axiosConfig";
 import {annotationAPI} from "../../apis/annotationAPI";
 
-export default function PostIt({id, category, dataX, dataY, text}) {
+export default function PostIt(props) {
+    let {id, category, dataX, dataY, text}  = props.annotation;
     const [postitText, setPostitText] = useState(text);
+    const postitTextRef = useRef(text);
     const postitRef = useRef(null);
-    const [postitPosition, setPostitPosition] = useState({dataX, dataY});
+    const [postitPosition, setPostitPosition] = useState({dataX: Number(dataX) || 0, dataY: Number(dataY) || 0});
 
     useEffect(() => {
         interact(postitRef.current).draggable({
@@ -20,10 +18,17 @@ export default function PostIt({id, category, dataX, dataY, text}) {
                 })
             ],
             listeners: {
-                move: dragMoveListener
+                move: dragMoveListener,
             }
         });
     }, []);
+
+    useEffect(() => {
+        setPostitText(text);
+    }, [props]);
+    useEffect(() => {
+        postitTextRef.current = postitText;
+    }, [postitText]);
 
     function enableTextEdit(event) {
         let textArea = event.target;
@@ -38,32 +43,56 @@ export default function PostIt({id, category, dataX, dataY, text}) {
         textArea.readOnly = true;
         textArea.style.userSelect = false;
         textArea.classList.remove("post-it-input-selected");
-
-        await updatePostItText(id, textArea.value);
+        await updatePostItDetails(id, postitPosition.dataX, postitPosition.dataY, postitTextRef.current, category);
     }
 
     async function dragMoveListener(event) {
         const target = event.target;
 
-        setPostitPosition((prevPosition) => {
+
+        setPostitPosition( (prevPosition) => {
             const newX = prevPosition.dataX + event.dx;
             const newY = prevPosition.dataY + event.dy;
+            props.onChange({
+                idAnnotation: id,
+                annotationDetail: JSON.stringify({
+                    ...props.annotation,
+                    dataX: newX,
+                    dataY: newY,
+                    text: postitTextRef.current
+                })
+            });
             target.style.transform = `translate(${newX}px, ${newY}px)`;
-
             if (event.button === 0) {
-                updatePostItDetails(id, newX, newY, null, postitText, category);
+                updatePostItDetails(id, newX, newY, postitTextRef.current, category);
             }
-
             return {dataX: newX, dataY: newY};
         });
+
     }
 
-    async function updatePostItDetails(id, x, y, color, text, category) {
-        await annotationAPI.updateAnnotationDetails(id, x, y, text, "PostIt", category);
+    async function updatePostItDetails(id, x, y, text, category) {
+        let postIt = await annotationAPI.updateAnnotation(id, {
+            annotationDetail: JSON.stringify({
+                category: category,
+                dataX: x,
+                dataY: y,
+                text: text,
+                annotation: "PostIt"
+            })
+        });
+        props.onChange(postIt.data);
     }
 
-    async function updatePostItText(id, text) {
-        await annotationAPI.updateAnnotationText(id, text);
+    function valueChange(event) {
+        setPostitText(event.target.value)
+        props.onChange({
+            idAnnotation: id,
+            annotationDetail: JSON.stringify({
+                ...props.annotation,
+                text: event.target.value,
+            })
+        });
     }
 
     return (
@@ -78,7 +107,7 @@ export default function PostIt({id, category, dataX, dataY, text}) {
                     value={postitText}
                     onDoubleClick={enableTextEdit}
                     onBlur={disableTextEdit}
-                    onChange={event => setPostitText(event.target.value)}// Add appropriate label
+                    onChange={valueChange}// Add appropriate label
                 />
             </div>
             <div className="post-it-username">username</div>
