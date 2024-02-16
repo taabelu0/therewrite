@@ -1,7 +1,9 @@
 package ch.fhnw.therewrite;
 
+import ch.fhnw.therewrite.controller.DocumentAccessTokenController;
 import ch.fhnw.therewrite.controller.GuestController;
 import ch.fhnw.therewrite.data.Document;
+import ch.fhnw.therewrite.data.DocumentAccessToken;
 import ch.fhnw.therewrite.data.Guest;
 import ch.fhnw.therewrite.repository.DocumentRepository;
 import ch.fhnw.therewrite.repository.GuestRepository;
@@ -20,6 +22,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.UUID;
 
 @Component
@@ -56,13 +59,14 @@ public class GuestFilter extends OncePerRequestFilter {
             return false;
         }
         Document document = documentRepository.getReferenceById(dId);
-        boolean valid = document.getAccessTokens().stream().map(dat -> dat.getToken().toString())
+        List<DocumentAccessToken> dats = document.getAccessTokens();
+        boolean valid = dats.stream()
+                .map(dat -> dat.getToken().toString())
                 .anyMatch(t -> t.equals(documentAccessToken));
         if(valid) {
             // create new guest if the token is valid
             GuestController gC = new GuestController(guestRepository, documentRepository);
             Guest guest = gC.createGuest(document);
-            document.addGuest(guest);
             session.setAttribute("guestId", guest.getId());
         }
         return valid;
@@ -70,7 +74,6 @@ public class GuestFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        System.out.println("checking if guest...");
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // default is unauthorized
         String uri = request.getRequestURI();
         String docId = uri.substring(uri.lastIndexOf('/') + 1); // assumes we are accessing a pdf resource which uses the pdf-id in its URI!!
@@ -82,8 +85,9 @@ public class GuestFilter extends OncePerRequestFilter {
                 return; // no need to go through potential token authorization if guest is already registered
             }
         }
-        if(request.getAttribute("documentAccessToken") != null) {
-            if(verifyToken(request.getAttribute("documentAccessToken").toString(), docId, request.getSession())) {
+        if(request.getParameter("documentAccessToken") != null) {
+            System.out.println(request.getParameter("documentAccessToken").toString() + ", " + docId +  ", " + request.getSession());
+            if(verifyToken(request.getParameter("documentAccessToken").toString(), docId, request.getSession())) {
                 response.setStatus(HttpServletResponse.SC_ACCEPTED);
             }
         }

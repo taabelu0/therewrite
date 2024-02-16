@@ -56,8 +56,9 @@ function Home() {
 
     function displayInviteLink(pdf) {
         accessTokenAPI.create(pdf.id).then(token => {
-            alert(window.location.origin + "/" + token);
-            window.open(window.location.origin + "/" + token);
+            let url = window.location.origin + "/view/" + pdf.id + "?documentAccessToken=" + token;
+            alert(url);
+            window.open(url);
         });
     }
 

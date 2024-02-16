@@ -33,13 +33,11 @@ import java.util.UUID;
 public class DocumentController {
     private final DocumentRepository documentRepository;
     private final StorageService storageService;
-    private final GuestController gc;
 
     @Autowired
-    public DocumentController(DocumentRepository documentRepository, StorageService storageService, GuestRepository guestRepository) {
+    public DocumentController(DocumentRepository documentRepository, StorageService storageService) {
         this.documentRepository = documentRepository;
         this.storageService = storageService;
-        this.gc = new GuestController(guestRepository, documentRepository);
     }
 
     @GetMapping(
@@ -95,8 +93,6 @@ public class DocumentController {
             String fileName = document.getId().toString() + ".pdf";
             String filePath = Paths.get(fileName).toString();
             document.setPath(filePath);
-            Guest guest = gc.createGuest(document);
-            document.addGuest(guest);
             documentRepository.save(document);
             try {
                 MultipartFile storeFile = new MockMultipartFile(fileName,

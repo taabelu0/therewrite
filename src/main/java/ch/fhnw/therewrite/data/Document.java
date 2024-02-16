@@ -85,10 +85,6 @@ public class Document {
         this.guests = guests;
     }
 
-    public boolean addGuest(Guest guest) {
-        return this.guests.add(guest);
-    }
-
     public void addAnnotation(Annotation annotation) {
         this.annotations.add(annotation);
         annotation.setDocument(this);

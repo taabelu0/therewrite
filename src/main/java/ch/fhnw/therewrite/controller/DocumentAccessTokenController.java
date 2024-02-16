@@ -1,11 +1,9 @@
 package ch.fhnw.therewrite.controller;
 import ch.fhnw.therewrite.data.Document;
 import ch.fhnw.therewrite.data.DocumentAccessToken;
-import ch.fhnw.therewrite.data.Guest;
 import ch.fhnw.therewrite.repository.DocumentAccessTokenRepository;
 import ch.fhnw.therewrite.repository.DocumentRepository;
 import ch.fhnw.therewrite.repository.GuestRepository;
-import jakarta.servlet.http.HttpSession;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
