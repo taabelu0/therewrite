@@ -1,5 +1,6 @@
 package ch.fhnw.therewrite;
 
+import ch.fhnw.therewrite.repository.DocumentAccessTokenRepository;
 import ch.fhnw.therewrite.repository.DocumentRepository;
 import ch.fhnw.therewrite.repository.GuestRepository;
 import jakarta.servlet.FilterChain;
@@ -26,10 +27,12 @@ import java.util.function.Supplier;
 public class SecurityConfiguration {
     private final GuestRepository guestRepository;
     private final DocumentRepository documentRepository;
+    private final DocumentAccessTokenRepository documentAccessTokenRepository;
 
-    public SecurityConfiguration(GuestRepository guestRepository, DocumentRepository documentRepository) {
+    public SecurityConfiguration(GuestRepository guestRepository, DocumentRepository documentRepository, DocumentAccessTokenRepository documentAccessTokenRepository) {
         this.guestRepository = guestRepository;
         this.documentRepository = documentRepository;
+        this.documentAccessTokenRepository = documentAccessTokenRepository;
     }
 
     @Bean
@@ -49,7 +52,7 @@ public class SecurityConfiguration {
                 )
                 // authorization without login (guest):
                 .addFilterBefore(
-                        new GuestFilter(guestRepository, documentRepository),
+                        new GuestFilter(guestRepository, documentRepository, documentAccessTokenRepository),
                         UsernamePasswordAuthenticationFilter.class
                 ).addFilterAfter(
                         new CsrfCookieFilter(), BasicAuthenticationFilter.class

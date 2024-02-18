@@ -1,10 +1,10 @@
 package ch.fhnw.therewrite;
 
-import ch.fhnw.therewrite.controller.DocumentAccessTokenController;
 import ch.fhnw.therewrite.controller.GuestController;
 import ch.fhnw.therewrite.data.Document;
 import ch.fhnw.therewrite.data.DocumentAccessToken;
 import ch.fhnw.therewrite.data.Guest;
+import ch.fhnw.therewrite.repository.DocumentAccessTokenRepository;
 import ch.fhnw.therewrite.repository.DocumentRepository;
 import ch.fhnw.therewrite.repository.GuestRepository;
 import jakarta.servlet.FilterChain;
@@ -12,16 +12,19 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import org.springframework.data.domain.Example;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import org.springframework.security.web.util.matcher.NegatedRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -29,10 +32,12 @@ import java.util.UUID;
 public class GuestFilter extends OncePerRequestFilter {
     private final GuestRepository guestRepository;
     private final DocumentRepository documentRepository;
+    private final DocumentAccessTokenRepository documentAccessTokenRepository;
 
-    public GuestFilter(GuestRepository guestRepository, DocumentRepository documentRepository) {
+    public GuestFilter(GuestRepository guestRepository, DocumentRepository documentRepository, DocumentAccessTokenRepository documentAccessTokenRepository) {
         this.guestRepository = guestRepository;
         this.documentRepository = documentRepository;
+        this.documentAccessTokenRepository = documentAccessTokenRepository;
     }
     public boolean verifyGuest(String guestId, String documentId) {
         UUID dId;
@@ -59,7 +64,7 @@ public class GuestFilter extends OncePerRequestFilter {
             return false;
         }
         Document document = documentRepository.getReferenceById(dId);
-        List<DocumentAccessToken> dats = document.getAccessTokens();
+        List<DocumentAccessToken> dats = documentAccessTokenRepository.findByDocumentId(document);
         boolean valid = dats.stream()
                 .map(dat -> dat.getToken().toString())
                 .anyMatch(t -> t.equals(documentAccessToken));
@@ -74,23 +79,33 @@ public class GuestFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // default is unauthorized
+
         String uri = request.getRequestURI();
         String docId = uri.substring(uri.lastIndexOf('/') + 1); // assumes we are accessing a pdf resource which uses the pdf-id in its URI!!
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication instanceof AnonymousAuthenticationToken) {
             Object guestId = request.getSession().getAttribute("guestId");
             if(guestId != null && verifyGuest(guestId.toString(), docId)) {
+                System.out.println("accepted guest");
                 response.setStatus(HttpServletResponse.SC_ACCEPTED);
+                filterChain.doFilter(request, response);
                 return; // no need to go through potential token authorization if guest is already registered
             }
         }
         if(request.getParameter("documentAccessToken") != null) {
             System.out.println(request.getParameter("documentAccessToken").toString() + ", " + docId +  ", " + request.getSession());
             if(verifyToken(request.getParameter("documentAccessToken").toString(), docId, request.getSession())) {
+                System.out.println("accepted token");
                 response.setStatus(HttpServletResponse.SC_ACCEPTED);
+                List<SimpleGrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_GUEST"));
+                Authentication auth = new UsernamePasswordAuthenticationToken("guest", null, authorities);
+                SecurityContextHolder.getContext().setAuthentication(auth);
+                filterChain.doFilter(request, response);
+                return;
             }
         }
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        filterChain.doFilter(request, response);
     }
 
     @Override
