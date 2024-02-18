@@ -257,18 +257,8 @@ function Noteboard({pdfName}) {
         >
             {showCommentBox && (
                 <CommentBox
+                    annotation={tempHighlight}
                     coordinates={annotationCoordinates}
-                    onSave={(comment) => {
-                        if (tempHighlight !== null) {
-                            tempHighlight.annotationText = comment;
-                            annotationAPI.updateAnnotation(tempHighlight, pdfName).then((data) => {
-                                setAnnotations({...annotations, [tempHighlight.id]: tempHighlight}); // Update the annotations state
-                            });
-                            setShowCommentBox(false);
-                        } else {
-                            console.error('tempHighlight is not initialized');
-                        }
-                    }}
                     onCancel={() => setShowCommentBox(false)}
                 />
             )}
