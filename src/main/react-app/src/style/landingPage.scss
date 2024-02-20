@@ -1,13 +1,12 @@
-// landingPage.scss
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
 
 body {
   margin: 0;
   padding: 0;
-  overflow-x: hidden;
-  overflow-y: hidden;
   font-family: 'Poppins', sans-serif;
 }
+
+
 
 .landing-container {
   display: flex;
@@ -22,9 +21,9 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  width: 100%;
-  padding-left: 20px;
-  padding-right: 40px;
+  width: 96.5%;
+  padding-left: 40px;
+  padding-right: 20px;
 }
 
 .landing-header h1 {
@@ -51,6 +50,7 @@ body {
 
 .signup-button {
   background-color: #000;
+  border-radius: 3px;
   color: #fff !important;
   padding: 15px 150px;
   font-size: 1.5rem;
