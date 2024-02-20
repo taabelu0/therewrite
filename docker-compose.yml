@@ -4,7 +4,7 @@ services:
       image: cr.gitlab.fhnw.ch/ip34-23vt/ip34-23vt_therewrite/therewrite/frontend:latest
       restart: always
       ports:
-          - "8080:80"
+          - "80:8080"
       networks:
         - therewrite
   database:
