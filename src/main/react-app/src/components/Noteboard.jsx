@@ -2,6 +2,7 @@ import React, {useEffect, useRef, useState} from "react";
 import PostIt from "./annotations/PostIt";
 import TinyText from "./annotations/TinyText";
 import CommentBox from './CommentBox';
+import CommentSideBar from "./annotations/CommentSideBar";
 import '../style/annotations.scss';
 import {ParagraphSideBar, ParagraphSideBarCalc} from "./annotations/ParagraphSideBar";
 import {ParagraphCustom, ParagraphCustomCalc} from "./annotations/ParagraphCustom";
