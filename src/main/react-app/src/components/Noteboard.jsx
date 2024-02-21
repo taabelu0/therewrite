@@ -211,7 +211,7 @@ function Noteboard({pdfName}) {
             annotation: "TinyText"
         };
         return await annotationAPI.saveAnnotation(newTinyText, pdfName).then((data) => {
-            newTinyText.id = data.idAnnotation.idAnnotation;
+            newTinyText.id = data.idAnnotation;
             setAnnotations({...annotations, [newTinyText['id']]: newTinyText});
             return data;
         });
