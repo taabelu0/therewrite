@@ -1,6 +1,7 @@
 import React, {useEffect, useRef, useState} from "react";
 import PostIt from "./annotations/PostIt";
 import TinyText from "./annotations/TinyText";
+import CommentBox from './CommentBox';
 import '../style/annotations.scss';
 import {ParagraphSideBar, ParagraphSideBarCalc} from "./annotations/ParagraphSideBar";
 import {ParagraphCustom, ParagraphCustomCalc} from "./annotations/ParagraphCustom";
@@ -24,6 +25,9 @@ let stompClient = new StompJs.Client({brokerURL: 'ws://localhost:8080/ws'})
 function Noteboard({pdfName}) {
     const [creatingComponent, setCreatingComponent] = useState(null);
     const [annotations, setAnnotations] = useState({});
+    const [showCommentBox, setShowCommentBox] = useState(false);
+    const [tempHighlight, setTempHighlight] = useState(null);
+    const [annotationCoordinates, setAnnotationCoordinates] = useState({ x: 0, y: 0 });
     let width = useRef("100%");
     let height = useRef("100%");
     const [selectedCategory, setSelectedCategory] = useState("Definition");
@@ -116,6 +120,9 @@ function Noteboard({pdfName}) {
             let newAnno = await ADDING_COMPONENT[creatingComponent](selectedCategory, x, y);
             sendMessage(newAnno); // notifies websocket
             setCreatingComponent(null);
+            setTempHighlight(newAnno); // Set tempHighlight to the new annotation
+            setShowCommentBox(true);
+            setAnnotationCoordinates({ x, y });
         }, 50);
     }
 
@@ -178,6 +185,8 @@ function Noteboard({pdfName}) {
             annotation: "UnderlineAnnotation"
         };
         BoundingBoxCalc(props);
+        setTempHighlight(props);
+        setShowCommentBox(true);
         return await annotationAPI.saveAnnotation(props, pdfName).then((data) => {
             props.id = data.idAnnotation;
             setAnnotations({...annotations, [props['id']]: props});
@@ -193,6 +202,8 @@ function Noteboard({pdfName}) {
             category: currentCategory.current,
             annotation: "HighlightAnnotation"
         };
+        setTempHighlight(props);
+        setShowCommentBox(true);
         BoundingBoxCalc(props);
         return await annotationAPI.saveAnnotation(props, pdfName).then((data) => {
             props.id = data.idAnnotation;
@@ -244,6 +255,13 @@ function Noteboard({pdfName}) {
                 height: height.current,
             }}
         >
+            {showCommentBox && (
+                <CommentBox
+                    annotation={tempHighlight}
+                    coordinates={annotationCoordinates}
+                    onCancel={() => setShowCommentBox(false)}
+                />
+            )}
             <nav id="sidebar">
                 <div id="toolbar">
                     <div

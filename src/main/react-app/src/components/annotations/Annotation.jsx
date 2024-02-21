@@ -36,6 +36,7 @@ export function AnnotationCalc(props) {
     if (props.selection)  {
         if (props.selection.rangeCount < 1) throw new Error("No selection available");
         props.range = props.selection.getRangeAt(0);
+
         props.bound = props.range.getBoundingClientRect();
         props.scrollX = window.scrollX;
         props.scrollY = window.scrollY;
