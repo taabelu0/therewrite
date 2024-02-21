@@ -2,8 +2,9 @@ import React, {useEffect, useRef, useState} from "react";
 import PostIt from "./annotations/PostIt";
 import TinyText from "./annotations/TinyText";
 import CommentBox from './CommentBox';
-import CommentSideBar from "./annotations/CommentSideBar";
+import SidebarAnnotation from "./annotations/SidebarAnnotation";
 import '../style/annotations.scss';
+import '../style/sidebar.scss';
 import {ParagraphSideBar, ParagraphSideBarCalc} from "./annotations/ParagraphSideBar";
 import {ParagraphCustom, ParagraphCustomCalc} from "./annotations/ParagraphCustom";
 import {HighlightAnnotation} from "./annotations/HighlightAnnotation";
@@ -28,6 +29,7 @@ function Noteboard({pdfName}) {
     const [annotations, setAnnotations] = useState({});
     const [showCommentBox, setShowCommentBox] = useState(false);
     const [tempHighlight, setTempHighlight] = useState(null);
+    const [showSidebar, setShowSidebar] = useState(false);
     const [annotationCoordinates, setAnnotationCoordinates] = useState({ x: 0, y: 0 });
     let width = useRef("100%");
     let height = useRef("100%");
@@ -248,6 +250,10 @@ function Noteboard({pdfName}) {
         sendMessage(annotation);
     }
 
+    function toggleSidebar() {
+        setShowSidebar(!showSidebar);
+    }
+
     return (
         <section
             id={"workspace"}
@@ -263,7 +269,7 @@ function Noteboard({pdfName}) {
                     onCancel={() => setShowCommentBox(false)}
                 />
             )}
-            <nav id="sidebar">
+            <nav id="sidebar-nav">
                 <div id="toolbar">
                     <div
                         className={`tool add-post-it ${creatingComponent === "HighlightAnnotation" ? "add-tool-active" : ""}`}
@@ -334,6 +340,14 @@ function Noteboard({pdfName}) {
                     </div>
                 </div>
             </div>
+            <section className={"sidebar " + ((showSidebar) ? "sidebar-deactivated" : "")}>
+                <button className="sidebar-arrow" onClick={toggleSidebar}></button>
+                <div className="sidebar-content">
+                    {Object.keys(annotations).map(key => {
+                        return <SidebarAnnotation annotation={annotations[key]} />
+                    })}
+                </div>
+            </section>
         </section>
     );
 }
