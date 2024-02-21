@@ -25,7 +25,7 @@ function CommentBox({ annotation, onCancel, coordinates }) {
     }
 
     return (
-        <div className="comment-box" style={{ top: `${coordinates.y}px`, left: `${coordinates.x}px`, position: 'absolute', zIndex: 1000 }}>
+        <div className="comment-box" style={{ top: `${coordinates.y}px`, left: `${coordinates.x}px`, position: 'absolute' }}>
             <textarea
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}

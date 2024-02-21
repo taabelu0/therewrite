@@ -1,13 +1,12 @@
 @import "variables";
 
-
 .sidebar {
     position: fixed;
     right: 0;
     top: calc(max($s-nav-min-height, $s-nav-height));
     height: calc(100% - max($s-nav-min-height, $s-nav-height));
     width: 480px;
-    z-index: 9999;
+    z-index: 9998;
     display: flex;
     background-color: white;
 
@@ -24,6 +23,7 @@
         border: none;
         padding: 0;
         height: 100%;
+        background-color: $c-light-tertiary;
     }
 
     &-content {

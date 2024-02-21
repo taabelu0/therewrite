@@ -5,6 +5,7 @@ import CommentBox from './CommentBox';
 import SidebarAnnotation from "./annotations/SidebarAnnotation";
 import '../style/annotations.scss';
 import '../style/sidebar.scss';
+import '../style/addAnnotation.scss';
 import {ParagraphSideBar, ParagraphSideBarCalc} from "./annotations/ParagraphSideBar";
 import {ParagraphCustom, ParagraphCustomCalc} from "./annotations/ParagraphCustom";
 import {HighlightAnnotation} from "./annotations/HighlightAnnotation";
