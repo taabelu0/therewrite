@@ -5,6 +5,7 @@ import ch.fhnw.therewrite.data.Document;
 import ch.fhnw.therewrite.data.Guest;
 import ch.fhnw.therewrite.data.User;
 import ch.fhnw.therewrite.repository.DocumentRepository;
+import ch.fhnw.therewrite.repository.GuestRepository;
 import ch.fhnw.therewrite.repository.UserRepository;
 import ch.fhnw.therewrite.storage.StorageFileNotFoundException;
 import ch.fhnw.therewrite.storage.StorageService;
