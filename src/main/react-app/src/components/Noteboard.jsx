@@ -1,7 +1,11 @@
 import React, {useEffect, useRef, useState} from "react";
 import PostIt from "./annotations/PostIt";
 import TinyText from "./annotations/TinyText";
+import CommentBox from './CommentBox';
+import SidebarAnnotation from "./annotations/SidebarAnnotation";
 import '../style/annotations.scss';
+import '../style/sidebar.scss';
+import '../style/addAnnotation.scss';
 import {ParagraphSideBar, ParagraphSideBarCalc} from "./annotations/ParagraphSideBar";
 import {ParagraphCustom, ParagraphCustomCalc} from "./annotations/ParagraphCustom";
 import {HighlightAnnotation} from "./annotations/HighlightAnnotation";
@@ -24,6 +28,10 @@ let stompClient = new StompJs.Client({brokerURL: 'ws://localhost:8080/ws'})
 function Noteboard({pdfName}) {
     const [creatingComponent, setCreatingComponent] = useState(null);
     const [annotations, setAnnotations] = useState({});
+    const [showCommentBox, setShowCommentBox] = useState(false);
+    const [tempHighlight, setTempHighlight] = useState(null);
+    const [showSidebar, setShowSidebar] = useState(false);
+    const [annotationCoordinates, setAnnotationCoordinates] = useState({ x: 0, y: 0 });
     let width = useRef("100%");
     let height = useRef("100%");
     const [selectedCategory, setSelectedCategory] = useState("Definition");
@@ -116,6 +124,9 @@ function Noteboard({pdfName}) {
             let newAnno = await ADDING_COMPONENT[creatingComponent](selectedCategory, x, y);
             sendMessage(newAnno); // notifies websocket
             setCreatingComponent(null);
+            setTempHighlight(newAnno); // Set tempHighlight to the new annotation
+            setShowCommentBox(true);
+            setAnnotationCoordinates({ x, y });
         }, 50);
     }
 
@@ -178,6 +189,8 @@ function Noteboard({pdfName}) {
             annotation: "UnderlineAnnotation"
         };
         BoundingBoxCalc(props);
+        setTempHighlight(props);
+        setShowCommentBox(true);
         return await annotationAPI.saveAnnotation(props, pdfName).then((data) => {
             props.id = data.idAnnotation;
             setAnnotations({...annotations, [props['id']]: props});
@@ -193,6 +206,8 @@ function Noteboard({pdfName}) {
             category: currentCategory.current,
             annotation: "HighlightAnnotation"
         };
+        setTempHighlight(props);
+        setShowCommentBox(true);
         BoundingBoxCalc(props);
         return await annotationAPI.saveAnnotation(props, pdfName).then((data) => {
             props.id = data.idAnnotation;
@@ -211,7 +226,7 @@ function Noteboard({pdfName}) {
             annotation: "TinyText"
         };
         return await annotationAPI.saveAnnotation(newTinyText, pdfName).then((data) => {
-            newTinyText.id = data.idAnnotation.idAnnotation;
+            newTinyText.id = data.idAnnotation;
             setAnnotations({...annotations, [newTinyText['id']]: newTinyText});
             return data;
         });
@@ -236,6 +251,10 @@ function Noteboard({pdfName}) {
         sendMessage(annotation);
     }
 
+    function toggleSidebar() {
+        setShowSidebar(!showSidebar);
+    }
+
     return (
         <section
             id={"workspace"}
@@ -244,7 +263,14 @@ function Noteboard({pdfName}) {
                 height: height.current,
             }}
         >
-            <nav id="sidebar">
+            {showCommentBox && (
+                <CommentBox
+                    annotation={tempHighlight}
+                    coordinates={annotationCoordinates}
+                    onCancel={() => setShowCommentBox(false)}
+                />
+            )}
+            <nav id="sidebar-nav">
                 <div id="toolbar">
                     <div
                         className={`tool add-post-it ${creatingComponent === "HighlightAnnotation" ? "add-tool-active" : ""}`}
@@ -315,6 +341,14 @@ function Noteboard({pdfName}) {
                     </div>
                 </div>
             </div>
+            <section className={"sidebar " + ((showSidebar) ? "sidebar-deactivated" : "")}>
+                <button className="sidebar-arrow" onClick={toggleSidebar}></button>
+                <div className="sidebar-content">
+                    {Object.keys(annotations).map(key => {
+                        return <SidebarAnnotation annotation={annotations[key]} />
+                    })}
+                </div>
+            </section>
         </section>
     );
 }

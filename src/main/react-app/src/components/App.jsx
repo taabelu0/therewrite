@@ -1,15 +1,21 @@
-import Navigation from './Navigation.jsx';
 import Home from'./Home.jsx';
+import LandingPage from './LandingPage.jsx';
 import {BrowserRouter as Router, Routes, Route} from 'react-router-dom';
 import Viewer from "./Viewer.jsx";
+import Navigation from "./Navigation";
+
 import NotFound from "./404";
 function App() {
 
+    const isLandingPage = window.location.pathname === '/';
+    const renderNavigation = !isLandingPage ? <Navigation /> : null;
+
     return (
         <Router>
-            <Navigation/>
+            {renderNavigation}
             <Routes>
-                <Route path="/" element={<Home/>}/>
+                <Route path="/" element={<LandingPage/>}/>
+                <Route path="/home" element={<Home/>}/>
                 <Route path="/view/:pdfName" element={<Viewer/>} />
                 <Route path="*" element={<NotFound/>} />
             </Routes>
