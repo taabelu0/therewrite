@@ -29,6 +29,9 @@ stages:
 
 build-job:
   stage: build
+  before_script:
+    - apk upgrade --no-cache 
+    - apk add --no-cache libgcc libstdc++ ncurses-libs
   script:
     - echo $MAVEN_CLI_OPTS
     - mvn $MAVEN_CLI_OPTS package
@@ -56,6 +59,7 @@ release-docker-job:
     - docker push $DOCKER_IMAGE_TAG
   only:
     - main
+    - feat/docker-react-app
 
 deploy-docker-job:
   stage: deploy
@@ -92,3 +96,4 @@ deploy-docker-job:
     - job: release-docker-job
   only:
     - main
+    - feat/docker-react-app

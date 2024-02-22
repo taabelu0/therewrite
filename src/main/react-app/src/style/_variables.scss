@@ -5,7 +5,7 @@ $s-workspace-width: 2400px;
 $s-workspace-pdf-width: 800px;
 $s-workspace-post-it: 192px;
 $s-workspace-post-it-border: 1px;
-$s-workspace-toolbar-margin: 80px;
+$s-workspace-sidebar-margin-top: 32px;
 $s-nav-height: 7vh;
 $s-nav-min-height: 3em;
 $s-nav-shadow: 5px;
@@ -16,6 +16,13 @@ $c-color-primary: #F5404D;
 $c-dark-primary: rgb(20, 20, 20);
 $c-dark-secondary: rgb(50, 50, 50);
 $c-selected: rgba(180, 180, 255, 0.6);
+
+$c-category-definition: #69E0A8;
+$c-category-explosion: #F1BD4C;
+$c-category-deletion: #EB5683;
+$c-category-correction: #3859A2;
+$c-category-speculation: #EE7A30;
+$c-category-addition: #7FA036;
 
 $c-workspace-post-it-yellow: #FFFF99;
 $c-workspace-post-it-green: #9BFA75;

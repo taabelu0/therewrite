@@ -1,0 +1,62 @@
+@import "variables";
+
+.tiny-text {
+  position: absolute;
+  height: 1.5rem;
+  z-index: 19;
+
+  &-input {
+
+    color: inherit;
+    background-color: transparent;
+    border: none;
+    padding: 0;
+    resize: none;
+    height: 100%;
+    width: 100%;
+
+    font-family: 'Nunito Sans', sans-serif;
+    font-size: 1.25rem;
+    cursor: grab;
+    font-weight: 800;
+
+    &-wrapper {
+      position: relative;
+    }
+
+    &-selected {
+      outline: 0.5rem solid $c-selected;
+    }
+  }
+
+  &-fake {
+    font-weight: 800;
+    font-size: 1.25rem;
+    visibility: hidden;
+    position: absolute;
+  }
+
+  &-definition {
+    color: $c-category-definition;
+  }
+
+  &-explosion {
+    color: $c-category-explosion;
+  }
+
+  &-deletion {
+    color: $c-category-deletion;
+  }
+
+  &-correction {
+    color: $c-category-correction;
+  }
+
+  &-speculation {
+    color: $c-category-speculation;
+  }
+
+  &-addition {
+    color: $c-category-addition;
+  }
+}

@@ -1,0 +1,97 @@
+.annotation {
+  position: absolute;
+  pointer-events: none;
+}
+
+.paragraph-sidebar {
+  position: absolute;
+  background-color: #0a84ff;
+  height: 50px;
+  width: 10px;
+  z-index: 100;
+  &-definition {
+    background-color: #69E0A8;
+  }
+  &-explosion {
+    background-color: #F1BD4C;
+  }
+  &-deletion {
+    background-color: #EB5683;
+  }
+  &-correction {
+    background-color: #3859A2;
+  }
+  &-speculation {
+    background-color: #EE7A30;
+  }
+  &-addition {
+    background-color: #7FA036;
+  }
+}
+
+
+.paragraph-custom {
+  position: absolute;
+  z-index: 100;
+}
+.squiggly-paragraph {
+  background-repeat: repeat;
+  background-position: 0 0;
+  background-size: 20px 40px; // default size
+  width: 100%;
+  height: 100%;
+  opacity: 0.8;
+
+}
+
+.content-clipper {
+  overflow: hidden;
+  display: block;
+}
+
+
+.underline {
+  position: absolute;
+  border-bottom: 1px solid red; /* Adjust color as needed */
+  &-definition {
+    border-color: #69E0A8;
+  }
+  &-explosion {
+    border-color: #F1BD4C;
+  }
+  &-deletion {
+    border-color: #EB5683;
+  }
+  &-correction {
+    border-color: #3859A2;
+  }
+  &-speculation {
+    border-color: #EE7A30;
+  }
+  &-addition {
+    border-color: #7FA036;
+  }
+}
+
+.highlight {
+  position: absolute;
+  opacity: 0.5;
+  &-definition {
+    background-color: #69E0A8;
+  }
+  &-explosion {
+    background-color: #F1BD4C;
+  }
+  &-deletion {
+    background-color: #EB5683;
+  }
+  &-correction {
+    background-color: #3859A2;
+  }
+  &-speculation {
+    background-color: #EE7A30;
+  }
+  &-addition {
+    background-color: #7FA036;
+  }
+}

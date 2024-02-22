@@ -1,7 +1,29 @@
 version: '3.5'
 services:
-    app:
-        image: cr.gitlab.fhnw.ch/ip34-23vt/ip34-23vt_therewrite/therewrite/frontend:latest
-        restart: always
-        ports:
-            - "80:8080"
+  app:
+      image: cr.gitlab.fhnw.ch/ip34-23vt/ip34-23vt_therewrite/therewrite/frontend:latest
+      restart: always
+      ports:
+          - "80:8080"
+      networks:
+        - therewrite
+  database:
+      container_name: postgresCont
+      image: postgres:latest
+      environment:
+        POSTGRES_USER: postgres
+        POSTGRES_PASSWORD: admin
+        POSTGRES_DB: TheRewrite
+      volumes:
+        - /var/lib/docker/volumes/postgres-volume/_data
+      ports:
+        - '5432:5432'
+      expose:
+        - '5432'
+      networks:
+        - therewrite
+networks:
+  therewrite:
+    name: therewrite
+    external: true
+    driver: bridge
