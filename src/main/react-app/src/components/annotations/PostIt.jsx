@@ -49,21 +49,21 @@ export default function PostIt(props) {
     async function dragMoveListener(event) {
         const target = event.target;
 
-
         setPostitPosition( (prevPosition) => {
             const newX = prevPosition.dataX + event.dx;
             const newY = prevPosition.dataY + event.dy;
             props.onChange({
                 idAnnotation: id,
+                annotationText: postitTextRef.current,
                 annotationDetail: JSON.stringify({
                     ...props.annotation,
                     dataX: newX,
-                    dataY: newY,
-                    text: postitTextRef.current
+                    dataY: newY
                 })
             });
             target.style.transform = `translate(${newX}px, ${newY}px)`;
             if (event.button === 0) {
+                console.log(postitTextRef.current, "TEXT")
                 updatePostItDetails(id, newX, newY, postitTextRef.current, category);
             }
             return {dataX: newX, dataY: newY};
@@ -73,11 +73,11 @@ export default function PostIt(props) {
 
     async function updatePostItDetails(id, x, y, text, category) {
         let postIt = await annotationAPI.updateAnnotation(id, {
+            annotationText: text,
             annotationDetail: JSON.stringify({
                 category: category,
                 dataX: x,
                 dataY: y,
-                text: text,
                 annotation: "PostIt"
             })
         });
@@ -88,9 +88,9 @@ export default function PostIt(props) {
         setPostitText(event.target.value)
         props.onChange({
             idAnnotation: id,
+            annotationText: event.target.value,
             annotationDetail: JSON.stringify({
-                ...props.annotation,
-                text: event.target.value,
+                ...props.annotation
             })
         });
     }

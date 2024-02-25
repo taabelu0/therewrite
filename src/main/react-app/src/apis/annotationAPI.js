@@ -9,12 +9,13 @@ export const annotationAPI = {
         return response.data
     },
 
-    saveAnnotation: async function (annotationDetails, documentId) {
+    saveAnnotation: async function (documentId, text, annotationDetails) {
         const annotation = {
-            annotationDetail: JSON.stringify(annotationDetails),
             document: {
-                id: documentId
-            }
+                id: documentId,
+                annotationText: text
+            },
+            annotationDetail: JSON.stringify(annotationDetails)
         };
         return api.post(`/api/annotation`,
             annotation
