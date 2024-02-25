@@ -29,7 +29,7 @@ function Noteboard({pdfName}) {
     const [creatingComponent, setCreatingComponent] = useState(null);
     const [annotations, setAnnotations] = useState({});
     const [showCommentBox, setShowCommentBox] = useState(false);
-    const [tempHighlight, setTempHighlight] = useState(null);
+    const [tempHighlight, setTempHighlight] = useState(null); // contains database annotation object and not front-end object
     const [showSidebar, setShowSidebar] = useState(false);
     const [annotationCoordinates, setAnnotationCoordinates] = useState({ x: 0, y: 0 });
     let width = useRef("100%");
@@ -56,6 +56,10 @@ function Noteboard({pdfName}) {
         loadAnnotations();
     }, []);
 
+    useEffect(() => {
+        setShowCommentBox(tempHighlight != null);
+    }, [tempHighlight]);
+
     function applyAnnotationChanges(msgAnnotation) {
         if (!msgAnnotation) {
             console.error('Annotation in message is null or undefined:', msgAnnotation);
@@ -63,6 +67,7 @@ function Noteboard({pdfName}) {
         }
         let patchAnnotation = JSON.parse(msgAnnotation['annotationDetail']);
         patchAnnotation.id = msgAnnotation.idAnnotation;
+        patchAnnotation.text = msgAnnotation.annotationText
         setAnnotations(prevAnnotations => {
             return {...prevAnnotations, ...{[patchAnnotation.id]: patchAnnotation}}
         });
@@ -95,6 +100,7 @@ function Noteboard({pdfName}) {
         newAnnotations.map(a => {
             let obj = JSON.parse(a['annotationDetail']);
             obj.id = a['idAnnotation'];
+            obj.text = a['annotationText'];
             newAnnotationsObj[a['idAnnotation']] = obj;
         });
         setAnnotations(newAnnotationsObj);
@@ -124,8 +130,6 @@ function Noteboard({pdfName}) {
             let newAnno = await ADDING_COMPONENT[creatingComponent](selectedCategory, x, y);
             sendMessage(newAnno); // notifies websocket
             setCreatingComponent(null);
-            setTempHighlight(newAnno); // Set tempHighlight to the new annotation
-            setShowCommentBox(true);
             setAnnotationCoordinates({ x, y });
         }, 50);
     }
@@ -161,11 +165,12 @@ function Noteboard({pdfName}) {
             annotation: "ParagraphSideBar"
         };
         ParagraphSideBarCalc(props);
-        return await annotationAPI.saveAnnotation(props, pdfName).then((data) => {
-            props.id = data.idAnnotation;
-            setAnnotations({...annotations, [props['id']]: props});
-            return data;
-        });
+        return await annotationAPI.saveAnnotation(pdfName, "", props)
+            .then(saveAnnotationCB(props))
+            .then((data) => {
+                setTempHighlight(data);
+                return data;
+            });
     }
 
     async function addParagraphCustomAnnotation() {
@@ -173,11 +178,12 @@ function Noteboard({pdfName}) {
         if (selection.rangeCount < 1) return;
         const props = {selection: selection, category: currentCategory.current, annotation: "ParagraphCustom"};
         ParagraphCustomCalc(props);
-        return await annotationAPI.saveAnnotation(props, pdfName).then((data) => {
-            props.id = data.idAnnotation;
-            setAnnotations({...annotations, [props['id']]: props});
-            return data;
-        });
+        return await annotationAPI.saveAnnotation(pdfName, "", props)
+            .then(saveAnnotationCB(props))
+            .then((data) => {
+                setTempHighlight(data);
+                return data;
+            });
     }
 
     async function addUnderlineAnnotation() {
@@ -189,13 +195,12 @@ function Noteboard({pdfName}) {
             annotation: "UnderlineAnnotation"
         };
         BoundingBoxCalc(props);
-        setTempHighlight(props);
-        setShowCommentBox(true);
-        return await annotationAPI.saveAnnotation(props, pdfName).then((data) => {
-            props.id = data.idAnnotation;
-            setAnnotations({...annotations, [props['id']]: props});
-            return data
-        });
+        return await annotationAPI.saveAnnotation(pdfName, "", props)
+            .then(saveAnnotationCB(props))
+            .then((data) => {
+                setTempHighlight(data);
+                return data;
+            });
     }
 
     async function addHighlightAnnotation() {
@@ -206,30 +211,24 @@ function Noteboard({pdfName}) {
             category: currentCategory.current,
             annotation: "HighlightAnnotation"
         };
-        setTempHighlight(props);
-        setShowCommentBox(true);
         BoundingBoxCalc(props);
-        return await annotationAPI.saveAnnotation(props, pdfName).then((data) => {
-            props.id = data.idAnnotation;
-            setAnnotations({...annotations, [props['id']]: props});
-            return data;
-        });
+        return await annotationAPI.saveAnnotation(pdfName, "", props)
+            .then(saveAnnotationCB(props))
+            .then((data) => {
+                setTempHighlight(data);
+                return data;
+            });
     }
-
 
     async function addTinyText(category, x, y) {
         const newTinyText = {
             category: category,
             dataX: x,
             dataY: y,
-            text: "",
             annotation: "TinyText"
         };
-        return await annotationAPI.saveAnnotation(newTinyText, pdfName).then((data) => {
-            newTinyText.id = data.idAnnotation;
-            setAnnotations({...annotations, [newTinyText['id']]: newTinyText});
-            return data;
-        });
+        return await annotationAPI.saveAnnotation(pdfName, "", newTinyText)
+            .then(saveAnnotationCB(newTinyText));
     }
 
     async function addPostIt(category, x, y) {
@@ -237,14 +236,19 @@ function Noteboard({pdfName}) {
             category: category,
             dataX: x,
             dataY: y,
-            text: "",
             annotation: "PostIt"
         };
-        return await annotationAPI.saveAnnotation(newPostIt, pdfName).then((data) => {
-            newPostIt.id = data.idAnnotation;
-            setAnnotations({...annotations, [newPostIt['id']]: newPostIt});
+        return await annotationAPI.saveAnnotation(pdfName, "", newPostIt)
+            .then(saveAnnotationCB(newPostIt));
+    }
+
+    function saveAnnotationCB(annotationObj) {
+        return (data) => {
+            annotationObj.id = data.idAnnotation;
+            annotationObj.text = data.annotationText
+            setAnnotations({...annotations, [annotationObj['id']]: annotationObj});
             return data;
-        });
+        }
     }
 
     function onAnnotationChange(annotation) {
@@ -267,6 +271,7 @@ function Noteboard({pdfName}) {
                 <CommentBox
                     annotation={tempHighlight}
                     coordinates={annotationCoordinates}
+                    onChange={onAnnotationChange}
                     onCancel={() => setShowCommentBox(false)}
                 />
             )}

@@ -1,15 +1,14 @@
 import React, { useState } from 'react';
 import { annotationAPI } from "../apis/annotationAPI";
 
-function CommentBox({ annotation, onCancel, coordinates }) {
+function CommentBox({ annotation, onCancel, coordinates, onChange }) {
     const [comment, setComment] = useState(annotation ? annotation.annotationText : '');
 
     const handleSave = () => {
         if (annotation) {
             if (comment !== annotation.annotationText) {
-                updateCommentDetails(annotation.id, comment).then(r => console.log(r));
+                updateCommentDetails(annotation.idAnnotation, comment).then(r => console.log(r));
             }
-            annotationAPI.updateAnnotation(annotation.id, {annotationText: comment});
         }
         else {
             console.log("Unable to save comment. Annotation is not defined.");
@@ -18,10 +17,10 @@ function CommentBox({ annotation, onCancel, coordinates }) {
 
     async function updateCommentDetails(id, text) {
         const updatedAnnotation = {
-            ...annotation,
             annotationText: text
         };
-        await annotationAPI.updateAnnotation(id, updatedAnnotation);
+        await annotationAPI.updateAnnotation(id, updatedAnnotation).then(resp => onChange(resp.data));
+        onCancel();
     }
 
     return (
