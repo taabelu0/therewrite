@@ -33,10 +33,6 @@ public class SecurityConfiguration {
     public DefaultSecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(auth -> auth
                         .requestMatchers("/view/**").authenticated()
-                        .requestMatchers("/api/document/all").permitAll()
-                        .requestMatchers("/api/index").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/document").permitAll()
-                        .requestMatchers("/api/**").authenticated()
                         // TODO: on user management implementation change this to be secure!! (.anyRequest().authenticated())
                         .anyRequest().permitAll()
                 )
