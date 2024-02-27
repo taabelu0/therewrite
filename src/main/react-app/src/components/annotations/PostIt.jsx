@@ -63,7 +63,6 @@ export default function PostIt(props) {
             });
             target.style.transform = `translate(${newX}px, ${newY}px)`;
             if (event.button === 0) {
-                console.log(postitTextRef.current, "TEXT")
                 updatePostItDetails(id, newX, newY, postitTextRef.current, category);
             }
             return {dataX: newX, dataY: newY};

@@ -38,6 +38,15 @@ export const annotationAPI = {
                 console.error('Error:', error);
             });
     },
+
+    deleteAnnotation: async function (annotationId) {
+        return api.delete(`/api/annotation/${annotationId}`)
+            .then(response => response.data)
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+    },
+
     getUrl() {
         return `${baseURL}/api/annotation/`;
     }

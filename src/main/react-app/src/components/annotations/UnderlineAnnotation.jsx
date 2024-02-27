@@ -6,7 +6,6 @@ export class UnderlineAnnotation extends Annotation {
     constructor(props) {
         super(props);
         this.state.currentRects = props.annotation.rects || [];
-        console.log('HELLO', props.annotation.rects)
     }
 
     render() {
