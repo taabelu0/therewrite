@@ -73,12 +73,25 @@ function Noteboard({pdfName}) {
         });
     }
 
+    function deleteAnno(toDelete) {
+        setAnnotations(prevAnnotations => {
+            const annotations = { ...prevAnnotations };
+            delete annotations[toDelete.idAnnotation];
+            return annotations;
+        });
+    }
+
     function initiateStompWS(pdfName) {
         stompClient.onConnect = (frame) => {
             console.log('Connection: ' + frame);
             stompClient.subscribe(`/session/${pdfName}`, (message) => {
-                let msgAnnotation = JSON.parse(message.body).message;
-                applyAnnotationChanges(msgAnnotation);
+                let msgAnnotation = JSON.parse(message.body);
+                if(msgAnnotation.type === "delete") {
+                    deleteAnno(msgAnnotation.message);
+                }
+                else if(msgAnnotation.type === "change") {
+                    applyAnnotationChanges(msgAnnotation.message);
+                }
             });
         };
 
@@ -101,6 +114,7 @@ function Noteboard({pdfName}) {
             let obj = JSON.parse(a['annotationDetail']);
             obj.id = a['idAnnotation'];
             obj.text = a['annotationText'];
+            obj.timeCreated = a['timeCreated'];
             newAnnotationsObj[a['idAnnotation']] = obj;
         });
         setAnnotations(newAnnotationsObj);
@@ -109,7 +123,10 @@ function Noteboard({pdfName}) {
     function sendMessage(anno) {
         stompClient.publish({
             destination: `/app/${pdfName}`,
-            body: JSON.stringify({"message": anno})
+            body: JSON.stringify({
+                "message": anno,
+                "type": "change"
+            })
         });
     }
 
@@ -258,6 +275,17 @@ function Noteboard({pdfName}) {
     function toggleSidebar() {
         setShowSidebar(!showSidebar);
     }
+    function deleteAnnotation(id) {
+        annotationAPI.deleteAnnotation(id).then((anno) => {
+            stompClient.publish({
+                destination: `/app/${pdfName}`,
+                body: JSON.stringify({
+                    "message": anno,
+                    "type": "delete"
+                })
+            });
+        });
+    }
 
     return (
         <section
@@ -350,7 +378,7 @@ function Noteboard({pdfName}) {
                 <button className="sidebar-arrow" onClick={toggleSidebar}></button>
                 <div className="sidebar-content">
                     {Object.keys(annotations).map(key => {
-                        return <SidebarAnnotation annotation={annotations[key]} />
+                        return <SidebarAnnotation annotation={annotations[key]} deleteAnnotation={deleteAnnotation} />
                     })}
                 </div>
             </section>

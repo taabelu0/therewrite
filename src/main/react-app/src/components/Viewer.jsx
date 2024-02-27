@@ -87,8 +87,6 @@ class Core extends Component<> {
     addHighlight(highlight) {
         const { highlights } = this.state;
 
-        console.log("Saving highlight", highlight);
-
         this.setState({
             highlights: [{ ...highlight, id: getNextId() }, ...highlights],
         });
