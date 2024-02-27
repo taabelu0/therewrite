@@ -7,7 +7,7 @@ function LandingPage() {
         <div className="landing-container">
             <div className="landing-header">
                 <h1>The Rewrite</h1>
-                <a href="/home" className="login-text">
+                <a href="/login" className="login-text">
                     Log In
                 </a>
             </div>

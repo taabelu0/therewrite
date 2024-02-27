@@ -1,5 +1,6 @@
 import Home from'./Home.jsx';
 import LandingPage from './LandingPage.jsx';
+import Login from './Login.jsx';
 import {BrowserRouter as Router, Routes, Route} from 'react-router-dom';
 import Viewer from "./Viewer.jsx";
 import Navigation from "./Navigation";
@@ -16,6 +17,7 @@ function App() {
             <Routes>
                 <Route path="/" element={<LandingPage/>}/>
                 <Route path="/home" element={<Home/>}/>
+                <Route path="/login" element={<Login/>}/>
                 <Route path="/view/:pdfName" element={<Viewer/>} />
                 <Route path="*" element={<NotFound/>} />
             </Routes>
