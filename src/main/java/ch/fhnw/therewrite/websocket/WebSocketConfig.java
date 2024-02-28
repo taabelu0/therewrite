@@ -27,6 +27,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         config.enableSimpleBroker("/session/");
     }
 
+    /**
     @Bean
     public TomcatServletWebServerFactory servletContainer() {
         TomcatServletWebServerFactory tomcat = new TomcatServletWebServerFactory() {
@@ -52,4 +53,5 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         connector.setRedirectPort(8443);
         return connector;
     }
+    **/
 }
