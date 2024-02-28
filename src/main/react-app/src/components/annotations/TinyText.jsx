@@ -50,11 +50,11 @@ export default function TinyText(props) {
         dataY += event.dy;
         props.onChange({
             idAnnotation: id,
+            annotationText: tinyTextText.current,
             annotationDetail: JSON.stringify({
                 ...props.annotation,
                 dataX: dataX,
                 dataY: dataY,
-                text: tinyTextText.current,
             })
         });
         target.style.transform = `translate(${dataX}px, ${dataY}px)`;
@@ -73,11 +73,11 @@ export default function TinyText(props) {
 
     async function updateTinyTextDetails(id, x, y, text, category) {
         let tinyText = await annotationAPI.updateAnnotation(id, {
+            annotationText: text,
             annotationDetail: JSON.stringify({
                 category: category,
                 dataX: x,
                 dataY: y,
-                text: text,
                 annotation: "TinyText"
             })
         });
@@ -87,9 +87,9 @@ export default function TinyText(props) {
     function valueChange(event) {
         props.onChange({
             idAnnotation: id,
+            annotationText: event.target.value,
             annotationDetail: JSON.stringify({
                 ...props.annotation,
-                text: event.target.value,
             })
         });
         setTinyText(event.target.value)

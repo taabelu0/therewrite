@@ -55,8 +55,15 @@ public class AnnotationController {
         return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(null);
     }
 
-    @DeleteMapping("")
-    public void deleteAnnotation(@RequestBody Annotation annotation) {
-        annotationRepository.delete(annotation);
+    @DeleteMapping("/{annoId}")
+    public ResponseEntity<Annotation> deleteAnnotation(@PathVariable String annoId) {
+        UUID aId = UUID.fromString(annoId);
+        Optional<Annotation> a = annotationRepository.findById(aId);
+        if(a.isPresent()) {
+            Annotation oldAnno = a.get();
+            annotationRepository.delete(oldAnno);
+            return ResponseEntity.status(HttpStatus.OK).body(oldAnno);
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
     }
 }

@@ -9,12 +9,13 @@ export const annotationAPI = {
         return response.data
     },
 
-    saveAnnotation: async function (annotationDetails, documentId) {
+    saveAnnotation: async function (documentId, text, annotationDetails) {
         const annotation = {
-            annotationDetail: JSON.stringify(annotationDetails),
             document: {
-                id: documentId
-            }
+                id: documentId,
+                annotationText: text
+            },
+            annotationDetail: JSON.stringify(annotationDetails)
         };
         return api.post(`/api/annotation`,
             annotation
@@ -37,6 +38,15 @@ export const annotationAPI = {
                 console.error('Error:', error);
             });
     },
+
+    deleteAnnotation: async function (annotationId) {
+        return api.delete(`/api/annotation/${annotationId}`)
+            .then(response => response.data)
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+    },
+
     getUrl() {
         return `${baseURL}/api/annotation/`;
     }

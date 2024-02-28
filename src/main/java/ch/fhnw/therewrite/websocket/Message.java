@@ -8,4 +8,7 @@ import java.io.Serializable;
 public class Message implements Serializable {
     @JsonProperty
     Annotation message;
+
+    @JsonProperty
+    String type;
 }
