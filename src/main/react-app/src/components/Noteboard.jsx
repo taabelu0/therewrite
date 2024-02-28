@@ -23,7 +23,7 @@ const ANNOTATION_COMPONENTS = {
     'PostIt': PostIt
 }; // define Annotation components here
 
-let stompClient = new StompJs.Client({brokerURL: `ws://${process.env.REACT_APP_WS_URL}/ws`})
+let stompClient = new StompJs.Client({brokerURL: `wss://${process.env.REACT_APP_WS_URL}/ws`})
 
 function Noteboard({pdfName}) {
     const [creatingComponent, setCreatingComponent] = useState(null);
