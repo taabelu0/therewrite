@@ -3,8 +3,8 @@ import '../style/login-registration.scss';
 
 function Registration() {
     return (
-        <div className="login-container"> {/* Re-using the same container for registration */}
-            <form className="login-form"> {/* Re-using the same form style for registration */}
+        <div className="login-container"> {}
+            <form className="login-form"> {}
                 <h1>Create Account</h1>
                 <div className="input-group">
                     <label htmlFor="name">Name</label>
