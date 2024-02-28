@@ -17,6 +17,7 @@ export class Annotation extends React.Component {
             currentLeft: props.annotation.left,
             currentScrollX: props.annotation.scrollX,
             currentScrollY: props.annotation.scrollY,
+            currentText: props.text
         };
         this.incrementCount = this.incrementCount.bind(this)
     }

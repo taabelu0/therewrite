@@ -244,7 +244,7 @@ function Noteboard({pdfName}) {
             dataY: y,
             annotation: "TinyText"
         };
-        return await annotationAPI.saveAnnotation(pdfName, "", newTinyText)
+        return await annotationAPI.saveAnnotation(pdfName, "type here...", newTinyText)
             .then(saveAnnotationCB(newTinyText));
     }
 
@@ -261,8 +261,9 @@ function Noteboard({pdfName}) {
 
     function saveAnnotationCB(annotationObj) {
         return (data) => {
+            console.log("TEXT:", data)
             annotationObj.id = data.idAnnotation;
-            annotationObj.text = data.annotationText
+            annotationObj.text = data.annotationText;
             setAnnotations({...annotations, [annotationObj['id']]: annotationObj});
             return data;
         }
