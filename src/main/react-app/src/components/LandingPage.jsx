@@ -16,7 +16,7 @@ function LandingPage() {
                 <p>
                     Collectively annotate and diversify literature through discussions.
                 </p>
-                <a href="/home" className="signup-button">
+                <a href="/registration" className="signup-button">
                     Sign Up
                 </a>
             </div>

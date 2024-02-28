@@ -64,3 +64,23 @@ body {
     background-color: darken(#000, 10%);
   }
 }
+
+
+.register-button {
+  display: block;
+  margin-top: 15px;
+  background-color: #555;
+  color: #fff !important;
+  padding: 10px;
+  font-size: 0.9rem;
+  border: none;
+  cursor: pointer;
+  border-radius: 3px;
+  text-align: center;
+  text-decoration: none;
+
+  &:hover {
+    background-color: darken(#555, 10%);
+  }
+}
+
