@@ -70,13 +70,14 @@
     flex-direction: column-reverse;
     display: flex;
     position: fixed;
-    left: 20%;
+    left: 0;
+    width: 100%;
     z-index: 9999;
     align-items: center;
     top: 17px;
-
-   // top: calc(max($s-nav-min-height, $s-nav-height) + $s-workspace-sidebar-nav-margin-top);
-    // height: calc(100mvh - max($s-nav-min-height, $s-nav-height) - $s-workspace-sidebar-nav-margin-top);
+    box-shadow: 0 0 1rem $c-light-secondary;
+    background-color: $c-light-primary;
+    border-bottom: 1px solid #d3d3d3;
 }
 
 #toolbar {
@@ -87,8 +88,6 @@
 
     border-radius:  0 0.25rem 0.25rem 0;
     overflow: hidden;
-    box-shadow: 0 0 1rem $c-light-secondary;
-    background-color: $c-light-primary;
 }
 
 #category-selection {
@@ -99,8 +98,6 @@
 
     border-radius:  0 0.25rem 0.25rem 0;
     overflow: hidden;
-    box-shadow: 0 0 1rem $c-light-secondary;
-    background-color: $c-light-primary;
 }
 
 .category {
@@ -238,19 +235,19 @@
 }
 
 .tool {
-    line-height: 3rem;
-    font-size: 2.5rem;
-    font-weight: 800;
-    color: white;
     aspect-ratio: 1 / 1;
     margin-bottom: 0.5rem;
-    border-radius: 0.25rem;
     overflow: hidden;
     text-align: center;
-    width: 72px;
-    height: 52px;
-    margin-right: 10px;
     background-color: $c-dark-secondary;
+    border-radius: 0.35rem;
+    color: #fff;
+    font-size: 2rem;
+    font-weight: 4;
+    height: 41px;
+    line-height: 2.5rem;
+    margin-right: 2px;
+    width: 66px;
 
     &:last-of-type {
         margin: 0;
