@@ -384,7 +384,7 @@ function Noteboard({pdfName}) {
                 <button className="sidebar-arrow" onClick={toggleSidebar}></button>
                 <div className="sidebar-content">
                     {Object.keys(annotations).map(key => {
-                        return <SidebarAnnotation annotation={annotations[key]} deleteAnnotation={deleteAnnotation}/>
+                        return <SidebarAnnotation annotation={annotations[key]} deleteAnnotation={deleteAnnotation} oldComments={{"someKey": {user: "ExampleUser", date: "2024-02-18 17:27:50.089", text: "This is a comment"}}}/>
                     })}
                 </div>
             </section>
