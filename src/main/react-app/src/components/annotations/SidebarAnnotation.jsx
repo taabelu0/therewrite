@@ -9,8 +9,9 @@ function SidebarAnnotation({ annotation, deleteAnnotation }) {
         deleteAnnotation(annotation.id);
     }
 
-    let date = new Date(annotation.timeCreated)
-    if(annotation.text) {
+
+    if(annotation.timeCreated) {
+        let date = new Date(annotation.timeCreated)
         return (
             <div className={`sidebar-content-annotation sidebar-content-annotation-${annotation.category.toLowerCase()}`}>
                 <div className="sidebar-content-annotation-delete" onClick={deleteAnno}></div>
