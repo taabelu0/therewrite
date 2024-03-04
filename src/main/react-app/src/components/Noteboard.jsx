@@ -14,6 +14,7 @@ import {UnderlineAnnotation} from "./annotations/UnderlineAnnotation";
 import {Annotation, BoundingBoxCalc} from "./annotations/Annotation";
 import * as StompJs from "@stomp/stompjs";
 import {getPagesFromRange} from "react-pdf-highlighter/dist/cjs/lib/pdfjs-dom";
+import {commentAPI} from "../apis/commentAPI";
 
 const ANNOTATION_COMPONENTS = {
     'HighlightAnnotation': HighlightAnnotation,
@@ -260,6 +261,15 @@ function Noteboard({pdfName}) {
             .then(saveAnnotationCB(newPostIt));
     }
 
+    async function createComment(annotationId, userId, commentText) {
+        try {
+            const comment = await commentAPI.createComment(annotationId, userId, commentText);
+            return comment;
+        } catch (error) {
+            console.error('Error creating comment:', error);
+        }
+    }
+
     function saveAnnotationCB(annotationObj) {
         return (data) => {
             annotationObj.id = data.idAnnotation;
@@ -384,7 +394,7 @@ function Noteboard({pdfName}) {
                 <button className="sidebar-arrow" onClick={toggleSidebar}></button>
                 <div className="sidebar-content">
                     {Object.keys(annotations).map(key => {
-                        return <SidebarAnnotation annotation={annotations[key]} deleteAnnotation={deleteAnnotation} oldComments={{"someKey": {user: "ExampleUser", date: "2024-02-18 17:27:50.089", text: "This is a comment"}}}/>
+                        return <SidebarAnnotation annotation={annotations[key]} deleteAnnotation={deleteAnnotation} createComment={createComment} oldComments={{"someKey": {user: "ExampleUser", date: "2024-02-18 17:27:50.089", text: "This is a comment"}}}/>
                     })}
                 </div>
             </section>
