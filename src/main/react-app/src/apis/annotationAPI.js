@@ -13,8 +13,8 @@ export const annotationAPI = {
         const annotation = {
             document: {
                 id: documentId,
-                annotationText: text
             },
+            annotationText: text,
             annotationDetail: JSON.stringify(annotationDetails)
         };
         return api.post(`/api/annotation`,
