@@ -2,7 +2,7 @@ import axios from "axios"
 
 export const baseURL = process.env.REACT_APP_API_URL;
 
-export const api = axios.create({baseURL})
+export const api = axios.create({baseURL, withCredentials: true})
 
 // defining a custom error handler for all APIs
 const errorHandler = (error) => {

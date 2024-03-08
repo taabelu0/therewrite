@@ -9,5 +9,6 @@ import java.util.List;
 import java.util.UUID;
 
 public interface GuestRepository extends JpaRepository<Guest, UUID> {
+    Guest findById(Guest guest);
     List<Guest> findByDocumentId(Document document);
 }

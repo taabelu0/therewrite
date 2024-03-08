@@ -29,6 +29,10 @@ public class Annotation implements Serializable {
     @JsonProperty
     private User userCreator;
 
+    @ManyToOne
+    @JoinColumn(name = "idGuestCreator")
+    @JsonProperty
+    private Guest guestCreator;
     @ManyToOne(fetch = FetchType.EAGER) // needs eager
     @JoinColumn(name = "documentId", nullable = false)
     @JsonProperty
@@ -72,6 +76,14 @@ public class Annotation implements Serializable {
 
     public void setUserCreator(User userCreator) {
         this.userCreator = userCreator;
+    }
+
+    public Guest getGuestCreator() {
+        return guestCreator;
+    }
+
+    public void setGuestCreator(Guest guestCreator) {
+        this.guestCreator = guestCreator;
     }
 
     public Timestamp getTimeCreated() {
@@ -120,6 +132,11 @@ public class Annotation implements Serializable {
 
     public void setAnnotationDetail(String annotationDetail) {
         this.annotationDetail = annotationDetail;
+    }
+
+    // gets UUID of the annotations owner ignoring whether the user is logged in or a guest
+    public UUID getOwner() {
+        return userCreator != null ? userCreator.getId() : guestCreator.getId();
     }
 
     public void patch(Annotation update) {
