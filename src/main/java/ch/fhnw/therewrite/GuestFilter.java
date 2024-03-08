@@ -12,15 +12,12 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import org.springframework.data.domain.Example;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
@@ -106,7 +103,7 @@ public class GuestFilter extends OncePerRequestFilter {
             UUID uuid = UUID.fromString(docId);
             isUUID = uuid.toString().equals(docId);
         } catch (IllegalArgumentException ignored){}
-        if(!isUUID) {
+        if(!isUUID) { // TODO: change to check for resources dynamically (additional filter)
             if (!(authentication instanceof AnonymousAuthenticationToken) && authentication != null && authentication.getPrincipal().equals("guest")) {
                 Object guestId = request.getSession().getAttribute("guestId");
                 if(guestId instanceof UUID && verifyGuest(guestId.toString())) {
