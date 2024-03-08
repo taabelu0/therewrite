@@ -92,6 +92,10 @@ public class GuestFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        if((boolean) request.getAttribute(this.getAlreadyFilteredAttributeName()))  { // spring security is apparently not able to do this check internally...
+            filterChain.doFilter(request, response);
+            return;
+        }
         response.setStatus(HttpServletResponse.SC_FORBIDDEN); // default
         String uri = request.getRequestURI();
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -102,8 +106,6 @@ public class GuestFilter extends OncePerRequestFilter {
             UUID uuid = UUID.fromString(docId);
             isUUID = uuid.toString().equals(docId);
         } catch (IllegalArgumentException ignored){}
-        System.out.println("GUESTFILTER");
-        System.out.println(uri);
         if(!isUUID) {
             if (!(authentication instanceof AnonymousAuthenticationToken) && authentication != null && authentication.getPrincipal().equals("guest")) {
                 Object guestId = request.getSession().getAttribute("guestId");
@@ -144,9 +146,6 @@ public class GuestFilter extends OncePerRequestFilter {
     protected boolean shouldNotFilter(HttpServletRequest request) {
         for (String matcher : permitAllMatchers) {
             if(new AntPathRequestMatcher(matcher).matches(request)) {
-                System.out.println("KICKED");
-                System.out.println(request.getRequestURI());
-                System.out.println("KICKED");
                 return true;
             }
         }
