@@ -143,9 +143,12 @@ function Noteboard({pdfName}) {
         const rect = noteboard.getBoundingClientRect();
         const x = clientX - rect.left;
         const y = clientY - rect.top;
-        setCreatingComponent(null);
+        if(creatingComponent === "PostIt" || creatingComponent === "TinyText") {
+            setCreatingComponent(null);
+        }
         setTimeout(async () => {
             let newAnno = await ADDING_COMPONENT[creatingComponent](selectedCategory, x, y);
+            document.getSelection().deleteFromDocument();
             if(!newAnno) return;
             sendMessage(newAnno); // notifies websocket
             setAnnotationCoordinates({x, y});
@@ -264,7 +267,9 @@ function Noteboard({pdfName}) {
         return (data) => {
             annotationObj.id = data.idAnnotation;
             annotationObj.text = data.annotationText
-            setAnnotations({...annotations, [annotationObj['id']]: annotationObj});
+            setAnnotations(prevAnnotations => {
+                return {...prevAnnotations, [annotationObj['id']]: annotationObj}
+            });
             return data;
         }
     }
