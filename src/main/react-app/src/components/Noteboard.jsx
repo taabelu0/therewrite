@@ -30,6 +30,7 @@ let stompClient = new StompJs.Client({brokerURL: `ws://${process.env.REACT_APP_W
 function Noteboard({pdfName}) {
     const [creatingComponent, setCreatingComponent] = useState(null);
     const [annotations, setAnnotations] = useState({});
+    const [comments, setComments] = useState({});
     const [showCommentBox, setShowCommentBox] = useState(false);
     const [tempHighlight, setTempHighlight] = useState(null); // contains database annotation object and not front-end object
     const [showSidebar, setShowSidebar] = useState(false);
@@ -76,6 +77,19 @@ function Noteboard({pdfName}) {
         });
     }
 
+    function addComment(annotationId, comment) {
+        setComments(prevComments => {
+            const existingComments = prevComments[annotationId] || [];
+            return {
+                ...prevComments,
+                [annotationId]: [
+                    ...existingComments,
+                    comment
+                ]
+            };
+        });
+    }
+
     function deleteAnno(toDelete) {
         setAnnotations(prevAnnotations => {
             const annotations = {...prevAnnotations};
@@ -89,10 +103,21 @@ function Noteboard({pdfName}) {
             console.log('Connection: ' + frame);
             stompClient.subscribe(`/session/${pdfName}`, (message) => {
                 let msgAnnotation = JSON.parse(message.body);
-                if (msgAnnotation.type === "delete") {
-                    deleteAnno(msgAnnotation.message);
-                } else if (msgAnnotation.type === "change") {
-                    applyAnnotationChanges(msgAnnotation.message);
+
+                switch (true) {
+                    case msgAnnotation.message && msgAnnotation.type === "change":
+                        applyAnnotationChanges(msgAnnotation.message);
+                        break;
+                    case msgAnnotation.message && msgAnnotation.type === "delete":
+                        deleteAnno(msgAnnotation.message);
+                        break;
+                    case msgAnnotation.comment && msgAnnotation.type === "change":
+                        addComment(msgAnnotation.comment.annotationId.idAnnotation, msgAnnotation.comment);
+                        break;
+                    case msgAnnotation.comment && msgAnnotation.type === "delete":
+                        break;
+                    default:
+                        console.error('Unknown message type:', msgAnnotation.type);
                 }
             });
         };
@@ -127,6 +152,7 @@ function Noteboard({pdfName}) {
             destination: `/app/${pdfName}`,
             body: JSON.stringify({
                 "message": anno,
+                "comment": null,
                 "type": "change"
             })
         });
@@ -264,7 +290,14 @@ function Noteboard({pdfName}) {
     async function createComment(annotationId, userId, commentText) {
         try {
             const comment = await commentAPI.createComment(annotationId, userId, commentText);
-            return comment;
+            stompClient.publish({
+                destination: `/app/${pdfName}`,
+                body: JSON.stringify({
+                    "message": null,
+                    "comment": comment,
+                    "type": "change"
+                })
+            });
         } catch (error) {
             console.error('Error creating comment:', error);
         }
@@ -290,6 +323,17 @@ function Noteboard({pdfName}) {
     function toggleSidebar() {
         setShowSidebar(!showSidebar);
     }
+    function loadCommentsByAnno(annotationId) {
+        commentAPI.getComments(annotationId).then((allComments) => {
+            console.log(annotationId)
+            setComments(prevComments => {
+                return {
+                    ...prevComments,
+                    [annotationId]: allComments
+                }
+            });
+        });
+    }
 
     function deleteAnnotation(id) {
         annotationAPI.deleteAnnotation(id).then((anno) => {
@@ -297,6 +341,7 @@ function Noteboard({pdfName}) {
                 destination: `/app/${pdfName}`,
                 body: JSON.stringify({
                     "message": anno,
+                    "comment": null,
                     "type": "delete"
                 })
             });
@@ -394,7 +439,7 @@ function Noteboard({pdfName}) {
                 <button className="sidebar-arrow" onClick={toggleSidebar}></button>
                 <div className="sidebar-content">
                     {Object.keys(annotations).map(key => {
-                        return <SidebarAnnotation annotation={annotations[key]} deleteAnnotation={deleteAnnotation} createComment={createComment} oldComments={{"someKey": {user: "ExampleUser", date: "2024-02-18 17:27:50.089", text: "This is a comment"}}}/>
+                        return <SidebarAnnotation annotation={annotations[key]} comments={comments[key]} loadComments={loadCommentsByAnno} deleteAnnotation={deleteAnnotation} createComment={createComment}/>
                     })}
                 </div>
             </section>

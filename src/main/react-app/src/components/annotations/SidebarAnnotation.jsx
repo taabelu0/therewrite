@@ -1,24 +1,14 @@
 import React, {useEffect, useState} from 'react';
 import {commentAPI} from "../../apis/commentAPI";
 
-function SidebarAnnotation({ annotation, deleteAnnotation, createComment }) {
+function SidebarAnnotation({ annotation, comments, loadComments, deleteAnnotation, createComment }) {
 
     const [showInput, setShowInput] = useState(false);
     const [input, setInput] = useState("");
     const [showComments, setShowComments] = useState(false);
-    const [comments, setComments] = useState({});
 
     useEffect(() => {
-        commentAPI.getComments(annotation.id).then((response) => {
-
-            if(response) {
-                response.forEach((newComment) => {
-                    setComments(prevComment => {
-                        return {...prevComment, ...{[newComment.idComment]: newComment}}
-                    });
-                });
-            }
-        });
+        loadComments(annotation.id);
     }, []);
 
     const switchShowInput = () => {
@@ -38,11 +28,7 @@ function SidebarAnnotation({ annotation, deleteAnnotation, createComment }) {
     }
 
     const handleCreateComment = () => {
-        createComment(annotation.id, null, input).then((newComment) => {
-            setComments(prevComment => {
-                return {...prevComment, ...{[newComment.idComment]: newComment}}
-            });
-        });
+        createComment(annotation.id, null, input);
         setInput("");
         switchShowInput();
     };
@@ -68,7 +54,7 @@ function SidebarAnnotation({ annotation, deleteAnnotation, createComment }) {
                         <div className="sidebar-annotation-control-input" onClick={switchShowInput}>{showInput ? "Cancel" : "Answer"}</div>
                     </div>
                     <div className={`sidebar-annotation-comment-wrapper ${showComments ? "" : "sidebar-annotation-comment-wrapper-hidden"}`}>
-                        {Object.keys(comments).map(key => {
+                        {comments && Object.keys(comments).map(key => {
                             return <div className="sidebar-annotation-comment">
                                 <div className="sidebar-annotation-comment-header">
                                     <div className="sidebar-annotation-comment-header-user">ExampleUser</div>
