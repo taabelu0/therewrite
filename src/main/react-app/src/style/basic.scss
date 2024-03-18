@@ -29,8 +29,9 @@ a {
   align-items: center;
   top: 0;
   z-index: 10000;
+  border-bottom: 1px solid $c-light-secondary;
 
-  box-shadow: 0 0 $s-nav-shadow $c-dark-secondary;
+  /*box-shadow: 0 0 $s-nav-shadow $c-dark-secondary;*/
   background-color: $c-light-primary;
 
   &-title {
