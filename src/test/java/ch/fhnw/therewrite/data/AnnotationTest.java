@@ -4,12 +4,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import ch.fhnw.therewrite.data.Annotation;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.UUID;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 public class AnnotationTest {
 
     @Test
