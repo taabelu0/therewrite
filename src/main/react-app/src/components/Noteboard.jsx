@@ -7,20 +7,21 @@ import '../style/annotations.scss';
 import '../style/sidebar.scss';
 import '../style/addAnnotation.scss';
 import {ParagraphSideBar, ParagraphSideBarCalc} from "./annotations/ParagraphSideBar";
-import {ParagraphCustom, ParagraphCustomCalc} from "./annotations/ParagraphCustom";
+// import {ParagraphCustom, ParagraphCustomCalc} from "./annotations/ParagraphCustom";
 import {HighlightAnnotation} from "./annotations/HighlightAnnotation";
 import {annotationAPI} from "../apis/annotationAPI";
 import {UnderlineAnnotation} from "./annotations/UnderlineAnnotation";
 import {Annotation, BoundingBoxCalc} from "./annotations/Annotation";
 import * as StompJs from "@stomp/stompjs";
 import {getPagesFromRange} from "react-pdf-highlighter/dist/cjs/lib/pdfjs-dom";
+import {Squiggly} from "./annotations/Squiggly";
 import {commentAPI} from "../apis/commentAPI";
 
 const ANNOTATION_COMPONENTS = {
     'HighlightAnnotation': HighlightAnnotation,
     'UnderlineAnnotation': UnderlineAnnotation,
     'TinyText': TinyText,
-    'ParagraphCustom': ParagraphCustom,
+    'Squiggly': Squiggly,
     'ParagraphSideBar': ParagraphSideBar,
     'PostIt': PostIt
 }; // define Annotation components here
@@ -46,7 +47,7 @@ function Noteboard({pdfName}) {
         "PostIt": addPostIt,
         "TinyText": addTinyText,
         'HighlightAnnotation': addHighlightAnnotation,
-        'ParagraphCustom': addParagraphCustomAnnotation,
+        'Squiggly': addSquigglyAnnotation,
         'UnderlineAnnotation': addUnderlineAnnotation
     }
 
@@ -218,11 +219,15 @@ function Noteboard({pdfName}) {
             });
     }
 
-    async function addParagraphCustomAnnotation() {
+    async function addSquigglyAnnotation() {
         let selection = window.getSelection();
         if (!isRangeExisting(selection)) return;
-        const props = {selection: selection, category: currentCategory.current, annotation: "ParagraphCustom"};
-        ParagraphCustomCalc(props);
+        const props = {
+            selection: selection,
+            category: currentCategory.current,
+            annotation: "Squiggly"
+        };
+        BoundingBoxCalc(props);
         return await annotationAPI.saveAnnotation(pdfName, "", props)
             .then(saveAnnotationCB(props))
             .then((data) => {
@@ -374,8 +379,8 @@ function Noteboard({pdfName}) {
                         ✎
                     </div>
                     <div
-                        className={`tool add-post-it ${creatingComponent === "ParagraphCustom" ? "add-tool-active" : ""}`}
-                        onClick={() => setCreatingComponent("ParagraphCustom")}
+                        className={`tool add-post-it ${creatingComponent === "Squiggly" ? "add-tool-active" : ""}`}
+                        onClick={() => setCreatingComponent("Squiggly")}
                     >
                         🖌
                     </div>
