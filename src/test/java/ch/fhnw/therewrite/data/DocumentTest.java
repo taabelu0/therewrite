@@ -6,13 +6,11 @@ import ch.fhnw.therewrite.data.Document;
 import org.hibernate.mapping.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.UUID;
 import java.util.ArrayList;
 
-@ExtendWith(MockitoExtension.class)
+@SpringBootTest
 public class DocumentTest {
 
     @Test

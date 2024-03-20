@@ -2,10 +2,6 @@ package ch.fhnw.therewrite.controller;
 
 import org.springframework.boot.test.context.SpringBootTest;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -15,38 +11,28 @@ import ch.fhnw.therewrite.data.Document;
 import ch.fhnw.therewrite.data.DocumentAccessToken;
 import ch.fhnw.therewrite.repository.DocumentAccessTokenRepository;
 import ch.fhnw.therewrite.repository.DocumentRepository;
-import ch.fhnw.therewrite.repository.GuestRepository;
 import ch.fhnw.therewrite.repository.UserRepository;
 
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.UUID;
 
-import org.aspectj.lang.annotation.Before;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 
-@ExtendWith(MockitoExtension.class)
+@SpringBootTest
 public class DocumentAccessTokenControllerTest {
 
-    @Mock
+    @Autowired
     private DocumentAccessTokenController documentAccessTokenController;
 
-    @Mock
+    @MockBean
     private DocumentAccessTokenRepository documentAccessTokenRepository;
 
-    @Mock
+    @MockBean
     private DocumentRepository documentRepository;
 
-    @Mock
-    private GuestRepository guestRepository;
-
-    @BeforeEach
-    public void setup() {
-        MockitoAnnotations.openMocks(this);
-        documentAccessTokenController = new DocumentAccessTokenController(documentAccessTokenRepository,
-                documentRepository, guestRepository);
-    }
+    @MockBean
+    private UserRepository userRepository;
 
     /**
      * @Test
