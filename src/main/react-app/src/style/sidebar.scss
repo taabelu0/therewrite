@@ -39,7 +39,7 @@
         &-delete {
             transition: 0.1s;
             &:hover {
-                background-color: $c-color-primary;
+                background-color: $c-color-primary !important;
                 color: $c-light-primary;
             }
         }
@@ -66,11 +66,13 @@
             background-color: $c-light-primary;
             box-shadow: 0 5px 15px rgba(37, 40, 43, 0.4);
             width: 240px;
-            opacity: 0;
             &-item {
                 padding: 0.5rem 0.75rem;
                 cursor: pointer;
                 border-bottom: 1px solid $c-light-secondary;
+                &:hover {
+                    background-color: $c-light-secondary;
+                }
                 &:last-of-type {
                     border: none;
                 }

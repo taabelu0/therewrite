@@ -19,7 +19,7 @@ function SidebarAnnotation({ annotation, comments, loadComments, deleteAnnotatio
 
     const switchShowOptions = () => {
         setShowOptions(!showOptions);
-        setShowCategories(false);
+        //setShowCategories(false);
     }
 
     const switchShowComments = () => {
@@ -68,7 +68,7 @@ function SidebarAnnotation({ annotation, comments, loadComments, deleteAnnotatio
                         </svg>
                     </div>
                 </div>
-                <div className="sidebar-annotation-optionmenu" style={{opacity: `${showOptions ? "1": "0"}`}}>
+                <div className="sidebar-annotation-optionmenu" style={{display: `${showOptions ? "block": "none"}`}}>
                     <div className="sidebar-annotation-optionmenu-item" onClick={switchShowCategories}>Change Category</div>
                     <div className="sidebar-annotation-optionmenu-item sidebar-option-delete" onClick={deleteAnno}>Delete Annotation</div>
                 </div>
