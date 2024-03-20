@@ -60,6 +60,7 @@ release-docker-job:
   only:
     - main
     - feat/docker-react-app
+    - develop
 
 deploy-docker-job:
   stage: deploy
@@ -97,3 +98,4 @@ deploy-docker-job:
   only:
     - main
     - feat/docker-react-app
+    - develop
