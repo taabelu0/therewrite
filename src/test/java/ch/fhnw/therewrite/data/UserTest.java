@@ -4,12 +4,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import ch.fhnw.therewrite.data.User;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
-
 import java.util.UUID;
 
-@ExtendWith(MockitoExtension.class)
+@SpringBootTest
 public class UserTest {
 
     @Test
