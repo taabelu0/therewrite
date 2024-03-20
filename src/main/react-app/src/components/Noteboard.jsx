@@ -87,10 +87,14 @@ function Noteboard({pdfName}) {
             console.log('Connection: ' + frame);
             stompClient.subscribe(`/session/${pdfName}`, (message) => {
                 let msgAnnotation = JSON.parse(message.body);
-                if (msgAnnotation.type === "delete") {
-                    deleteAnno(msgAnnotation.message);
-                } else if (msgAnnotation.type === "change") {
-                    applyAnnotationChanges(msgAnnotation.message);
+                if (msgAnnotation && msgAnnotation.message) {
+                    if (msgAnnotation.type === "delete") {
+                        deleteAnno(msgAnnotation.message);
+                    } else if (msgAnnotation.type === "change") {
+                        applyAnnotationChanges(msgAnnotation.message);
+                    }
+                } else {
+                    console.error('Invalid WebSocket message:', message.body);
                 }
             });
         };
@@ -298,20 +302,10 @@ function Noteboard({pdfName}) {
     }
 
     function editAnnotation(id, currentText) {
-        annotationAPI.updateAnnotation(id, {annotationText: currentText}).then((anno) => {
-            if (anno) {
-                stompClient.publish({
-                    destination: `/app/${pdfName}`,
-                    body: JSON.stringify({
-                        "message": anno,
-                        "type": "change"
-                    })
-                });
-                setAnnotations(prevAnnotations => {
-                    const updatedAnnotations = {...prevAnnotations};
-                    updatedAnnotations[id].text = currentText;
-                    return updatedAnnotations;
-                });
+        console.log('editAnnotation called with id:', id, 'and text:', currentText);
+        annotationAPI.updateAnnotation(id, {annotationText: currentText}).then((resp) => {
+            if (resp) {
+                sendMessage(resp.data);
             } else {
                 console.error('Error: Failed to update annotation');
             }
