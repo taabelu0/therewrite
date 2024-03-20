@@ -74,14 +74,14 @@
     width: 100%;
     z-index: 9999;
     align-items: center;
-    top: 17px;
+    top: $s-nav-height;
     box-shadow: 0 0 1rem $c-light-secondary;
     background-color: $c-light-primary;
     border-bottom: 1px solid #d3d3d3;
 }
 
 #toolbar {
-    padding: 0.5rem;
+    padding: $s-workspace-sidebar-nav-margin-top;
     display: flex;
     flex-direction: row;
     width: fit-content;
@@ -91,7 +91,6 @@
 }
 
 #category-selection {
-    padding: 1rem;
     display: flex;
     flex-direction: row;
     margin: $s-workspace-sidebar-nav-margin-top 0 0 0;
@@ -103,7 +102,7 @@
 .category {
     //width: calc(100% - 1rem - 0.125rem);
     width: 127px;
-    height: 30px;
+    height: 1.5rem;
     margin-right: 10px;
     font-size: 1rem;
     line-height: 1.25rem;
@@ -235,19 +234,16 @@
 }
 
 .tool {
-    aspect-ratio: 1 / 1;
-    margin-bottom: 0.5rem;
     overflow: hidden;
     text-align: center;
     background-color: $c-dark-secondary;
-    border-radius: 0.35rem;
-    color: #fff;
+    border-radius: $s-border-radius;
+    color: $c-light-primary;
     font-size: 2rem;
-    font-weight: 4;
-    height: 41px;
     line-height: 2.5rem;
-    margin-right: 2px;
-    width: 66px;
+    margin-right: 0.25rem;
+    width: 4rem;
+    height: 2.5rem;
 
     &:last-of-type {
         margin: 0;
