@@ -64,6 +64,48 @@
                 transition: opacity 0.1s;
             }
 
+            &:hover > &-edit {
+                opacity: 1;
+            }
+
+            &-edit {
+                position: absolute;
+                top: 0.5rem;
+                right: 1.25rem;
+                width: 2.1rem;
+                height: 1.4rem;
+                background-color: rgb(100, 100, 220);
+                border-radius: 0.25rem;
+                cursor: pointer;
+                overflow: hidden;
+                opacity: 0;
+                transition: opacity 0.1s;
+            }
+
+            &-cancel {
+                background-color: #f44336; /* Red */
+                border: none;
+                color: white;
+                text-align: center;
+                text-decoration: none;
+                display: inline-block;
+                font-size: 16px;
+                margin: 4px 2px;
+                cursor: pointer;
+            }
+
+            &-save {
+                background-color: #4CAF50; /* Green */
+                border: none;
+                color: white;
+                text-align: center;
+                text-decoration: none;
+                display: inline-block;
+                font-size: 16px;
+                margin: 4px 2px;
+                cursor: pointer;
+            }
+
             &-footer {
 
                 display: flex;
@@ -81,6 +123,17 @@
                     font-size: 0.75rem;
                     font-weight: 200;
                 }
+            }
+
+            &-textInput {
+                width: 80%;
+                height: 100%;
+                padding: 0.5rem;
+                border: 1px solid #ccc;
+                border-radius: 0.25rem;
+                font-size: 1rem;
+                line-height: 1.25rem;
+                resize: none;
             }
 
             &-text {
@@ -118,3 +171,4 @@
         }
     }
 }
+

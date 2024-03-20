@@ -82,7 +82,6 @@ function Noteboard({pdfName}) {
             return annotations;
         });
     }
-
     function initiateStompWS(pdfName) {
         stompClient.onConnect = (frame) => {
             console.log('Connection: ' + frame);
@@ -298,6 +297,27 @@ function Noteboard({pdfName}) {
         });
     }
 
+    function editAnnotation(id, currentText) {
+        annotationAPI.updateAnnotation(id, {annotationText: currentText}).then((anno) => {
+            if (anno) {
+                stompClient.publish({
+                    destination: `/app/${pdfName}`,
+                    body: JSON.stringify({
+                        "message": anno,
+                        "type": "change"
+                    })
+                });
+                setAnnotations(prevAnnotations => {
+                    const updatedAnnotations = {...prevAnnotations};
+                    updatedAnnotations[id].text = currentText;
+                    return updatedAnnotations;
+                });
+            } else {
+                console.error('Error: Failed to update annotation');
+            }
+        });
+    }
+
     return (
         <section
             id={"workspace"}
@@ -389,7 +409,7 @@ function Noteboard({pdfName}) {
                 <button className="sidebar-arrow" onClick={toggleSidebar}></button>
                 <div className="sidebar-content">
                     {Object.keys(annotations).map(key => {
-                        return <SidebarAnnotation annotation={annotations[key]} deleteAnnotation={deleteAnnotation}/>
+                        return <SidebarAnnotation annotation={annotations[key]} deleteAnnotation={deleteAnnotation} editAnnotation={editAnnotation} onChange={onAnnotationChange}/>
                     })}
                 </div>
             </section>
