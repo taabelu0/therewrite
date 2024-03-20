@@ -16,22 +16,12 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.DefaultSecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Configuration
 @EnableWebSecurity
 public class SecurityConfiguration {
     private final GuestRepository guestRepository;
     private final DocumentRepository documentRepository;
     private final DocumentAccessTokenRepository documentAccessTokenRepository;
-    private final List<String> permitAllMatchers = List.of(
-            "/api/document/**",
-            "/api/document/",
-            "/",
-            "/home",
-            "/static/**"
-    );
 
     public SecurityConfiguration(GuestRepository guestRepository, DocumentRepository documentRepository, DocumentAccessTokenRepository documentAccessTokenRepository) {
         this.guestRepository = guestRepository;
@@ -41,19 +31,18 @@ public class SecurityConfiguration {
 
     @Bean
     public DefaultSecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.authorizeHttpRequests(auth -> {
-                    for (String matcher : permitAllMatchers) {
-                        auth.requestMatchers(matcher).permitAll();
-                    }
-                    auth.anyRequest().authenticated();
-                })
+        http.authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/view/**").authenticated()
+                        // TODO: on user management implementation change this to be secure!! (.anyRequest().authenticated())
+                        .anyRequest().permitAll()
+                )
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement((session) -> session
                         .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
                 )
                 // authorization without login (guest):
                 .addFilterBefore(
-                        new GuestFilter(permitAllMatchers, guestRepository, documentRepository, documentAccessTokenRepository),
+                        new GuestFilter(guestRepository, documentRepository, documentAccessTokenRepository),
                         UsernamePasswordAuthenticationFilter.class
                 );
         return http.build();
