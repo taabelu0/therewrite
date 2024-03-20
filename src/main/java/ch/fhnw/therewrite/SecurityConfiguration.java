@@ -25,9 +25,10 @@ public class SecurityConfiguration {
     private final GuestRepository guestRepository;
     private final DocumentRepository documentRepository;
     private final DocumentAccessTokenRepository documentAccessTokenRepository;
-    private final List<String> permitAllMatchers = List.of(
+    public static final List<String> permitAllMatchers = List.of(
             "/api/document/**",
             "/api/document/",
+            "/api/documentAccessToken/create",
             "/",
             "/home",
             "/static/**"
@@ -53,7 +54,7 @@ public class SecurityConfiguration {
                 )
                 // authorization without login (guest):
                 .addFilterBefore(
-                        new GuestFilter(permitAllMatchers, guestRepository, documentRepository, documentAccessTokenRepository),
+                        new GuestFilter(guestRepository, documentRepository, documentAccessTokenRepository),
                         UsernamePasswordAuthenticationFilter.class
                 );
         return http.build();

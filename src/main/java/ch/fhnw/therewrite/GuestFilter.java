@@ -25,15 +25,16 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
+import static ch.fhnw.therewrite.SecurityConfiguration.permitAllMatchers;
+
 @Component
 public class GuestFilter extends OncePerRequestFilter {
     private final GuestRepository guestRepository;
     private final DocumentRepository documentRepository;
     private final DocumentAccessTokenRepository documentAccessTokenRepository;
-    private final List<String> permitAllMatchers;
 
-    public GuestFilter(List<String> permitAllMatchers, GuestRepository guestRepository, DocumentRepository documentRepository, DocumentAccessTokenRepository documentAccessTokenRepository) {
-        this.permitAllMatchers = permitAllMatchers;
+
+    public GuestFilter(GuestRepository guestRepository, DocumentRepository documentRepository, DocumentAccessTokenRepository documentAccessTokenRepository) {
         this.guestRepository = guestRepository;
         this.documentRepository = documentRepository;
         this.documentAccessTokenRepository = documentAccessTokenRepository;
@@ -89,10 +90,6 @@ public class GuestFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        if((boolean) request.getAttribute(this.getAlreadyFilteredAttributeName()))  { // spring security is apparently not able to do this check internally...
-            filterChain.doFilter(request, response);
-            return;
-        }
         response.setStatus(HttpServletResponse.SC_FORBIDDEN); // default
         String uri = request.getRequestURI();
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
