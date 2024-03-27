@@ -16,12 +16,23 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.DefaultSecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfiguration {
     private final GuestRepository guestRepository;
     private final DocumentRepository documentRepository;
     private final DocumentAccessTokenRepository documentAccessTokenRepository;
+    public static final List<String> permitAllMatchers = List.of(
+            "/api/document/**",
+            "/api/document/",
+            "/api/documentAccessToken/create",
+            "/",
+            "/home",
+            "/static/**"
+    );
 
     public SecurityConfiguration(GuestRepository guestRepository, DocumentRepository documentRepository, DocumentAccessTokenRepository documentAccessTokenRepository) {
         this.guestRepository = guestRepository;
@@ -31,11 +42,12 @@ public class SecurityConfiguration {
 
     @Bean
     public DefaultSecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/view/**").authenticated()
-                        // TODO: on user management implementation change this to be secure!! (.anyRequest().authenticated())
-                        .anyRequest().permitAll()
-                )
+        http.authorizeHttpRequests(auth -> {
+                    for (String matcher : permitAllMatchers) {
+                        auth.requestMatchers(matcher).permitAll();
+                    }
+                    auth.anyRequest().authenticated();
+                })
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement((session) -> session
                         .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
