@@ -96,13 +96,13 @@ public class GuestFilter extends OncePerRequestFilter {
         String uri = request.getRequestURI();
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String docId = uri.substring(uri.lastIndexOf('/') + 1); // TODO: get id by other means
-        boolean isUUID = false;
+        boolean isDocUUID = false;
 
         try{
             UUID uuid = UUID.fromString(docId);
-            isUUID = uuid.toString().equals(docId);
+            isDocUUID = uuid.toString().equals(docId) && new AntPathRequestMatcher("/view/*").matches(request);
         } catch (IllegalArgumentException ignored){}
-        if(!isUUID) { // TODO: change to check for resources dynamically (additional filter)
+        if(!isDocUUID) { // TODO: change to check for resources dynamically (additional filter)
             if (!(authentication instanceof AnonymousAuthenticationToken) && authentication != null && authentication.getPrincipal().equals("guest")) {
                 Object guestId = request.getSession().getAttribute("guestId");
                 if(guestId instanceof UUID && verifyGuest(guestId.toString())) {
