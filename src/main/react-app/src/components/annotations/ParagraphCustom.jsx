@@ -13,7 +13,7 @@ export class ParagraphCustom extends Annotation {
     }
 
     render() {
-        return (<div style={{
+        return (<div id={this.state.key} style={{
             top: this.state.currentTop,
             left: this.state.currentLeft,
             height: this.state.currentHeight,

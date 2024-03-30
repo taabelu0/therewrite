@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {commentAPI} from "../../apis/commentAPI";
 
-function SidebarAnnotation({ annotation, comments, loadComments, deleteAnnotation, createComment }) {
+function SidebarAnnotation({ annotation, comments, loadComments, deleteAnnotation, createComment, onSelection }) {
 
     const [showInput, setShowInput] = useState(false);
     const [showOptions, setShowOptions] = useState(false);
@@ -47,7 +47,7 @@ function SidebarAnnotation({ annotation, comments, loadComments, deleteAnnotatio
     if(annotation.timeCreated) {
         let date = new Date(annotation.timeCreated)
         return (
-            <div className={`sidebar-annotation sidebar-annotation-${annotation.category.toLowerCase()}`}>
+            <div onClick={(event) => onSelection(event, annotation.id)} id={'sidebar-' + annotation.id} className={`sidebar-annotation sidebar-annotation-${annotation.category.toLowerCase()}`}>
                 <div className="sidebar-annotation-header">
                     <div className="sidebar-annotation-header-info">
                         <div className="sidebar-annotation-header-info-user">ExampleUser</div>

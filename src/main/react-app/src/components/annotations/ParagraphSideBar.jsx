@@ -6,7 +6,7 @@ export class ParagraphSideBar extends Annotation {
         super(props);
     }
 
-    render() { return (<div style={{
+    render() { return (<div id={this.state.key} style={{
         top: this.state.currentTop,
         left: this.state.currentLeft,
         height: this.state.currentHeight,

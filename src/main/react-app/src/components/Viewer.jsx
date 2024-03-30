@@ -41,7 +41,7 @@ function PDFViewer() {
     return (
         <div>
             <Core pdfName={pdfName}></Core>
-            <Noteboard pdfName={pdfName}
+            <Noteboard pdfID={pdfName}
             ></Noteboard>
         </div>
     );
