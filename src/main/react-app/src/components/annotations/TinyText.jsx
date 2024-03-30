@@ -96,7 +96,7 @@ export default function TinyText(props) {
     }
 
     return (
-        <div className={`tiny-text tiny-text-${category.toLowerCase()}`} ref={tinyTextRef} style={{
+        <div className={`annotation-root tiny-text tiny-text-${category.toLowerCase()}`} ref={tinyTextRef} style={{
             transform: `translate(${dataX}px, ${dataY}px)`
         }}>
             <div className="tiny-text-input-wrapper">

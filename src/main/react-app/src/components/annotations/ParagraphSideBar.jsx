@@ -11,7 +11,7 @@ export class ParagraphSideBar extends Annotation {
         left: this.state.currentLeft,
         height: this.state.currentHeight,
         width: this.state.currentWidth
-    }} className={`paragraph-sidebar paragraph-sidebar-${this.state.currentCategory.toLowerCase()} annotation`}>
+    }} className={`annotation-root paragraph-sidebar paragraph-sidebar-${this.state.currentCategory.toLowerCase()} annotation`}>
     </div>)};
 }
 

@@ -10,7 +10,7 @@ export class UnderlineAnnotation extends Annotation {
 
     render() {
         return (
-            <div>
+            <div className={"annotation-root"}>
                 {this.state.currentRects.map((rect, index) => {
                     return (
                         <div

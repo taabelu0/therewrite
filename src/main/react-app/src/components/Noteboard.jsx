@@ -36,6 +36,8 @@ function Noteboard({pdfName}) {
     const [tempHighlight, setTempHighlight] = useState(null); // contains database annotation object and not front-end object
     const [showSidebar, setShowSidebar] = useState(false);
     const [annotationCoordinates, setAnnotationCoordinates] = useState({x: 0, y: 0});
+    const [selectedAnnotations, setSelectedAnnotations] = useState([]);
+    const selectedAnnotation = useRef({});
     let width = useRef("100%");
     let height = useRef("100%");
     const [selectedCategory, setSelectedCategory] = useState("Definition");
@@ -57,8 +59,13 @@ function Noteboard({pdfName}) {
 
     useEffect(() => {
         initiateStompWS(pdfName);
-        loadAnnotations();
+        loadAnnotations().finally();
+        registerAnnotationSelect();
     }, []);
+
+    useEffect(() => {
+        changeSelected(selectedAnnotation.current);
+    }, [selectedAnnotation.current]);
 
     useEffect(() => {
         setShowCommentBox(tempHighlight != null);
@@ -174,7 +181,7 @@ function Noteboard({pdfName}) {
         setCreatingComponent(null);
         setTimeout(async () => {
             let newAnno = await ADDING_COMPONENT[creatingComponent](selectedCategory, x, y);
-            if(!newAnno) return;
+            if (!newAnno) return;
             sendMessage(newAnno); // notifies websocket
             setAnnotationCoordinates({x, y});
         }, 50);
@@ -325,9 +332,51 @@ function Noteboard({pdfName}) {
         sendMessage(annotation);
     }
 
+    function registerAnnotationSelect() {
+        document.addEventListener('click', e => {
+            const allAnnos = document.querySelectorAll('.annotation');
+            allAnnos.forEach(element => element.style.pointerEvents = 'auto'); // enable pointer events
+            const elements = document.elementsFromPoint(e.clientX, e.clientY); // get elements at mouse position
+            allAnnos.forEach(element => element.style.pointerEvents = 'none'); // disable them again
+            const annotationElements = [];
+            elements.map(e => {
+                if (e.classList.contains("annotation-root")) annotationElements.push(e); // classList uses contains instead of includes
+                else {
+                    let parent = e.closest(".annotation-root");
+                    if (parent) annotationElements.push(parent); // add parent if parent is annotation
+                }
+            });
+            if (annotationElements.length <= 0) return;
+            setSelectedAnnotations(prevAnnos => {
+                if (prevAnnos.length === annotationElements.length) {
+                    if (prevAnnos.filter(pA => !annotationElements.includes(pA)).length === 0) { // if they are equal
+                        if(annotationElements.length > 1) {
+                            let prevFirst = prevAnnos.shift();
+                            prevAnnos.push(prevFirst);
+                            changeSelected(selectedAnnotation.current, 'remove');
+                            selectedAnnotation.current = prevAnnos[0];
+                        }
+                        return prevAnnos;
+                    }
+                }
+                if(selectedAnnotation.current !== annotationElements[0]) {
+                    changeSelected(selectedAnnotation.current, 'remove');
+                    selectedAnnotation.current = annotationElements[0];
+                }
+                return annotationElements;
+            });
+
+        }, {passive: true});
+    }
+
+    function changeSelected(element, keyword = 'add') {
+        if (element?.classList) element.classList[keyword]("selected-annotation");
+    }
+
     function toggleSidebar() {
         setShowSidebar(!showSidebar);
     }
+
     function loadCommentsByAnno(annotationId) {
         commentAPI.getComments(annotationId).then((allComments) => {
             console.log(annotationId)
@@ -444,7 +493,9 @@ function Noteboard({pdfName}) {
                 <button className="sidebar-arrow" onClick={toggleSidebar}></button>
                 <div className="sidebar-content">
                     {Object.keys(annotations).map(key => {
-                        return <SidebarAnnotation annotation={annotations[key]} comments={comments[key]} loadComments={loadCommentsByAnno} deleteAnnotation={deleteAnnotation} createComment={createComment}/>
+                        return <SidebarAnnotation annotation={annotations[key]} comments={comments[key]}
+                                                  loadComments={loadCommentsByAnno} deleteAnnotation={deleteAnnotation}
+                                                  createComment={createComment}/>
                     })}
                 </div>
             </section>

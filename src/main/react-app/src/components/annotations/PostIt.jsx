@@ -95,7 +95,7 @@ export default function PostIt(props) {
     }
 
     return (
-        <div className={`post-it post-it-${category.toLowerCase()}`} ref={postitRef} style={{
+        <div className={`annotation-root post-it post-it-${category.toLowerCase()}`} ref={postitRef} style={{
             transform: `translate(${dataX}px, ${dataY}px)`
         }}>
             <div className="post-it-inner">
