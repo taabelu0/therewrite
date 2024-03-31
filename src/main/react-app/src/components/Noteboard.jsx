@@ -353,6 +353,32 @@ function Noteboard({pdfName}) {
         });
     }
 
+    async function updateAnnoCategory(id, category) {
+        setAnnotations(prevAnnotations => {
+            let annoDetail = prevAnnotations[id];
+
+            // Delete unnecessary keys
+            delete annoDetail["id"];
+            delete annoDetail["text"];
+            delete annoDetail["timeCreated"];
+            delete annoDetail["category"];
+
+            annotationAPI.updateAnnotation(id, {
+                annotationDetail: JSON.stringify({
+                    ...annoDetail,
+                    category: category,
+                })
+            }).then((anno) => {
+                // prevAnnotations[id] = anno.data;
+                // applyAnnotationChanges(anno.data);
+                onAnnotationChange(anno.data);
+            });
+            return prevAnnotations;
+        });
+
+
+    }
+
     return (
         <section
             id={"workspace"}
@@ -444,7 +470,7 @@ function Noteboard({pdfName}) {
                 <button className="sidebar-arrow" onClick={toggleSidebar}></button>
                 <div className="sidebar-content">
                     {Object.keys(annotations).map(key => {
-                        return <SidebarAnnotation annotation={annotations[key]} comments={comments[key]} loadComments={loadCommentsByAnno} deleteAnnotation={deleteAnnotation} createComment={createComment}/>
+                        return <SidebarAnnotation annotation={annotations[key]} comments={comments[key]} loadComments={loadCommentsByAnno} deleteAnnotation={deleteAnnotation} updateAnnoCategory={updateAnnoCategory} createComment={createComment} />
                     })}
                 </div>
             </section>
