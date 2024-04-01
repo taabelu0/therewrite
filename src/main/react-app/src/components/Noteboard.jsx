@@ -321,15 +321,22 @@ function Noteboard({pdfID}) {
     }
 
     function onSidebarSelection(event, id) {
+        changeSelected(selectedAnnotationRef.current, 'remove');
+        let newSelected = document.getElementById(id);
+        selectedAnnotationRef.current = newSelected;
+        changeSelected(newSelected);
         scrollToAnnotation(document.getElementById(id));
     }
 
     function scrollToAnnotation(element) {
         const OFFSET = 100;
-        let vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0)
+        let vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0);
+        let vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
         let top = (element.firstChild ? element.firstChild.getBoundingClientRect().top : element.getBoundingClientRect().top ) + window.scrollY;
+        let left = (element.firstChild ? element.firstChild.getBoundingClientRect().left : element.getBoundingClientRect().left ) + window.scrollX;
         window.scroll({
             top: top - (vh / 2) + OFFSET,
+            left: left - (vw / 2) + OFFSET,
             behavior: 'smooth'
         });
     }
@@ -343,7 +350,7 @@ function Noteboard({pdfID}) {
     }
 
     function registerAnnotationSelect() {
-        document.addEventListener('click', e => {
+        document.addEventListener('mousedown', e => {
             const allAnnos = document.querySelectorAll('.annotation');
             allAnnos.forEach(element => element.style.pointerEvents = 'auto'); // enable pointer events
             const elements = document.elementsFromPoint(e.clientX, e.clientY); // get elements at mouse position
@@ -377,12 +384,19 @@ function Noteboard({pdfID}) {
                 }
                 return annotationElements;
             });
-            document.getElementById('sidebar-' + selectedAnnotationRef.current.id).scrollIntoView({behavior: "smooth"});
+            let sidebarElement = document.getElementById('sidebar-' + selectedAnnotationRef.current.id);
+            if(sidebarElement) sidebarElement.scrollIntoView({behavior: "smooth"}); // scroll on sidebar
+
         }, {passive: true});
     }
 
     function changeSelected(element, keyword = 'add') {
-        if (element?.classList) element.classList[keyword]("selected-annotation");
+        if (element?.classList) {
+            element.classList[keyword]("selected-annotation");
+            // also change class on sidebar element
+            let sidebarElement = document.getElementById('sidebar-' + element.id);
+            if(sidebarElement) sidebarElement.classList[keyword]("selected-annotation-sidebar");
+        }
     }
 
     function toggleSidebar() {
