@@ -171,9 +171,12 @@ function Noteboard({pdfName}) {
         const rect = noteboard.getBoundingClientRect();
         const x = clientX - rect.left;
         const y = clientY - rect.top;
-        setCreatingComponent(null);
+        if(creatingComponent === "PostIt" || creatingComponent === "TinyText") {
+            setCreatingComponent(null);
+        }
         setTimeout(async () => {
             let newAnno = await ADDING_COMPONENT[creatingComponent](selectedCategory, x, y);
+            document.getSelection().deleteFromDocument();
             if(!newAnno) return;
             sendMessage(newAnno); // notifies websocket
             setAnnotationCoordinates({x, y});
@@ -353,6 +356,27 @@ function Noteboard({pdfName}) {
         });
     }
 
+    function editAnnotation(id, currentText) {
+        annotationAPI.updateAnnotation(id, {annotationText: currentText}).then((anno) => {
+            if (anno) {
+                stompClient.publish({
+                    destination: `/app/${pdfName}`,
+                    body: JSON.stringify({
+                        "message": anno,
+                        "type": "change"
+                    })
+                });
+                setAnnotations(prevAnnotations => {
+                    const updatedAnnotations = {...prevAnnotations};
+                    updatedAnnotations[id].text = currentText;
+                    return updatedAnnotations;
+                });
+            } else {
+                console.error('Error: Failed to update annotation');
+            }
+        });
+    }
+
     return (
         <section
             id={"workspace"}
@@ -444,7 +468,7 @@ function Noteboard({pdfName}) {
                 <button className="sidebar-arrow" onClick={toggleSidebar}></button>
                 <div className="sidebar-content">
                     {Object.keys(annotations).map(key => {
-                        return <SidebarAnnotation annotation={annotations[key]} comments={comments[key]} loadComments={loadCommentsByAnno} deleteAnnotation={deleteAnnotation} createComment={createComment}/>
+                        return <SidebarAnnotation annotation={annotations[key]} comments={comments[key]} loadComments={loadCommentsByAnno} deleteAnnotation={deleteAnnotation} createComment={createComment} editAnnotation={editAnnotation} onChange={onAnnotationChange}/>
                     })}
                 </div>
             </section>
