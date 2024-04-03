@@ -78,6 +78,26 @@ function Noteboard({pdfName}) {
         });
     }
 
+    function applyCommentChanges(comment) {
+        if (!comment) {
+            console.error('Comment in message is null or undefined:', comment);
+            return;
+        }
+        setComments(prevComments => {
+            const existingComments = prevComments[comment.annotationId.idAnnotation] || [];
+            const updatedComments = existingComments.map(existingComment => {
+                if (existingComment.idComment === comment.idComment) {
+                    return comment;
+                }
+                return existingComment;
+            });
+            return {
+                ...prevComments,
+                [comment.annotationId.idAnnotation]: updatedComments,
+            };
+        });
+    }
+
     function addComment(annotationId, comment) {
         setComments(prevComments => {
             const existingComments = prevComments[annotationId] || [];
@@ -109,13 +129,14 @@ function Noteboard({pdfName}) {
                     case msgAnnotation.message && msgAnnotation.type === "change":
                         applyAnnotationChanges(msgAnnotation.message);
                         break;
+                    case msgAnnotation.comment && msgAnnotation.type === "change":
+                        applyCommentChanges(msgAnnotation.comment);
+                        break;
                     case msgAnnotation.message && msgAnnotation.type === "delete":
                         deleteAnno(msgAnnotation.message);
                         break;
-                    case msgAnnotation.comment && msgAnnotation.type === "change":
-                        addComment(msgAnnotation.comment.annotationId.idAnnotation, msgAnnotation.comment);
-                        break;
                     case msgAnnotation.comment && msgAnnotation.type === "delete":
+                        // handle comment deletion here
                         break;
                     default:
                         console.error('Unknown message type:', msgAnnotation.type);
@@ -154,6 +175,17 @@ function Noteboard({pdfName}) {
             body: JSON.stringify({
                 "message": anno,
                 "comment": null,
+                "type": "change"
+            })
+        });
+    }
+
+    function sendComment(comm) {
+        stompClient.publish({
+            destination: `/app/${pdfName}`,
+            body: JSON.stringify({
+                "message": null,
+                "comment": comm,
                 "type": "change"
             })
         });
@@ -315,7 +347,9 @@ function Noteboard({pdfName}) {
         return (data) => {
             annotationObj.id = data.idAnnotation;
             annotationObj.text = data.annotationText
-            setAnnotations({...annotations, [annotationObj['id']]: annotationObj});
+            setAnnotations(prevAnnotations => {
+                return {...prevAnnotations, [annotationObj['id']]: annotationObj}
+            });
             return data;
         }
     }
@@ -337,9 +371,10 @@ function Noteboard({pdfName}) {
             setComments(prevComments => {
                 return {
                     ...prevComments,
-                    [annotationId]: allComments
+                    [annotationId]: allComments,
                 }
             });
+            console.log("all comments:", allComments)
         });
     }
 
@@ -357,20 +392,21 @@ function Noteboard({pdfName}) {
     }
 
     function editAnnotation(id, currentText) {
-        annotationAPI.updateAnnotation(id, {annotationText: currentText}).then((anno) => {
-            if (anno) {
-                stompClient.publish({
-                    destination: `/app/${pdfName}`,
-                    body: JSON.stringify({
-                        "message": anno,
-                        "type": "change"
-                    })
-                });
-                setAnnotations(prevAnnotations => {
-                    const updatedAnnotations = {...prevAnnotations};
-                    updatedAnnotations[id].text = currentText;
-                    return updatedAnnotations;
-                });
+        console.log('editAnnotation called with id:', id, 'and text:', currentText);
+        annotationAPI.updateAnnotation(id, {annotationText: currentText}).then((resp) => {
+            if (resp) {
+                sendMessage(resp.data);
+            } else {
+                console.error('Error: Failed to update annotation');
+            }
+        });
+    }
+
+    function editComment(id, currentText) {
+        console.log('editComment called with id:', id, 'and text:', currentText);
+        commentAPI.updateComment(id, {commentText: currentText}).then((resp) => {
+            if (resp) {
+                sendComment(resp.data);
             } else {
                 console.error('Error: Failed to update annotation');
             }
@@ -468,7 +504,7 @@ function Noteboard({pdfName}) {
                 <button className="sidebar-arrow" onClick={toggleSidebar}></button>
                 <div className="sidebar-content">
                     {Object.keys(annotations).map(key => {
-                        return <SidebarAnnotation annotation={annotations[key]} comments={comments[key]} loadComments={loadCommentsByAnno} deleteAnnotation={deleteAnnotation} createComment={createComment} editAnnotation={editAnnotation} onChange={onAnnotationChange}/>
+                        return <SidebarAnnotation annotation={annotations[key]} comment={comments[key]} loadComments={loadCommentsByAnno} deleteAnnotation={deleteAnnotation} createComment={createComment} editAnnotation={editAnnotation} editComment={editComment} onChange={onAnnotationChange}/>
                     })}
                 </div>
             </section>

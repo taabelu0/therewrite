@@ -1,7 +1,6 @@
 import React, {useEffect, useState} from 'react';
-import {commentAPI} from "../../apis/commentAPI";
 
-function SidebarAnnotation({ annotation, comments, loadComments, deleteAnnotation, createComment, editAnnotation, onChange }) {
+function SidebarAnnotation({ annotation, comment, loadComments, deleteAnnotation, createComment, editAnnotation, editComment, onChange }) {
 
     const [showInput, setShowInput] = useState(false);
     const [showOptions, setShowOptions] = useState(false);
@@ -9,14 +8,22 @@ function SidebarAnnotation({ annotation, comments, loadComments, deleteAnnotatio
     const [input, setInput] = useState("");
     const [showComments, setShowComments] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
+    const [isEditingComment, setIsEditingComment] = useState(false);
     const [editedText, setEditedText] = useState(annotation.text);
+    const [editingCommentId, setEditingCommentId] = useState(null);
+    const [editedCommentText, setEditedCommentText] = useState('');
 
     useEffect(() => {
+        console.log('comment prop:', comment)
+        if(comment) {
+            console.log('comment.id:', comment.idComment)
+        }
         loadComments(annotation.id);
     }, []);
 
     const startEditing = () => {
         setIsEditing(true);
+        switchShowOptions();
     }
 
     const handleTextChange = (event) => {
@@ -58,10 +65,34 @@ function SidebarAnnotation({ annotation, comments, loadComments, deleteAnnotatio
     }
 
     const handleCreateComment = () => {
-        createComment(annotation.id, null, input);
-        setInput("");
-        switchShowInput();
+        createComment(annotation.id, null, input)
+            .then(() => {
+                setInput("");
+                switchShowInput();
+                loadComments(annotation.id);
+            });
     };
+
+    const startEditingComment = (id, text) => {
+        console.log("comment id startEditingComment:", id)
+        setEditingCommentId(id);
+        setEditedCommentText(text);
+        setIsEditingComment(true);
+    }
+
+    const saveEditedComment = () => {
+        console.log("comment id saveEditedComment:", editingCommentId)
+        editComment(editingCommentId, editedCommentText);
+        setIsEditingComment(false);
+    }
+
+    const cancelEditComment = () => {
+        setEditingCommentId(null);
+    }
+
+    const handleCommentTextChange = (event) => {
+        setEditedCommentText(event.target.value);
+    }
 
     if(annotation.timeCreated) {
         let date = new Date(annotation.timeCreated)
@@ -129,14 +160,25 @@ function SidebarAnnotation({ annotation, comments, loadComments, deleteAnnotatio
                     </div>
                     <div
                         className={`sidebar-annotation-comment-wrapper ${showComments ? "" : "sidebar-annotation-comment-wrapper-hidden"}`}>
-                        {comments && Object.keys(comments).map(key => {
+                        {comment && Object.keys(comment).map(key => {
                             return <div className="sidebar-annotation-comment">
                                 <div className="sidebar-annotation-comment-header">
                                     <div className="sidebar-annotation-comment-header-user">ExampleUser</div>
                                     <div
-                                        className="sidebar-annotation-comment-header-date">{(new Date(comments[key].timeCreated)).toLocaleDateString("en-GB")}</div>
+                                        className="sidebar-annotation-comment-header-date">{(new Date(comment[key].timeCreated)).toLocaleDateString("en-GB")}</div>
                                 </div>
-                                <div className="sidebar-annotation-comment-text">{comments[key].commentText}</div>
+                                {isEditingComment && editingCommentId === comment[key].idComment ? (
+                                    <div className="input-edit-group">
+                                        <input className="sidebar-annotation-textInput" value={editedCommentText} onChange={handleCommentTextChange}/>
+                                        <div className="button-group">
+                                            <button className="sidebar-annotation-save" onClick={saveEditedComment}>Save</button>
+                                            <button className="sidebar-annotation-cancel" onClick={cancelEditComment}>Cancel</button>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="sidebar-annotation-comment-text">{comment[key].commentText}</div>
+                                )}
+                                <button className="sidebar-annotation-comment-edit" onClick={() => startEditingComment(comment[key].idComment, comment[key].commentText)}>Edit</button>
                             </div>
                         })}
                     </div>

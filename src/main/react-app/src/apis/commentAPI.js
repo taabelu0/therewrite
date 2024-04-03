@@ -15,6 +15,28 @@ export const commentAPI = {
             });
     },
 
+    updateComment: function (id, obj) {
+        const comment = {
+            idComment: id,
+            ...obj
+        };
+
+        return api.patch(`/api/comment`,
+            comment
+        )
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+    },
+
+    deleteComment: async function (commentId) {
+        return api.delete(`/api/comment/${commentId}`)
+            .then(response => response.data)
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+    },
+
     getComments: async function (annotationId) {
         const response = await api.request({
             url: `/api/comment/all/${annotationId}`,
