@@ -9,6 +9,7 @@ export class Annotation extends React.Component {
 
         this.state = {
             count: 0,
+            key: props.annotation.id,
             currentSelection: props.annotation.selection,
             currentCategory: props.annotation.category,
             currentHeight: props.annotation.height,
