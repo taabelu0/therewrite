@@ -1,6 +1,7 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
+import OptionsIcon from "./icons/OptionsIcon";
 
-function SidebarAnnotation({ annotation, comment, loadComments, deleteAnnotation, createComment, editAnnotation, editComment, onChange }) {
+function SidebarAnnotation({ annotation, comment, loadComments, deleteAnnotation, deleteComment, createComment, editAnnotation, editComment, onChange }) {
 
     const [showInput, setShowInput] = useState(false);
     const [showOptions, setShowOptions] = useState(false);
@@ -12,6 +13,26 @@ function SidebarAnnotation({ annotation, comment, loadComments, deleteAnnotation
     const [editedText, setEditedText] = useState(annotation.text);
     const [editingCommentId, setEditingCommentId] = useState(null);
     const [editedCommentText, setEditedCommentText] = useState('');
+    const [shownCommentOptionsMenuId, setShownCommentOptionsMenuId] = useState(null);
+
+    const optionMenuRef = useRef(null);
+    const commentOptionMenuRef = useRef(null);
+
+    useEffect(() => {
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
+
+    const handleClickOutside = (event) => {
+        if (optionMenuRef.current && !optionMenuRef.current.contains(event.target)) {
+            setShowOptions(false);
+        }
+        if (commentOptionMenuRef.current && !commentOptionMenuRef.current.contains(event.target)) {
+            setShownCommentOptionsMenuId(null);
+        }
+    };
 
     useEffect(() => {
         console.log('comment prop:', comment)
@@ -21,9 +42,10 @@ function SidebarAnnotation({ annotation, comment, loadComments, deleteAnnotation
         loadComments(annotation.id);
     }, []);
 
+
     const startEditing = () => {
         setIsEditing(true);
-        switchShowOptions();
+        setShowOptions(false);
     }
 
     const handleTextChange = (event) => {
@@ -44,8 +66,10 @@ function SidebarAnnotation({ annotation, comment, loadComments, deleteAnnotation
     }
 
     const switchShowOptions = () => {
+        if (shownCommentOptionsMenuId !== null) {
+            setShownCommentOptionsMenuId(null);
+        }
         setShowOptions(!showOptions);
-        //setShowCategories(false);
     }
 
     const switchShowComments = () => {
@@ -60,6 +84,10 @@ function SidebarAnnotation({ annotation, comment, loadComments, deleteAnnotation
         deleteAnnotation(annotation.id);
     }
 
+    const deleteComm = (id) => {
+        deleteComment(id);
+    }
+
     const setCurrentInput = (event) => {
        setInput(event.target.value);
     }
@@ -70,6 +98,9 @@ function SidebarAnnotation({ annotation, comment, loadComments, deleteAnnotation
                 setInput("");
                 switchShowInput();
                 loadComments(annotation.id);
+                if(!showComments) {
+                    switchShowComments();
+                }
             });
     };
 
@@ -94,6 +125,13 @@ function SidebarAnnotation({ annotation, comment, loadComments, deleteAnnotation
         setEditedCommentText(event.target.value);
     }
 
+    const toggleCommentOptionsMenu = (id) => {
+        if (showOptions) {
+            setShowOptions(false);
+        }
+        setShownCommentOptionsMenuId(prevId => prevId === id ? null : id);
+    }
+
     if(annotation.timeCreated) {
         let date = new Date(annotation.timeCreated)
         return (
@@ -107,32 +145,16 @@ function SidebarAnnotation({ annotation, comment, loadComments, deleteAnnotation
                     <div
                         className={`sidebar-annotation-header-options sidebar-annotation-header-options-${annotation.category.toLowerCase()} ${showOptions ? `sidebar-annotation-header-options-${annotation.category.toLowerCase()}-active` : ""}`}
                         onClick={switchShowOptions}>
-                        <svg fill="#000000" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg"
-                             viewBox="0 0 342.382 342.382">
-                            <g>
-                                <g>
-                                    <g>
-                                        <path d="M45.225,125.972C20.284,125.972,0,146.256,0,171.191c0,24.94,20.284,45.219,45.225,45.219
-                                    c24.926,0,45.219-20.278,45.219-45.219C90.444,146.256,70.151,125.972,45.225,125.972z"/>
-                                    </g>
-                                    <g>
-                                        <path d="M173.409,125.972c-24.938,0-45.225,20.284-45.225,45.219c0,24.94,20.287,45.219,45.225,45.219
-                                    c24.936,0,45.226-20.278,45.226-45.219C218.635,146.256,198.345,125.972,173.409,125.972z"/>
-                                    </g>
-                                    <g>
-                                        <path d="M297.165,125.972c-24.932,0-45.222,20.284-45.222,45.219c0,24.94,20.29,45.219,45.222,45.219
-                                    c24.926,0,45.217-20.278,45.217-45.219C342.382,146.256,322.091,125.972,297.165,125.972z"/>
-                                    </g>
-                                </g>
-                            </g>
-                        </svg>
+                        <OptionsIcon/>
                     </div>
                 </div>
-                <div className="sidebar-annotation-optionmenu" style={{display: `${showOptions ? "block" : "none"}`}}>
+                {showOptions && (
+                <div className="sidebar-annotation-optionmenu" ref={optionMenuRef}>
                     <div className="sidebar-annotation-optionmenu-item" onClick={switchShowCategories}>Change Category</div>
                     <div className="sidebar-annotation-optionmenu-item sidebar-option-edit" onClick={startEditing}>Edit Annotation</div>
                     <div className="sidebar-annotation-optionmenu-item sidebar-option-delete" onClick={deleteAnno}>Delete Annotation</div>
                 </div>
+                )}
                 {isEditing ? (
                     <div className="input-edit-group">
                         <input className="sidebar-annotation-textInput" value={editedText} onChange={handleTextChange}/>
@@ -153,8 +175,11 @@ function SidebarAnnotation({ annotation, comment, loadComments, deleteAnnotation
                         <div className="sidebar-annotation-comment-input-send" onClick={handleCreateComment}>Send</div>
                     </div>
                     <div className="sidebar-annotation-control">
-                        <div className="sidebar-annotation-control-comments"
-                             onClick={switchShowComments}>{showComments ? "Hide Comments" : "Show Comments"}</div>
+                        {comment && Object.keys(comment).length > 0 && (
+                            <div className="sidebar-annotation-control-comments"
+                                 onClick={switchShowComments}>{showComments ? "Hide Comments" : "Show Comments"}</div>
+                        )}
+                        <div className="sidebar-annotation-control-comments"></div>
                         <div className="sidebar-annotation-control-input"
                              onClick={switchShowInput}>{showInput ? "Cancel" : "Answer"}</div>
                     </div>
@@ -166,19 +191,41 @@ function SidebarAnnotation({ annotation, comment, loadComments, deleteAnnotation
                                     <div className="sidebar-annotation-comment-header-user">ExampleUser</div>
                                     <div
                                         className="sidebar-annotation-comment-header-date">{(new Date(comment[key].timeCreated)).toLocaleDateString("en-GB")}</div>
+                                    <div
+                                        className={`sidebar-annotation-comment-header-options sidebar-annotation-header-options-${annotation.category.toLowerCase()} ${shownCommentOptionsMenuId === comment[key].idComment ? `sidebar-annotation-header-options-${annotation.category.toLowerCase()}-active` : ""}`}
+                                        onClick={() => toggleCommentOptionsMenu(comment[key].idComment)}>
+                                        <OptionsIcon/>
+                                        {shownCommentOptionsMenuId === comment[key].idComment && (
+                                            <div className="sidebar-annotation-optionmenu" ref={commentOptionMenuRef}>
+                                                <div className="sidebar-annotation-optionmenu-item sidebar-option-edit"
+                                                     onClick={() => startEditingComment(comment[key].idComment, comment[key].commentText)}>
+                                                    Edit Comment
+                                                </div>
+                                                <div
+                                                    className="sidebar-annotation-optionmenu-item sidebar-option-delete"
+                                                    onClick={() => deleteComm(comment[key].idComment)}>
+                                                    Delete Comment
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
                                 {isEditingComment && editingCommentId === comment[key].idComment ? (
                                     <div className="input-edit-group">
-                                        <input className="sidebar-annotation-textInput" value={editedCommentText} onChange={handleCommentTextChange}/>
+                                        <input className="sidebar-annotation-textInput" value={editedCommentText}
+                                               onChange={handleCommentTextChange}/>
                                         <div className="button-group">
-                                            <button className="sidebar-annotation-save" onClick={saveEditedComment}>Save</button>
-                                            <button className="sidebar-annotation-cancel" onClick={cancelEditComment}>Cancel</button>
+                                            <button className="sidebar-annotation-save"
+                                                    onClick={saveEditedComment}>Save
+                                            </button>
+                                            <button className="sidebar-annotation-cancel"
+                                                    onClick={cancelEditComment}>Cancel
+                                            </button>
                                         </div>
                                     </div>
                                 ) : (
                                     <div className="sidebar-annotation-comment-text">{comment[key].commentText}</div>
                                 )}
-                                <button className="sidebar-annotation-comment-edit" onClick={() => startEditingComment(comment[key].idComment, comment[key].commentText)}>Edit</button>
                             </div>
                         })}
                     </div>

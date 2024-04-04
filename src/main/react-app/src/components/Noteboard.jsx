@@ -119,6 +119,14 @@ function Noteboard({pdfName}) {
         });
     }
 
+    function deleteComm(toDelete) {
+        setComments(prevComments => {
+            const comments = {...prevComments};
+            comments[toDelete.annotationId.idAnnotation] = comments[toDelete.annotationId.idAnnotation].filter(comment => comment.idComment !== toDelete.idComment);
+            return comments;
+        });
+    }
+
     function initiateStompWS(pdfName) {
         stompClient.onConnect = (frame) => {
             console.log('Connection: ' + frame);
@@ -136,7 +144,7 @@ function Noteboard({pdfName}) {
                         deleteAnno(msgAnnotation.message);
                         break;
                     case msgAnnotation.comment && msgAnnotation.type === "delete":
-                        // handle comment deletion here
+                        deleteComm(msgAnnotation.comment);
                         break;
                     default:
                         console.error('Unknown message type:', msgAnnotation.type);
@@ -402,6 +410,19 @@ function Noteboard({pdfName}) {
         });
     }
 
+    function deleteComment(id) {
+        commentAPI.deleteComment(id).then((comm) => {
+            stompClient.publish({
+                destination: `/app/${pdfName}`,
+                body: JSON.stringify({
+                    "message": null,
+                    "comment": comm,
+                    "type": "delete"
+                })
+            });
+        });
+    }
+
     function editComment(id, currentText) {
         console.log('editComment called with id:', id, 'and text:', currentText);
         commentAPI.updateComment(id, {commentText: currentText}).then((resp) => {
@@ -504,7 +525,7 @@ function Noteboard({pdfName}) {
                 <button className="sidebar-arrow" onClick={toggleSidebar}></button>
                 <div className="sidebar-content">
                     {Object.keys(annotations).map(key => {
-                        return <SidebarAnnotation annotation={annotations[key]} comment={comments[key]} loadComments={loadCommentsByAnno} deleteAnnotation={deleteAnnotation} createComment={createComment} editAnnotation={editAnnotation} editComment={editComment} onChange={onAnnotationChange}/>
+                        return <SidebarAnnotation annotation={annotations[key]} comment={comments[key]} loadComments={loadCommentsByAnno} deleteAnnotation={deleteAnnotation} deleteComment={deleteComment} createComment={createComment} editAnnotation={editAnnotation} editComment={editComment} onChange={onAnnotationChange}/>
                     })}
                 </div>
             </section>

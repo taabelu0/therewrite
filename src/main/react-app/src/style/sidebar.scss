@@ -65,7 +65,6 @@
 
         &-textInput {
             width: 80%;
-            height: 100%;
             padding: 0.5rem;
             border: 1px solid #ccc;
             border-radius: 0.25rem;
@@ -211,7 +210,7 @@
         }
 
         &-comment {
-
+            position: relative;
             font-size: 0.9rem;
             border-top: 2px solid;
             padding: 0.5rem;
@@ -222,8 +221,8 @@
             }
 
             &-header {
-
                 display: flex;
+                justify-content: space-between;
                 align-items: center;
                 height: 1.25rem;
                 width: 100%;
@@ -237,6 +236,47 @@
                     font-size: 0.75rem;
                     font-weight: 200;
                     margin-left: 0.5rem;
+                }
+
+                &-options {
+                    margin-left: auto;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    cursor: pointer;
+
+                    svg {
+                        width: 20px;
+                        height: 20px;
+                    }
+
+                    &:hover svg {
+                        fill: $c-light-secondary;
+                    }
+
+                    &-definition svg {
+                        fill: $c-category-definition;
+                    }
+
+                    &-explosion svg {
+                        fill: $c-category-explosion;
+                    }
+
+                    &-deletion svg {
+                        fill: $c-category-deletion;
+                    }
+
+                    &-correction svg {
+                        fill: $c-category-correction;
+                    }
+
+                    &-speculation svg {
+                        fill: $c-category-speculation;
+                    }
+
+                    &-addition svg {
+                        fill: $c-category-addition;
+                    }
                 }
             }
 
