@@ -1,26 +1,48 @@
-import React, {useState, useRef, useEffect} from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import '../../style/post-it.scss';
 import interact from 'interactjs';
-import {annotationAPI} from "../../apis/annotationAPI";
+import { annotationAPI } from "../../apis/annotationAPI";
 
 export default function PostIt(props) {
-    let {id, category, dataX, dataY, text}  = props.annotation;
+    let { id, category, dataX, dataY, text } = props.annotation;
     const [postitText, setPostitText] = useState(text);
     const postitTextRef = useRef(text);
     const postitRef = useRef(null);
-    const [postitPosition, setPostitPosition] = useState({dataX: Number(dataX) || 0, dataY: Number(dataY) || 0});
+    const [postitPosition, setPostitPosition] = useState({ dataX: Number(dataX) || 0, dataY: Number(dataY) || 0 });
 
     useEffect(() => {
-        interact(postitRef.current).draggable({
-            modifiers: [
-                interact.modifiers.restrictRect({
-                    endOnly: true
-                })
-            ],
-            listeners: {
-                move: dragMoveListener,
-            }
-        });
+        // Initialize draggable functionality
+        interact(postitRef.current)
+            .draggable({
+                modifiers: [
+                    interact.modifiers.restrictRect({
+                        restriction: 'parent',
+                        endOnly: true
+                    })
+                ],
+                listeners: { move: dragMoveListener }
+            })
+            .resizable({
+                // Enable resize from all edges and corners
+                edges: { left: true, right: true, bottom: true, top: true },
+                listeners: {
+                    move(event) {
+                        let { width, height } = event.rect;
+                        // Update the element's style to reflect the new size
+                        event.target.style.width = `${width}px`;
+                        event.target.style.height = `${height}px`;
+
+                        // Update position to compensate for the resize from top/left edges
+                        const x = parseFloat(event.target.getAttribute('data-x')) + event.deltaRect.left;
+                        const y = parseFloat(event.target.getAttribute('data-y')) + event.deltaRect.top;
+
+                        event.target.style.transform = `translate(${x}px, ${y}px)`;
+
+                        event.target.setAttribute('data-x', x);
+                        event.target.setAttribute('data-y', y);
+                    }
+                }
+            });
     }, []);
 
     useEffect(() => {
@@ -96,7 +118,7 @@ export default function PostIt(props) {
 
     return (
         <div id={id} className={`annotation-root post-it post-it-${category.toLowerCase()}`} ref={postitRef} style={{
-            transform: `translate(${dataX}px, ${dataY}px)`
+            transform: `translate(${postitPosition.dataX}px, ${postitPosition.dataY}px)`
         }}>
             <div className="post-it-inner">
                 <div className="post-it-card" />
@@ -106,7 +128,7 @@ export default function PostIt(props) {
                     value={postitText}
                     onDoubleClick={enableTextEdit}
                     onBlur={disableTextEdit}
-                    onChange={valueChange}// Add appropriate label
+                    onChange={valueChange}
                 />
             </div>
             <div className="post-it-username">username</div>
