@@ -354,28 +354,27 @@ function Noteboard({pdfName}) {
     }
 
     async function updateAnnoCategory(id, category) {
+        let annoDetail;
         setAnnotations(prevAnnotations => {
-            let annoDetail = prevAnnotations[id];
-
-            // Delete unnecessary keys
-            delete annoDetail["id"];
-            delete annoDetail["text"];
-            delete annoDetail["timeCreated"];
-            delete annoDetail["category"];
-
-            annotationAPI.updateAnnotation(id, {
-                annotationDetail: JSON.stringify({
-                    ...annoDetail,
-                    category: category,
-                })
-            }).then((anno) => {
-                // prevAnnotations[id] = anno.data;
-                // applyAnnotationChanges(anno.data);
-                onAnnotationChange(anno.data);
-            });
+            annoDetail = prevAnnotations[id];
             return prevAnnotations;
         });
+        // Delete unnecessary keys
+        delete annoDetail["id"];
+        delete annoDetail["text"];
+        delete annoDetail["timeCreated"];
+        delete annoDetail["category"];
 
+        annotationAPI.updateAnnotation(id, {
+            annotationDetail: JSON.stringify({
+                ...annoDetail,
+                category: category,
+            })
+        }).then((anno) => {
+            // prevAnnotations[id] = anno.data;
+            // applyAnnotationChanges(anno.data);
+            onAnnotationChange(anno.data);
+        });
 
     }
 
