@@ -1,7 +1,7 @@
 import React, {useEffect, useRef, useState} from 'react';
 import OptionsIcon from "./icons/OptionsIcon";
 
-function SidebarAnnotation({ annotation, comment, loadComments, deleteAnnotation, deleteComment, createComment, editAnnotation, editComment, onChange }) {
+function SidebarAnnotation({ annotation, comment, loadComments, deleteAnnotation, deleteComment, createComment, editAnnotation, editComment, onSelection, onChange }) {
 
     const [showInput, setShowInput] = useState(false);
     const [showOptions, setShowOptions] = useState(false);
@@ -135,7 +135,7 @@ function SidebarAnnotation({ annotation, comment, loadComments, deleteAnnotation
     if(annotation.timeCreated) {
         let date = new Date(annotation.timeCreated)
         return (
-            <div className={`sidebar-annotation sidebar-annotation-${annotation.category.toLowerCase()}`}>
+            <div onClick={(event) => onSelection(event, annotation.id)} id={'sidebar-' + annotation.id} className={`sidebar-annotation sidebar-annotation-${annotation.category.toLowerCase()}`}>
                 <div className="sidebar-annotation-header">
                     <div className="sidebar-annotation-header-info">
                         <div className="sidebar-annotation-header-info-user">ExampleUser</div>

@@ -3,6 +3,11 @@
   pointer-events: none;
 }
 
+.selected-annotation, .selected-annotation > div {
+  z-index: 101;
+  box-shadow: black 0px 1px;
+}
+
 .paragraph-sidebar {
   position: absolute;
   background-color: #0a84ff;

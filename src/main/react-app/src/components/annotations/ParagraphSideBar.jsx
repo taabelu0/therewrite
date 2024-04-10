@@ -6,12 +6,12 @@ export class ParagraphSideBar extends Annotation {
         super(props);
     }
 
-    render() { return (<div style={{
+    render() { return (<div id={this.state.key} style={{
         top: this.state.currentTop,
         left: this.state.currentLeft,
         height: this.state.currentHeight,
         width: this.state.currentWidth
-    }} className={`paragraph-sidebar paragraph-sidebar-${this.state.currentCategory.toLowerCase()} annotation`}>
+    }} className={`annotation-root paragraph-sidebar paragraph-sidebar-${this.state.currentCategory.toLowerCase()} annotation`}>
     </div>)};
 }
 

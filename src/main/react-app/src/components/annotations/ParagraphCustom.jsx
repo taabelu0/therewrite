@@ -13,12 +13,12 @@ export class ParagraphCustom extends Annotation {
     }
 
     render() {
-        return (<div style={{
+        return (<div id={this.state.key} style={{
             top: this.state.currentTop,
             left: this.state.currentLeft,
             height: this.state.currentHeight,
             width: this.state.currentWidth
-        }} className={"paragraph-custom annotation"}>
+        }} className={"annotation-root paragraph-custom annotation"}>
             <div className="squiggly-paragraph" style={{
                 backgroundSize: `${40 * (this.state.currentHeight / 100)}px ${this.state.currentHeight}px`,
                 backgroundImage: `url(${this.state.currentSVG})`

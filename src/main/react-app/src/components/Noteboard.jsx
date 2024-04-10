@@ -28,7 +28,7 @@ const ANNOTATION_COMPONENTS = {
 
 let stompClient = new StompJs.Client({brokerURL: `ws://${process.env.REACT_APP_WS_URL}/ws`})
 
-function Noteboard({pdfName}) {
+function Noteboard({pdfID}) {
     const [creatingComponent, setCreatingComponent] = useState(null);
     const [annotations, setAnnotations] = useState({});
     const [comments, setComments] = useState({});
@@ -36,6 +36,8 @@ function Noteboard({pdfName}) {
     const [tempHighlight, setTempHighlight] = useState(null); // contains database annotation object and not front-end object
     const [showSidebar, setShowSidebar] = useState(false);
     const [annotationCoordinates, setAnnotationCoordinates] = useState({x: 0, y: 0});
+    const [selectedAnnotations, setSelectedAnnotations] = useState([]); // DOM element reference
+    const selectedAnnotationRef = useRef({}); // DOM element reference
     let width = useRef("100%");
     let height = useRef("100%");
     const [selectedCategory, setSelectedCategory] = useState("Definition");
@@ -56,8 +58,9 @@ function Noteboard({pdfName}) {
     }, [selectedCategory]);
 
     useEffect(() => {
-        initiateStompWS(pdfName);
-        loadAnnotations();
+        initiateStompWS(pdfID);
+        loadAnnotations().finally();
+        registerAnnotationSelect();
     }, []);
 
     useEffect(() => {
@@ -165,7 +168,7 @@ function Noteboard({pdfName}) {
     }
 
     async function loadAnnotations() {
-        let newAnnotations = await annotationAPI.getList(pdfName);
+        let newAnnotations = await annotationAPI.getList(pdfID);
         let newAnnotationsObj = {};
         newAnnotations.map(a => {
             let obj = JSON.parse(a['annotationDetail']);
@@ -179,7 +182,7 @@ function Noteboard({pdfName}) {
 
     function sendMessage(anno) {
         stompClient.publish({
-            destination: `/app/${pdfName}`,
+            destination: `/app/${pdfID}`,
             body: JSON.stringify({
                 "message": anno,
                 "comment": null,
@@ -254,7 +257,7 @@ function Noteboard({pdfName}) {
             annotation: "ParagraphSideBar"
         };
         ParagraphSideBarCalc(props);
-        return await annotationAPI.saveAnnotation(pdfName, "", props)
+        return await annotationAPI.saveAnnotation(pdfID, "", props)
             .then(saveAnnotationCB(props))
             .then((data) => {
                 setTempHighlight(data);
@@ -271,7 +274,7 @@ function Noteboard({pdfName}) {
             annotation: "Squiggly"
         };
         BoundingBoxCalc(props);
-        return await annotationAPI.saveAnnotation(pdfName, "", props)
+        return await annotationAPI.saveAnnotation(pdfID, "", props)
             .then(saveAnnotationCB(props))
             .then((data) => {
                 setTempHighlight(data);
@@ -288,7 +291,7 @@ function Noteboard({pdfName}) {
             annotation: "UnderlineAnnotation"
         };
         BoundingBoxCalc(props);
-        return await annotationAPI.saveAnnotation(pdfName, "", props)
+        return await annotationAPI.saveAnnotation(pdfID, "", props)
             .then(saveAnnotationCB(props))
             .then((data) => {
                 setTempHighlight(data);
@@ -305,7 +308,7 @@ function Noteboard({pdfName}) {
             annotation: "HighlightAnnotation"
         };
         BoundingBoxCalc(props);
-        return await annotationAPI.saveAnnotation(pdfName, "", props)
+        return await annotationAPI.saveAnnotation(pdfID, "", props)
             .then(saveAnnotationCB(props))
             .then((data) => {
                 setTempHighlight(data);
@@ -320,7 +323,7 @@ function Noteboard({pdfName}) {
             dataY: y,
             annotation: "TinyText"
         };
-        return await annotationAPI.saveAnnotation(pdfName, "type here...", newTinyText)
+        return await annotationAPI.saveAnnotation(pdfID, "type here...", newTinyText)
             .then(saveAnnotationCB(newTinyText));
     }
 
@@ -331,24 +334,8 @@ function Noteboard({pdfName}) {
             dataY: y,
             annotation: "PostIt"
         };
-        return await annotationAPI.saveAnnotation(pdfName, "", newPostIt)
+        return await annotationAPI.saveAnnotation(pdfID, "", newPostIt)
             .then(saveAnnotationCB(newPostIt));
-    }
-
-    async function createComment(annotationId, userId, commentText) {
-        try {
-            const comment = await commentAPI.createComment(annotationId, userId, commentText);
-            stompClient.publish({
-                destination: `/app/${pdfName}`,
-                body: JSON.stringify({
-                    "message": null,
-                    "comment": comment,
-                    "type": "change"
-                })
-            });
-        } catch (error) {
-            console.error('Error creating comment:', error);
-        }
     }
 
     function saveAnnotationCB(annotationObj) {
@@ -362,6 +349,43 @@ function Noteboard({pdfName}) {
         }
     }
 
+    async function createComment(annotationId, userId, commentText) {
+        try {
+            const comment = await commentAPI.createComment(annotationId, userId, commentText);
+            stompClient.publish({
+                destination: `/app/${pdfID}`,
+                body: JSON.stringify({
+                    "message": null,
+                    "comment": comment,
+                    "type": "change"
+                })
+            });
+        } catch (error) {
+            console.error('Error creating comment:', error);
+        }
+    }
+
+    function onSidebarSelection(event, id) {
+        changeSelected(selectedAnnotationRef.current, 'remove');
+        let newSelected = document.getElementById(id);
+        selectedAnnotationRef.current = newSelected;
+        changeSelected(newSelected);
+        scrollToAnnotation(document.getElementById(id));
+    }
+
+    function scrollToAnnotation(element) {
+        const OFFSET = 100;
+        let vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0);
+        let vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
+        let top = (element.firstChild ? element.firstChild.getBoundingClientRect().top : element.getBoundingClientRect().top ) + window.scrollY;
+        let left = (element.firstChild ? element.firstChild.getBoundingClientRect().left : element.getBoundingClientRect().left ) + window.scrollX;
+        window.scroll({
+            top: top - (vh / 2) + OFFSET,
+            left: left - (vw / 2) + OFFSET,
+            behavior: 'smooth'
+        });
+    }
+
     function isRangeExisting(selection) {
         return selection.rangeCount > 0 && !selection.isCollapsed && getPagesFromRange(selection.getRangeAt(0)).length > 0;
     }
@@ -370,9 +394,60 @@ function Noteboard({pdfName}) {
         sendMessage(annotation);
     }
 
+    function registerAnnotationSelect() {
+        document.addEventListener('mousedown', e => {
+            const allAnnos = document.querySelectorAll('.annotation');
+            allAnnos.forEach(element => element.style.pointerEvents = 'auto'); // enable pointer events
+            const elements = document.elementsFromPoint(e.clientX, e.clientY); // get elements at mouse position
+            allAnnos.forEach(element => element.style.pointerEvents = 'none'); // disable them again
+            const annotationElements = [];
+            elements.map(e => {
+                if (e.classList.contains("annotation-root")) annotationElements.push(e); // classList uses contains instead of includes
+                else {
+                    let parent = e.closest(".annotation-root");
+                    if (parent) annotationElements.push(parent); // add parent if parent is annotation
+                }
+            });
+            if (annotationElements.length <= 0) return;
+            setSelectedAnnotations(prevAnnos => {
+                if (prevAnnos.length === annotationElements.length) {
+                    if (prevAnnos.filter(pA => !annotationElements.includes(pA)).length === 0) { // if they are equal
+                        if (annotationElements.length > 1) {
+                            let prevFirst = prevAnnos.shift();
+                            prevAnnos.push(prevFirst);
+                            changeSelected(selectedAnnotationRef.current, 'remove');
+                            selectedAnnotationRef.current = prevAnnos[0];
+                            changeSelected(selectedAnnotationRef.current);
+                        }
+                        return prevAnnos;
+                    }
+                }
+                if (selectedAnnotationRef.current !== annotationElements[0]) {
+                    changeSelected(selectedAnnotationRef.current, 'remove');
+                    selectedAnnotationRef.current = annotationElements[0];
+                    changeSelected(selectedAnnotationRef.current);
+                }
+                return annotationElements;
+            });
+            let sidebarElement = document.getElementById('sidebar-' + selectedAnnotationRef.current.id);
+            if(sidebarElement) sidebarElement.scrollIntoView({behavior: "smooth"}); // scroll on sidebar
+
+        }, {passive: true});
+    }
+
+    function changeSelected(element, keyword = 'add') {
+        if (element?.classList) {
+            element.classList[keyword]("selected-annotation");
+            // also change class on sidebar element
+            let sidebarElement = document.getElementById('sidebar-' + element.id);
+            if(sidebarElement) sidebarElement.classList[keyword]("selected-annotation-sidebar");
+        }
+    }
+
     function toggleSidebar() {
         setShowSidebar(!showSidebar);
     }
+
     function loadCommentsByAnno(annotationId) {
         commentAPI.getComments(annotationId).then((allComments) => {
             console.log(annotationId)
@@ -389,7 +464,7 @@ function Noteboard({pdfName}) {
     function deleteAnnotation(id) {
         annotationAPI.deleteAnnotation(id).then((anno) => {
             stompClient.publish({
-                destination: `/app/${pdfName}`,
+                destination: `/app/${pdfID}`,
                 body: JSON.stringify({
                     "message": anno,
                     "comment": null,
@@ -525,7 +600,7 @@ function Noteboard({pdfName}) {
                 <button className="sidebar-arrow" onClick={toggleSidebar}></button>
                 <div className="sidebar-content">
                     {Object.keys(annotations).map(key => {
-                        return <SidebarAnnotation annotation={annotations[key]} comment={comments[key]} loadComments={loadCommentsByAnno} deleteAnnotation={deleteAnnotation} deleteComment={deleteComment} createComment={createComment} editAnnotation={editAnnotation} editComment={editComment} onChange={onAnnotationChange}/>
+                        return <SidebarAnnotation annotation={annotations[key]} comment={comments[key]} loadComments={loadCommentsByAnno} deleteAnnotation={deleteAnnotation} deleteComment={deleteComment} createComment={createComment} editAnnotation={editAnnotation} editComment={editComment} onChange={onAnnotationChange} onSelection={onSidebarSelection}/>
                     })}
                 </div>
             </section>
