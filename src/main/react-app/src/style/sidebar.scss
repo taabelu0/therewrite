@@ -43,6 +43,13 @@
                 color: $c-light-primary;
             }
         }
+        &-edit {
+            transition: 0.1s;
+            &:hover {
+                background-color: $c-color-secondary !important;
+                color: $c-light-primary;
+            }
+        }
     }
 
     &-annotation {
@@ -55,6 +62,40 @@
 
         display: flex;
         flex-direction: column;
+
+        &-textInput {
+            width: 80%;
+            padding: 0.5rem;
+            border: 1px solid #ccc;
+            border-radius: 0.25rem;
+            font-size: 1rem;
+            line-height: 1.25rem;
+            resize: none;
+        }
+
+        &-cancel {
+            background-color: #f44336;
+            border: none;
+            color: white;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+        }
+
+        &-save {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+        }
 
         &-optionmenu {
             z-index: 9999;
@@ -169,7 +210,7 @@
         }
 
         &-comment {
-
+            position: relative;
             font-size: 0.9rem;
             border-top: 2px solid;
             padding: 0.5rem;
@@ -180,8 +221,8 @@
             }
 
             &-header {
-
                 display: flex;
+                justify-content: space-between;
                 align-items: center;
                 height: 1.25rem;
                 width: 100%;
@@ -196,6 +237,51 @@
                     font-weight: 200;
                     margin-left: 0.5rem;
                 }
+
+                &-options {
+                    margin-left: auto;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    cursor: pointer;
+
+                    svg {
+                        width: 20px;
+                        height: 20px;
+                    }
+
+                    &:hover svg {
+                        fill: $c-light-secondary;
+                    }
+
+                    &-definition svg {
+                        fill: $c-category-definition;
+                    }
+
+                    &-explosion svg {
+                        fill: $c-category-explosion;
+                    }
+
+                    &-deletion svg {
+                        fill: $c-category-deletion;
+                    }
+
+                    &-correction svg {
+                        fill: $c-category-correction;
+                    }
+
+                    &-speculation svg {
+                        fill: $c-category-speculation;
+                    }
+
+                    &-addition svg {
+                        fill: $c-category-addition;
+                    }
+                }
+            }
+
+            &-edit {
+
             }
 
             &-input {

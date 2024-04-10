@@ -81,6 +81,26 @@ function Noteboard({pdfID}) {
         });
     }
 
+    function applyCommentChanges(comment) {
+        if (!comment) {
+            console.error('Comment in message is null or undefined:', comment);
+            return;
+        }
+        setComments(prevComments => {
+            const existingComments = prevComments[comment.annotationId.idAnnotation] || [];
+            const updatedComments = existingComments.map(existingComment => {
+                if (existingComment.idComment === comment.idComment) {
+                    return comment;
+                }
+                return existingComment;
+            });
+            return {
+                ...prevComments,
+                [comment.annotationId.idAnnotation]: updatedComments,
+            };
+        });
+    }
+
     function addComment(annotationId, comment) {
         setComments(prevComments => {
             const existingComments = prevComments[annotationId] || [];
@@ -102,6 +122,14 @@ function Noteboard({pdfID}) {
         });
     }
 
+    function deleteComm(toDelete) {
+        setComments(prevComments => {
+            const comments = {...prevComments};
+            comments[toDelete.annotationId.idAnnotation] = comments[toDelete.annotationId.idAnnotation].filter(comment => comment.idComment !== toDelete.idComment);
+            return comments;
+        });
+    }
+
     function initiateStompWS(pdfName) {
         stompClient.onConnect = (frame) => {
             console.log('Connection: ' + frame);
@@ -112,13 +140,14 @@ function Noteboard({pdfID}) {
                     case msgAnnotation.message && msgAnnotation.type === "change":
                         applyAnnotationChanges(msgAnnotation.message);
                         break;
+                    case msgAnnotation.comment && msgAnnotation.type === "change":
+                        applyCommentChanges(msgAnnotation.comment);
+                        break;
                     case msgAnnotation.message && msgAnnotation.type === "delete":
                         deleteAnno(msgAnnotation.message);
                         break;
-                    case msgAnnotation.comment && msgAnnotation.type === "change":
-                        addComment(msgAnnotation.comment.annotationId.idAnnotation, msgAnnotation.comment);
-                        break;
                     case msgAnnotation.comment && msgAnnotation.type === "delete":
+                        deleteComm(msgAnnotation.comment);
                         break;
                     default:
                         console.error('Unknown message type:', msgAnnotation.type);
@@ -162,6 +191,17 @@ function Noteboard({pdfID}) {
         });
     }
 
+    function sendComment(comm) {
+        stompClient.publish({
+            destination: `/app/${pdfName}`,
+            body: JSON.stringify({
+                "message": null,
+                "comment": comm,
+                "type": "change"
+            })
+        });
+    }
+
     function handleDocumentMouseDown(event) {
         if (creatingComponent !== null) {
             createAnnotation(event);
@@ -174,10 +214,13 @@ function Noteboard({pdfID}) {
         const rect = noteboard.getBoundingClientRect();
         const x = clientX - rect.left;
         const y = clientY - rect.top;
-        setCreatingComponent(null);
+        if(creatingComponent === "PostIt" || creatingComponent === "TinyText") {
+            setCreatingComponent(null);
+        }
         setTimeout(async () => {
             let newAnno = await ADDING_COMPONENT[creatingComponent](selectedCategory, x, y);
-            if (!newAnno) return;
+            document.getSelection().deleteFromDocument();
+            if(!newAnno) return;
             sendMessage(newAnno); // notifies websocket
             setAnnotationCoordinates({x, y});
         }, 50);
@@ -299,7 +342,9 @@ function Noteboard({pdfID}) {
         return (data) => {
             annotationObj.id = data.idAnnotation;
             annotationObj.text = data.annotationText
-            setAnnotations({...annotations, [annotationObj['id']]: annotationObj});
+            setAnnotations(prevAnnotations => {
+                return {...prevAnnotations, [annotationObj['id']]: annotationObj}
+            });
             return data;
         }
     }
@@ -409,9 +454,10 @@ function Noteboard({pdfID}) {
             setComments(prevComments => {
                 return {
                     ...prevComments,
-                    [annotationId]: allComments
+                    [annotationId]: allComments,
                 }
             });
+            console.log("all comments:", allComments)
         });
     }
 
@@ -425,6 +471,41 @@ function Noteboard({pdfID}) {
                     "type": "delete"
                 })
             });
+        });
+    }
+
+    function editAnnotation(id, currentText) {
+        console.log('editAnnotation called with id:', id, 'and text:', currentText);
+        annotationAPI.updateAnnotation(id, {annotationText: currentText}).then((resp) => {
+            if (resp) {
+                sendMessage(resp.data);
+            } else {
+                console.error('Error: Failed to update annotation');
+            }
+        });
+    }
+
+    function deleteComment(id) {
+        commentAPI.deleteComment(id).then((comm) => {
+            stompClient.publish({
+                destination: `/app/${pdfName}`,
+                body: JSON.stringify({
+                    "message": null,
+                    "comment": comm,
+                    "type": "delete"
+                })
+            });
+        });
+    }
+
+    function editComment(id, currentText) {
+        console.log('editComment called with id:', id, 'and text:', currentText);
+        commentAPI.updateComment(id, {commentText: currentText}).then((resp) => {
+            if (resp) {
+                sendComment(resp.data);
+            } else {
+                console.error('Error: Failed to update annotation');
+            }
         });
     }
 
@@ -519,9 +600,7 @@ function Noteboard({pdfID}) {
                 <button className="sidebar-arrow" onClick={toggleSidebar}></button>
                 <div className="sidebar-content">
                     {Object.keys(annotations).map(key => {
-                        return <SidebarAnnotation annotation={annotations[key]} comments={comments[key]}
-                                                  loadComments={loadCommentsByAnno} deleteAnnotation={deleteAnnotation}
-                                                  createComment={createComment} onSelection={onSidebarSelection}/>
+                        return <SidebarAnnotation annotation={annotations[key]} comment={comments[key]} loadComments={loadCommentsByAnno} deleteAnnotation={deleteAnnotation} deleteComment={deleteComment} createComment={createComment} editAnnotation={editAnnotation} editComment={editComment} onChange={onAnnotationChange} onSelection={onSidebarSelection}/>
                     })}
                 </div>
             </section>
