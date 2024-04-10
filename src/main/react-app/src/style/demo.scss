@@ -91,6 +91,16 @@
   }
 }
 
+#demo-toolbar {
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: row;
+  width: fit-content;
+
+  border-radius:  0 0.25rem 0.25rem 0;
+  overflow: hidden;
+}
+
 .demo-categories-open{
   width: 200px;
 
@@ -111,7 +121,7 @@
   }
 
   &.category-active {
-    background-color: rgba(105, 224, 168,0.2);
+    background-color: rgba(77, 180, 213, 0.2);
   }
 }
 
@@ -122,7 +132,7 @@
   }
 
   &.category-active {
-    background-color: rgba(241, 189, 76,0.2);
+    background-color: rgba(255, 165, 0, 0.2);
   }
 }
 
@@ -133,7 +143,7 @@
   }
 
   &.category-active {
-    background-color: rgba(235, 86, 131,0.2);
+    background-color: rgba(255, 69, 0, 0.2);
   }
 }
 
@@ -144,7 +154,7 @@
   }
 
   &.category-active {
-    background-color: rgba(56, 89, 162,0.2);
+    background-color: rgba(168, 70, 168, 0.2);
   }
 }
 
@@ -155,7 +165,7 @@
   }
 
   &.category-active {
-    background-color: rgba(238, 122, 48,0.2);
+    background-color: rgba(175, 138, 77, 0.2);
   }
 }
 
@@ -166,6 +176,177 @@
     color: $c-category-addition;
   }
   &.category-active {
-    background-color: rgba(126, 160, 54, 0.2);
+    background-color: rgba(60, 179, 113, 0.2);
+  }
+}
+
+.demo-styles{
+  margin-right: 20px;
+  display: flex;
+  flex-direction: row;
+  border-radius: 0.7rem;
+}
+
+//Add Styles-Addition etc for each of the class
+.demo-styles-Definition{
+  border: 0.5px solid $c-category-definition;
+}
+
+.demo-styles-Explosion{
+  border: 0.5px solid $c-category-explosion;
+}
+
+.demo-styles-Deletion{
+  border: 0.5px solid $c-category-deletion;
+}
+
+.demo-styles-Correction{
+  border: 0.5px solid $c-category-correction;
+}
+
+.demo-styles-Speculation{
+  border: 0.5px solid $c-category-speculation;
+}
+
+.demo-styles-Addition{
+  border: 0.5px solid $c-category-addition;
+}
+
+.demo-tool {
+  position: relative; // Add relative positioning to the parent container
+
+  // Add absolute positioning to the SVG elements
+  svg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform: scale(0.8);
+  }
+
+  // Rest of your existing styling...
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  text-align: center;
+  color: #fff;
+  font-size: 2rem;
+  font-weight: 4;
+  height: 41px;
+  line-height: 2.5rem;
+  width: 66px;
+  border-right: 1px solid rgba(0, 0, 0, 0.08);
+
+  &:last-of-type {
+    margin: 0;
+    border-right: 0;
+  }
+}
+
+.demo-tool-Definition{
+  svg:first-child {
+    .cls-1{
+      fill: color-mix(in srgb, $c-category-definition, white 40%);
+    }
+  }
+}
+
+.demo-tool-Explosion{
+  svg:first-child {
+    .cls-1{
+      fill: color-mix(in srgb, $c-category-explosion, white 40%);
+    }
+  }
+}
+
+.demo-tool-Deletion{
+  svg:first-child {
+    .cls-1{
+      fill: color-mix(in srgb, $c-category-deletion, white 40%);
+    }
+  }
+}
+
+.demo-tool-Correction{
+  svg:first-child {
+    .cls-1{
+      fill: color-mix(in srgb, $c-category-correction, white 40%);
+    }
+  }
+}
+
+.demo-tool-Speculation{
+  //Target first SVG in the tool
+  svg:first-child {
+    .cls-1{
+      fill: color-mix(in srgb, $c-category-speculation, white 40%);
+    }
+  }
+
+}
+
+.demo-tool-Addition{
+  //Target first SVG in the tool
+  svg:first-child {
+    .cls-1{
+      fill: color-mix(in srgb, $c-category-addition, white 40%);
+    }
+  }
+
+}
+
+.demo-add-post-it:hover {
+  cursor: pointer;
+}
+
+.demo-add-tool-active-Definition{
+  background-color: rgba(77, 180, 213, 0.2);
+  svg:first-child {
+    .cls-1{
+      fill: $c-category-definition;
+    }
+  }
+}
+
+.demo-add-tool-active-Explosion{
+  background-color:rgba(255, 165, 0, 0.2);
+  svg:first-child {
+    .cls-1{
+      fill: $c-category-explosion;
+    }
+  }
+}
+
+.demo-add-tool-active-Deletion{
+  background-color: rgba(255, 69, 0, 0.2);
+  svg:first-child {
+    .cls-1{
+      fill: $c-category-deletion;
+    }
+  }
+}
+
+.demo-add-tool-active-Correction{
+  background-color: rgba(168, 70, 168, 0.2);
+  svg:first-child {
+    .cls-1{
+      fill: $c-category-correction;
+    }
+  }
+}
+
+.demo-add-tool-active-Speculation {
+  background-color: rgba(175, 138, 77, 0.2);
+  svg:first-child {
+    .cls-1 {
+      fill: $c-category-speculation;
+    }
+  }
+}
+
+.demo-add-tool-active-Addition{
+  background-color: rgba(60, 179, 113, 0.2);
+  svg:first-child {
+    .cls-1{
+      fill: $c-category-addition;
+    }
   }
 }
