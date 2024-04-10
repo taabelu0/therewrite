@@ -9,6 +9,7 @@ export class Annotation extends React.Component {
 
         this.state = {
             count: 0,
+            key: props.annotation.id,
             currentSelection: props.annotation.selection,
             currentCategory: props.annotation.category,
             currentHeight: props.annotation.height,
@@ -33,7 +34,7 @@ export class Annotation extends React.Component {
 }
 
 export function AnnotationCalc(props) {
-    if (props.selection)  {
+    if (props.selection) {
         if (props.selection.rangeCount < 1) throw new Error("No selection available");
         props.range = props.selection.getRangeAt(0);
 
@@ -63,17 +64,21 @@ const isClientRectInsidePageRect = (clientRect, pageRect) => {
     return true;
 };
 
+
 const getClientRectsCustom = (range, pages, scroll) => {
     const clientRects = Array.from(range.getClientRects());
     const rects = [];
     for (const clientRect of clientRects) {
         for (const page of pages) {
             const pageRect = page.node.getBoundingClientRect();
-            if (isClientRectInsidePageRect(clientRect, pageRect) &&
+
+            if (
+                isClientRectInsidePageRect(clientRect, pageRect) &&
                 clientRect.width > 0 &&
                 clientRect.height > 0 &&
                 clientRect.width < pageRect.width &&
-                clientRect.height < pageRect.height) {
+                clientRect.height < pageRect.height
+            ) {
                 const highlightedRect = {
                     top: clientRect.top + scroll.scrollY,
                     left: clientRect.left + scroll.scrollX,
@@ -81,6 +86,7 @@ const getClientRectsCustom = (range, pages, scroll) => {
                     height: clientRect.height,
                     pageNumber: page.number,
                 };
+
                 rects.push(highlightedRect);
             }
         }
