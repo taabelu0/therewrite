@@ -7,7 +7,6 @@ import '../style/annotations.scss';
 import '../style/sidebar.scss';
 import '../style/addAnnotation.scss';
 import {ParagraphSideBar, ParagraphSideBarCalc} from "./annotations/ParagraphSideBar";
-// import {ParagraphCustom, ParagraphCustomCalc} from "./annotations/ParagraphCustom";
 import {HighlightAnnotation} from "./annotations/HighlightAnnotation";
 import {annotationAPI} from "../apis/annotationAPI";
 import {UnderlineAnnotation} from "./annotations/UnderlineAnnotation";
@@ -193,7 +192,7 @@ function Noteboard({pdfID}) {
 
     function sendComment(comm) {
         stompClient.publish({
-            destination: `/app/${pdfName}`,
+            destination: `/app/${pdfID}`,
             body: JSON.stringify({
                 "message": null,
                 "comment": comm,
@@ -488,7 +487,7 @@ function Noteboard({pdfID}) {
     function deleteComment(id) {
         commentAPI.deleteComment(id).then((comm) => {
             stompClient.publish({
-                destination: `/app/${pdfName}`,
+                destination: `/app/${pdfID}`,
                 body: JSON.stringify({
                     "message": null,
                     "comment": comm,
