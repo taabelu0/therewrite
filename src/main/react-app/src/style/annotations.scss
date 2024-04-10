@@ -15,22 +15,22 @@
   width: 10px;
   z-index: 100;
   &-definition {
-    background-color: #69E0A8;
+    background-color: #4DB4D5;
   }
   &-explosion {
-    background-color: #F1BD4C;
+    background-color: #FFA500;
   }
   &-deletion {
-    background-color: #EB5683;
+    background-color: #FF4500;
   }
   &-correction {
-    background-color: #3859A2;
+    background-color: #A846A8;
   }
   &-speculation {
-    background-color: #EE7A30;
+    background-color: #AF8A4D;
   }
   &-addition {
-    background-color: #7FA036;
+    background-color: #3CB371;
   }
 }
 
@@ -57,24 +57,24 @@
 
 .underline {
   position: absolute;
-  border-bottom: 1px solid red; /* Adjust color as needed */
+  border-bottom: 1px solid red;
   &-definition {
-    border-color: #69E0A8;
+    border-color: #4DB4D5;
   }
   &-explosion {
-    border-color: #F1BD4C;
+    border-color: #FFA500;
   }
   &-deletion {
-    border-color: #EB5683;
+    border-color: #FF4500;
   }
   &-correction {
-    border-color: #3859A2;
+    border-color: #A846A8;
   }
   &-speculation {
-    border-color: #EE7A30;
+    border-color: #AF8A4D;
   }
   &-addition {
-    border-color: #7FA036;
+    border-color: #3CB371;
   }
 }
 
@@ -82,21 +82,21 @@
   position: absolute;
   opacity: 0.5;
   &-definition {
-    background-color: #69E0A8;
+    background-color: #4DB4D5;
   }
   &-explosion {
-    background-color: #F1BD4C;
+    background-color: #FFA500;
   }
   &-deletion {
-    background-color: #EB5683;
+    background-color: #FF4500;
   }
   &-correction {
-    background-color: #3859A2;
+    background-color: #A846A8;
   }
   &-speculation {
-    background-color: #EE7A30;
+    background-color: #AF8A4D;
   }
   &-addition {
-    background-color: #7FA036;
+    background-color: #3CB371;
   }
 }
