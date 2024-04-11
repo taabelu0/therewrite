@@ -1,7 +1,7 @@
 import React, {useEffect, useRef, useState} from 'react';
 import OptionsIcon from "./icons/OptionsIcon";
 
-function SidebarAnnotation({ annotation, comment, loadComments, deleteAnnotation, deleteComment, createComment, editAnnotation, editComment, onSelection, onChange }) {
+function SidebarAnnotation({ annotation, comment, updateAnnoCategory, loadComments, deleteAnnotation, deleteComment, createComment, editAnnotation, editComment, onSelection, onChange }) {
 
     const [showInput, setShowInput] = useState(false);
     const [showOptions, setShowOptions] = useState(false);
@@ -70,6 +70,7 @@ function SidebarAnnotation({ annotation, comment, loadComments, deleteAnnotation
             setShownCommentOptionsMenuId(null);
         }
         setShowOptions(!showOptions);
+        setShowCategories(false);
     }
 
     const switchShowComments = () => {
@@ -77,6 +78,7 @@ function SidebarAnnotation({ annotation, comment, loadComments, deleteAnnotation
     }
 
     const switchShowCategories = () => {
+        setShowOptions(!showOptions);
         setShowCategories(!showCategories);
     }
 
@@ -132,6 +134,36 @@ function SidebarAnnotation({ annotation, comment, loadComments, deleteAnnotation
         setShownCommentOptionsMenuId(prevId => prevId === id ? null : id);
     }
 
+    const setAnnoCatDefinition = () => {
+        setShowCategories(false);
+        updateAnnoCategory(annotation.id, "Definition");
+    }
+
+    const setAnnoCatExplosion = () => {
+        setShowCategories(false);
+        updateAnnoCategory(annotation.id, "Explosion");
+    }
+
+    const setAnnoCatDeletion = () => {
+        setShowCategories(false);
+        updateAnnoCategory(annotation.id, "Deletion");
+    }
+
+    const setAnnoCatCorrection = () => {
+        setShowCategories(false);
+        updateAnnoCategory(annotation.id, "Correction");
+    }
+
+    const setAnnoCatSpeculation = () => {
+        setShowCategories(false);
+        updateAnnoCategory(annotation.id, "Speculation");
+    }
+
+    const setAnnoCatAddition = () => {
+        setShowCategories(false);
+        updateAnnoCategory(annotation.id, "Addition");
+    }
+
     if(annotation.timeCreated) {
         let date = new Date(annotation.timeCreated)
         return (
@@ -154,6 +186,16 @@ function SidebarAnnotation({ annotation, comment, loadComments, deleteAnnotation
                     <div className="sidebar-annotation-optionmenu-item sidebar-option-edit" onClick={startEditing}>Edit Annotation</div>
                     <div className="sidebar-annotation-optionmenu-item sidebar-option-delete" onClick={deleteAnno}>Delete Annotation</div>
                 </div>
+                )}
+                {showCategories && (
+                    <div className="sidebar-annotation-optionmenu" style={{display: `${showCategories ? "block": "none"}`}}>
+                        <div className="sidebar-annotation-optionmenu-item item-definition" onClick={setAnnoCatDefinition}>Definition</div>
+                        <div className="sidebar-annotation-optionmenu-item item-explosion" onClick={setAnnoCatExplosion}>Explosion</div>
+                        <div className="sidebar-annotation-optionmenu-item item-deletion" onClick={setAnnoCatDeletion}>Deletion</div>
+                        <div className="sidebar-annotation-optionmenu-item item-correction" onClick={setAnnoCatCorrection}>Correction</div>
+                        <div className="sidebar-annotation-optionmenu-item item-speculation" onClick={setAnnoCatSpeculation}>Speculation</div>
+                        <div className="sidebar-annotation-optionmenu-item item-addition" onClick={setAnnoCatAddition}>Addition</div>
+                    </div>
                 )}
                 {isEditing ? (
                     <div className="input-edit-group">
