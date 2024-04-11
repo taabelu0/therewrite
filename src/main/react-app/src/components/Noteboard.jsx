@@ -15,6 +15,13 @@ import * as StompJs from "@stomp/stompjs";
 import {getPagesFromRange} from "react-pdf-highlighter/dist/cjs/lib/pdfjs-dom";
 import {Squiggly} from "./annotations/Squiggly";
 import {commentAPI} from "../apis/commentAPI";
+import '../style/demo.scss';
+import HighlightIcon from "./annotations/icons/HighlightIcon";
+import UnderlineIcon from "./annotations/icons/UnderlineIcon";
+import PostItIcon from "./annotations/icons/PostItIcon";
+import TinyTextIcon from "./annotations/icons/TinyTextIcon";
+import SquigglyIcon from "./annotations/icons/SquigglyIcon";
+import ParagraphSidebarIcon from "./annotations/icons/ParagraphSidebarIcon";
 
 const ANNOTATION_COMPONENTS = {
     'HighlightAnnotation': HighlightAnnotation,
@@ -40,8 +47,40 @@ function Noteboard({pdfID}) {
     let width = useRef("100%");
     let height = useRef("100%");
     const [selectedCategory, setSelectedCategory] = useState("Definition");
+    const [toggleAnnotationCategories,setToggleAnnotationCategories] = useState(false);
 
     const currentCategory = useRef(selectedCategory);
+
+    const annoationCategories = [
+        {
+            name:"Definition",
+            description:"Select this category to add definitions of terms you found in the documents."
+        },
+        {
+            name:"Explosion",
+            description: "Select to add terms, notes and descriptions or external resources, e.g. links to material you feel needs to included in the document."
+        },
+        {
+            name: "Deletion",
+            description: "Select to signal that you would like to delete specific terms in the document altogether. Add some thoughts or links to sources that explain why you feel the term should be deleted."
+        },
+        {
+            name:"Correction",
+            description: "Select to propose changes to the term in question. Note that correction has an authoritative connotation: you're suggesting a definitive replacement!"
+        },
+        {
+            name: "Speculation",
+            description: "Select this category if you would like to avoid the authoritative connotation of correction. Speculation is future-oriented, open-ended, evocative and can involve uncertain trajectories."
+        },
+        {
+            name: "Addition",
+            description: "For additions."
+        }
+    ]
+
+    const toggleCategories = () => {
+        setToggleAnnotationCategories(prevState => !prevState);
+    }
 
     const ADDING_COMPONENT = {
         "ParagraphSideBar": addParagraphAnnotation,
@@ -532,6 +571,7 @@ function Noteboard({pdfID}) {
         });
     }
 
+
     return (
         <section
             id={"workspace"}
@@ -548,60 +588,67 @@ function Noteboard({pdfID}) {
                     onCancel={() => setShowCommentBox(false)}
                 />
             )}
-            <nav id="sidebar-nav">
-                <div id="toolbar">
-                    <div
-                        className={`tool add-post-it ${creatingComponent === "HighlightAnnotation" ? "add-tool-active" : ""}`}
-                        id="add-post-it-green"
-                        onClick={() => setCreatingComponent("HighlightAnnotation")}
-                    >
-                        ✎
+                <nav id="demo-sidebar-nav">
+                    <button className="toggleCategoriesBtn" onClick={toggleCategories}>Annotation Categories</button>
+                    <p className="category-text">Select a category while annotating to mark your highlights and
+                        notes.</p>
+                    <div id="demo-category-selection">
+                        {annoationCategories.map((cat, key) => (
+                            <div
+                                className={`demo-category demo-category-${cat.name.toLowerCase()} ${selectedCategory === cat.name ? "category-active" : ""} ${toggleAnnotationCategories ? 'demo-categories-open' : ''}`}
+                                key={key}
+                                onClick={() => setSelectedCategory(`${cat.name}`)}
+                            >
+                                <p className={"demo-category-title"}>{cat.name}</p>
+                                <p className={`demo-category-desc`}>{cat.description}</p>
+                            </div>
+                        ))}
                     </div>
-                    <div
-                        className={`tool add-post-it ${creatingComponent === "Squiggly" ? "add-tool-active" : ""}`}
-                        onClick={() => setCreatingComponent("Squiggly")}
-                    >
-                        🖌
-                    </div>
-                    <div
-                        className={`tool add-post-it ${creatingComponent === "ParagraphSideBar" ? "add-tool-active" : ""}`}
-                        onClick={() => setCreatingComponent("ParagraphSideBar")}
-                    >
-                        |
-                    </div>
-                    <div
-                        className={`tool add-post-it ${creatingComponent === "UnderlineAnnotation" ? "add-tool-active" : ""}`}
-                        onClick={() => setCreatingComponent("UnderlineAnnotation")}
-                    >
-                        ⎁
-                    </div>
-                    <div
-                        className={`tool add-post-it ${creatingComponent === "PostIt" ? "add-tool-active" : ""}`}
-                        onClick={() => setCreatingComponent("PostIt")}
-                    >
-                        🗅
-                    </div>
-                    <div
-                        className={`tool add-post-it ${creatingComponent === "TinyText" ? "add-tool-active" : ""}`}
-                        id="add-post-it-yellow"
-                        onClick={() => setCreatingComponent("TinyText")}
-                    >
-                        Ƭ
-                    </div>
-                </div>
-                <div id="category-selection">
-                    {["Definition", "Explosion", "Deletion", "Correction", "Speculation", "Addition"].map((cat, key) => (
-                        <div
-                            className={`category category-${cat.toLowerCase()} ${selectedCategory === cat ? "category-active" : ""}`}
-                            key={key}
-                            onClick={() => setSelectedCategory(`${cat}`)}
-                        >
-                            <div className="category-ball"></div>
-                            <div>{cat}</div>
+                    <div id="demo-toolbar">
+                        <div className={`demo-styles ${'demo-styles-' + selectedCategory}`}>
+                            <div
+                                className={`demo-tool demo-add-post-it ${creatingComponent === "HighlightAnnotation" ? "demo-add-tool-active-" + selectedCategory : ""} ${'demo-tool-' + selectedCategory}`}
+                                id="add-post-it-green"
+                                onClick={() => setCreatingComponent("HighlightAnnotation")}
+                            >
+                                <HighlightIcon/>
+                            </div>
+                            <div
+                                className={`demo-tool demo-add-post-it ${creatingComponent === "UnderlineAnnotation" ? "demo-add-tool-active-" + selectedCategory : ""} ${'demo-tool-' + selectedCategory}`}
+                                onClick={() => setCreatingComponent("UnderlineAnnotation")}
+                            >
+                                <UnderlineIcon/>
+                            </div>
+                            <div
+                                className={`demo-tool demo-add-post-it ${creatingComponent === "Squiggly" ? "demo-add-tool-active-" + selectedCategory : ""} ${'demo-tool-' + selectedCategory}`}
+                                onClick={() => setCreatingComponent("Squiggly")}
+                            >
+                                <SquigglyIcon/>
+                            </div>
+                            <div
+                                className={`demo-tool demo-add-post-it ${creatingComponent === "ParagraphSideBar" ? "demo-add-tool-active-" + selectedCategory : ""} ${'demo-tool-' + selectedCategory}`}
+                                onClick={() => setCreatingComponent("ParagraphSideBar")}
+                            >
+                                <ParagraphSidebarIcon/>
+                            </div>
                         </div>
-                    ))}
-                </div>
-            </nav>
+                        <div className={`demo-styles ${'demo-styles-' + selectedCategory}`}>
+                            <div
+                                className={`demo-tool demo-add-post-it ${creatingComponent === "PostIt" ? "demo-add-tool-active-" + selectedCategory : ""} ${'demo-tool-' + selectedCategory}`}
+                                onClick={() => setCreatingComponent("PostIt")}
+                            >
+                                <PostItIcon/>
+                            </div>
+                            <div
+                                className={`demo-tool demo-add-post-it ${creatingComponent === "TinyText" ? "demo-add-tool-active-" + selectedCategory : ""} ${'demo-tool-' + selectedCategory}`}
+                                id="add-post-it-yellow"
+                                onClick={() => setCreatingComponent("TinyText")}
+                            >
+                                <TinyTextIcon/>
+                            </div>
+                        </div>
+                    </div>
+                </nav>
             <div id={"noteboard"}>
                 <div id={"annotation-absolute"}>
                     <div id={"annotation-container"}>
