@@ -22,8 +22,8 @@ The application.properties (src/main/resources/application.properties) file need
 - The app.access does not need any adaptation.
 - Our development default for spring.datasource.url is "jdbc:postgresql://localhost:5432/TheRewrite", you can change this depending on your database setup.
 - Set the appropriate username and password for your postgresql setup.
-- On first initialization set the spring.jpa.hibernate.ddl-auto to "create".
-- For the database to persist change to "update" on consecutive application-startups.
+- On first initialization set the spring.jpa.hibernate.ddl-auto to "create" (without ").
+- For the database to persist change to "update" (without ") on consecutive application-startups.
 ```properties
 spring.servlet.multipart.max-file-size=10MB
 spring.servlet.multipart.max-request-size=10MB
@@ -41,13 +41,16 @@ spring.jpa.hibernate.ddl-auto=<create/update(see description)>
 3.**Run the Spring Boot Application**
 Start the Spring Boot server with maven:
     ```bash
-    mvn spring-boot:run
+    sh build.sh
     ```
+    
 
 4.**Access the Application**
 Available at `http://localhost:8080/`.
 
 ### React Development
+
+Local react development currently not supported: CORS errors due to Spring Security -> go through step 1 and 2 then proceed with the full application setup and run the file "devBuild.sh" instead of "build.sh"
 
 Node or React are not requirements and only used for front-end development.
 The Spring-Boot application uses the build (build.sh) of the React App. 
@@ -75,7 +78,6 @@ Development with React:
    sh build.sh
    ```
    On Windows use a bash terminal (Git Bash).
-   
 
 
 ## License

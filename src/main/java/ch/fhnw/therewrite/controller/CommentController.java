@@ -8,6 +8,7 @@ import ch.fhnw.therewrite.repository.AnnotationRepository;
 import ch.fhnw.therewrite.repository.CommentRepository;
 import ch.fhnw.therewrite.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -37,6 +38,31 @@ public class CommentController {
         //} else {
         //    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         //}
+    }
+
+    @Modifying
+    @PatchMapping("")
+    public ResponseEntity<Comment> patchComment(@RequestBody Comment update) {
+        Optional<Comment> optionalComment = commentRepository.findById(update.getIdComment());
+        if(optionalComment.isPresent()) {
+            Comment comm = optionalComment.get();
+            comm.patch(update);
+            Comment resp = commentRepository.save(comm);
+            return ResponseEntity.status(HttpStatus.OK).body(resp);
+        }
+        return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(null);
+    }
+
+    @DeleteMapping("/{commId}")
+    public ResponseEntity<Comment> deleteComment(@PathVariable String commId) {
+        UUID aId = UUID.fromString(commId);
+        Optional<Comment> a = commentRepository.findById(aId);
+        if(a.isPresent()) {
+            Comment oldComm = a.get();
+            commentRepository.delete(oldComm);
+            return ResponseEntity.status(HttpStatus.OK).body(oldComm);
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
     }
 
     @GetMapping("/all/{annotationId}")
