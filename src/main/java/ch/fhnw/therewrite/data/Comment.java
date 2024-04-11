@@ -68,4 +68,8 @@ public class Comment {
     public void setTimeCreated(Timestamp timeCreated) {
         this.timeCreated = timeCreated;
     }
+
+    public void patch(Comment update) {
+        if(update.commentText != null) this.setCommentText(update.commentText);
+    }
 }

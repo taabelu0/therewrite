@@ -27,7 +27,7 @@
     justify-content: center;
     width: $s-workspace-width;
     min-height: 100vh;
-    transform-origin: top left; /* Only needed for transform: scale */
+    transform-origin: top left;
 }
 
 #noteboard {
@@ -67,47 +67,49 @@
 }
 
 #sidebar-nav {
+    flex-direction: column-reverse;
+    display: flex;
     position: fixed;
     left: 0;
-    top: calc(max($s-nav-min-height, $s-nav-height) + $s-workspace-sidebar-nav-margin-top);
-    height: calc(100mvh - max($s-nav-min-height, $s-nav-height) - $s-workspace-sidebar-nav-margin-top);
+    width: 100%;
     z-index: 9999;
-
-    display: flex;
-    flex-direction: column;
+    align-items: center;
+    top: $s-nav-height;
+    box-shadow: 0 0 1rem $c-light-secondary;
+    background-color: $c-light-primary;
+    border-bottom: 1px solid #d3d3d3;
 }
 
 #toolbar {
-    width: 3rem;
-    padding: 0.5rem;
+    padding: $s-workspace-sidebar-nav-margin-top;
+    display: flex;
+    flex-direction: row;
+    width: fit-content;
 
     border-radius:  0 0.25rem 0.25rem 0;
     overflow: hidden;
-    box-shadow: 0 0 1rem $c-light-secondary;
-    background-color: $c-light-primary;
 }
 
 #category-selection {
-
-    width: 8rem;
-    padding: 1rem;
+    display: flex;
+    flex-direction: row;
     margin: $s-workspace-sidebar-nav-margin-top 0 0 0;
 
     border-radius:  0 0.25rem 0.25rem 0;
     overflow: hidden;
-    box-shadow: 0 0 1rem $c-light-secondary;
-    background-color: $c-light-primary;
 }
 
 .category {
-    width: calc(100% - 1rem - 0.125rem);
+    //width: calc(100% - 1rem - 0.125rem);
+    width: 127px;
+    height: 1.5rem;
+    margin-right: 10px;
     font-size: 1rem;
     line-height: 1.25rem;
     padding: 0.25rem 0.5rem;
     border-radius:  0.375rem;
     border: 0.0625rem solid;
     overflow: hidden;
-    margin: 0 0 1rem 0;
     font-weight: 700;
 
     display: flex;
@@ -232,17 +234,16 @@
 }
 
 .tool {
-    line-height: 3rem;
-    text-align: center;
-    font-size: 2.5rem;
-    font-weight: 800;
-    color: white;
-    width: 100%;
-    aspect-ratio: 1 / 1;
-    margin-bottom: 0.5rem;
-    border-radius: 0.25rem;
     overflow: hidden;
+    text-align: center;
     background-color: $c-dark-secondary;
+    border-radius: $s-border-radius;
+    color: $c-light-primary;
+    font-size: 2rem;
+    line-height: 2.5rem;
+    margin-right: 0.25rem;
+    width: 4rem;
+    height: 2.5rem;
 
     &:last-of-type {
         margin: 0;

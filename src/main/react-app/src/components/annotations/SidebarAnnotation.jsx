@@ -1,36 +1,93 @@
-import React, {useEffect, useState} from 'react';
-import {commentAPI} from "../../apis/commentAPI";
+import React, {useEffect, useRef, useState} from 'react';
+import OptionsIcon from "./icons/OptionsIcon";
 
-function SidebarAnnotation({ annotation, deleteAnnotation, createComment }) {
+function SidebarAnnotation({ annotation, comment, updateAnnoCategory, loadComments, deleteAnnotation, deleteComment, createComment, editAnnotation, editComment, onSelection, onChange }) {
 
     const [showInput, setShowInput] = useState(false);
+    const [showOptions, setShowOptions] = useState(false);
+    const [showCategories, setShowCategories] = useState(false);
     const [input, setInput] = useState("");
     const [showComments, setShowComments] = useState(false);
-    const [comments, setComments] = useState({});
+    const [isEditing, setIsEditing] = useState(false);
+    const [isEditingComment, setIsEditingComment] = useState(false);
+    const [editedText, setEditedText] = useState(annotation.text);
+    const [editingCommentId, setEditingCommentId] = useState(null);
+    const [editedCommentText, setEditedCommentText] = useState('');
+    const [shownCommentOptionsMenuId, setShownCommentOptionsMenuId] = useState(null);
+
+    const optionMenuRef = useRef(null);
+    const commentOptionMenuRef = useRef(null);
 
     useEffect(() => {
-        commentAPI.getComments(annotation.id).then((response) => {
-
-            if(response) {
-                response.forEach((newComment) => {
-                    setComments(prevComment => {
-                        return {...prevComment, ...{[newComment.idComment]: newComment}}
-                    });
-                });
-            }
-        });
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
     }, []);
+
+    const handleClickOutside = (event) => {
+        if (optionMenuRef.current && !optionMenuRef.current.contains(event.target)) {
+            setShowOptions(false);
+        }
+        if (commentOptionMenuRef.current && !commentOptionMenuRef.current.contains(event.target)) {
+            setShownCommentOptionsMenuId(null);
+        }
+    };
+
+    useEffect(() => {
+        console.log('comment prop:', comment)
+        if(comment) {
+            console.log('comment.id:', comment.idComment)
+        }
+        loadComments(annotation.id);
+    }, []);
+
+
+    const startEditing = () => {
+        setIsEditing(true);
+        setShowOptions(false);
+    }
+
+    const handleTextChange = (event) => {
+        setEditedText(event.target.value);
+    }
+
+    const saveEditedAnno = () => {
+        editAnnotation(annotation.id, editedText);
+        setIsEditing(false);
+    }
+
+    const cancelEdit = () => {
+        setIsEditing(false);
+    }
 
     const switchShowInput = () => {
         setShowInput(!showInput);
+    }
+
+    const switchShowOptions = () => {
+        if (shownCommentOptionsMenuId !== null) {
+            setShownCommentOptionsMenuId(null);
+        }
+        setShowOptions(!showOptions);
+        setShowCategories(false);
     }
 
     const switchShowComments = () => {
         setShowComments(!showComments);
     }
 
+    const switchShowCategories = () => {
+        setShowOptions(!showOptions);
+        setShowCategories(!showCategories);
+    }
+
     const deleteAnno = () => {
         deleteAnnotation(annotation.id);
+    }
+
+    const deleteComm = (id) => {
+        deleteComment(id);
     }
 
     const setCurrentInput = (event) => {
@@ -38,43 +95,179 @@ function SidebarAnnotation({ annotation, deleteAnnotation, createComment }) {
     }
 
     const handleCreateComment = () => {
-        createComment(annotation.id, null, input).then((newComment) => {
-            setComments(prevComment => {
-                return {...prevComment, ...{[newComment.idComment]: newComment}}
+        createComment(annotation.id, null, input)
+            .then(() => {
+                setInput("");
+                switchShowInput();
+                loadComments(annotation.id);
+                if(!showComments) {
+                    switchShowComments();
+                }
             });
-        });
-        setInput("");
-        switchShowInput();
     };
 
+    const startEditingComment = (id, text) => {
+        console.log("comment id startEditingComment:", id)
+        setEditingCommentId(id);
+        setEditedCommentText(text);
+        setIsEditingComment(true);
+    }
+
+    const saveEditedComment = () => {
+        console.log("comment id saveEditedComment:", editingCommentId)
+        editComment(editingCommentId, editedCommentText);
+        setIsEditingComment(false);
+    }
+
+    const cancelEditComment = () => {
+        setEditingCommentId(null);
+    }
+
+    const handleCommentTextChange = (event) => {
+        setEditedCommentText(event.target.value);
+    }
+
+    const toggleCommentOptionsMenu = (id) => {
+        if (showOptions) {
+            setShowOptions(false);
+        }
+        setShownCommentOptionsMenuId(prevId => prevId === id ? null : id);
+    }
+
+    const setAnnoCatDefinition = () => {
+        setShowCategories(false);
+        updateAnnoCategory(annotation.id, "Definition");
+    }
+
+    const setAnnoCatExplosion = () => {
+        setShowCategories(false);
+        updateAnnoCategory(annotation.id, "Explosion");
+    }
+
+    const setAnnoCatDeletion = () => {
+        setShowCategories(false);
+        updateAnnoCategory(annotation.id, "Deletion");
+    }
+
+    const setAnnoCatCorrection = () => {
+        setShowCategories(false);
+        updateAnnoCategory(annotation.id, "Correction");
+    }
+
+    const setAnnoCatSpeculation = () => {
+        setShowCategories(false);
+        updateAnnoCategory(annotation.id, "Speculation");
+    }
+
+    const setAnnoCatAddition = () => {
+        setShowCategories(false);
+        updateAnnoCategory(annotation.id, "Addition");
+    }
 
     if(annotation.timeCreated) {
         let date = new Date(annotation.timeCreated)
         return (
-            <div className={`sidebar-annotation sidebar-annotation-${annotation.category.toLowerCase()}`}>
+            <div onClick={(event) => onSelection(event, annotation.id)} id={'sidebar-' + annotation.id} className={`sidebar-annotation sidebar-annotation-${annotation.category.toLowerCase()}`}>
                 <div className="sidebar-annotation-header">
-                    <div className="sidebar-annotation-header-user">ExampleUser</div>
-                    <div className="sidebar-annotation-header-date">{date.toLocaleDateString("en-GB")}</div>
+                    <div className="sidebar-annotation-header-info">
+                        <div className="sidebar-annotation-header-info-user">ExampleUser</div>
+                        <div className="sidebar-annotation-header-info-date">{date.toLocaleDateString("en-GB")}</div>
+
+                    </div>
+                    <div
+                        className={`sidebar-annotation-header-options sidebar-annotation-header-options-${annotation.category.toLowerCase()} ${showOptions ? `sidebar-annotation-header-options-${annotation.category.toLowerCase()}-active` : ""}`}
+                        onClick={switchShowOptions}>
+                        <OptionsIcon/>
+                    </div>
                 </div>
-                <div className="sidebar-annotation-delete" onClick={deleteAnno}></div>
-                <div className="sidebar-annotation-text">{annotation.text}</div>
+                {showOptions && (
+                <div className="sidebar-annotation-optionmenu" ref={optionMenuRef}>
+                    <div className="sidebar-annotation-optionmenu-item" onClick={switchShowCategories}>Change Category</div>
+                    <div className="sidebar-annotation-optionmenu-item sidebar-option-edit" onClick={startEditing}>Edit Annotation</div>
+                    <div className="sidebar-annotation-optionmenu-item sidebar-option-delete" onClick={deleteAnno}>Delete Annotation</div>
+                </div>
+                )}
+                {showCategories && (
+                    <div className="sidebar-annotation-optionmenu" style={{display: `${showCategories ? "block": "none"}`}}>
+                        <div className="sidebar-annotation-optionmenu-item item-definition" onClick={setAnnoCatDefinition}>Definition</div>
+                        <div className="sidebar-annotation-optionmenu-item item-explosion" onClick={setAnnoCatExplosion}>Explosion</div>
+                        <div className="sidebar-annotation-optionmenu-item item-deletion" onClick={setAnnoCatDeletion}>Deletion</div>
+                        <div className="sidebar-annotation-optionmenu-item item-correction" onClick={setAnnoCatCorrection}>Correction</div>
+                        <div className="sidebar-annotation-optionmenu-item item-speculation" onClick={setAnnoCatSpeculation}>Speculation</div>
+                        <div className="sidebar-annotation-optionmenu-item item-addition" onClick={setAnnoCatAddition}>Addition</div>
+                    </div>
+                )}
+                {isEditing ? (
+                    <div className="input-edit-group">
+                        <input className="sidebar-annotation-textInput" value={editedText} onChange={handleTextChange}/>
+                    </div>
+                ) : (
+                    <div className="sidebar-content-annotation-text">{annotation.text}</div>
+                )}
+                {isEditing && (
+                    <div className="button-group">
+                        <button className="sidebar-annotation-save" onClick={saveEditedAnno}>Save</button>
+                        <button className="sidebar-annotation-cancel" onClick={cancelEdit}>Cancel</button>
+                    </div>
+                )}
                 <div className="sidebar-annotation-footer">
-                    <div className={`sidebar-annotation-comment-input ${showInput ? "" : "sidebar-annotation-comment-input-hidden"}`}>
+                    <div
+                        className={`sidebar-annotation-comment-input ${showInput ? "" : "sidebar-annotation-comment-input-hidden"}`}>
                         <input type="text" placeholder="Type here..." value={input} onChange={setCurrentInput}/>
                         <div className="sidebar-annotation-comment-input-send" onClick={handleCreateComment}>Send</div>
                     </div>
                     <div className="sidebar-annotation-control">
-                        <div className="sidebar-annotation-control-comments" onClick={switchShowComments}>{showComments ? "Hide Comments" : "Show Comments"}</div>
-                        <div className="sidebar-annotation-control-input" onClick={switchShowInput}>{showInput ? "Cancel" : "Answer"}</div>
+                        {comment && Object.keys(comment).length > 0 && (
+                            <div className="sidebar-annotation-control-comments"
+                                 onClick={switchShowComments}>{showComments ? "Hide Comments" : "Show Comments"}</div>
+                        )}
+                        <div className="sidebar-annotation-control-comments"></div>
+                        <div className="sidebar-annotation-control-input"
+                             onClick={switchShowInput}>{showInput ? "Cancel" : "Answer"}</div>
                     </div>
-                    <div className={`sidebar-annotation-comment-wrapper ${showComments ? "" : "sidebar-annotation-comment-wrapper-hidden"}`}>
-                        {Object.keys(comments).map(key => {
+                    <div
+                        className={`sidebar-annotation-comment-wrapper ${showComments ? "" : "sidebar-annotation-comment-wrapper-hidden"}`}>
+                        {comment && Object.keys(comment).map(key => {
                             return <div className="sidebar-annotation-comment">
                                 <div className="sidebar-annotation-comment-header">
                                     <div className="sidebar-annotation-comment-header-user">ExampleUser</div>
-                                    <div className="sidebar-annotation-comment-header-date">{(new Date(comments[key].timeCreated)).toLocaleDateString("en-GB")}</div>
+                                    <div
+                                        className="sidebar-annotation-comment-header-date">{(new Date(comment[key].timeCreated)).toLocaleDateString("en-GB")}</div>
+                                    <div
+                                        className={`sidebar-annotation-comment-header-options sidebar-annotation-header-options-${annotation.category.toLowerCase()} ${shownCommentOptionsMenuId === comment[key].idComment ? `sidebar-annotation-header-options-${annotation.category.toLowerCase()}-active` : ""}`}
+                                        onClick={() => toggleCommentOptionsMenu(comment[key].idComment)}>
+                                        <OptionsIcon/>
+                                        {shownCommentOptionsMenuId === comment[key].idComment && (
+                                            <div className="sidebar-annotation-optionmenu" ref={commentOptionMenuRef}>
+                                                <div className="sidebar-annotation-optionmenu-item sidebar-option-edit"
+                                                     onClick={() => startEditingComment(comment[key].idComment, comment[key].commentText)}>
+                                                    Edit Comment
+                                                </div>
+                                                <div
+                                                    className="sidebar-annotation-optionmenu-item sidebar-option-delete"
+                                                    onClick={() => deleteComm(comment[key].idComment)}>
+                                                    Delete Comment
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
-                                <div className="sidebar-annotation-comment-text">{comments[key].commentText}</div>
+                                {isEditingComment && editingCommentId === comment[key].idComment ? (
+                                    <div className="input-edit-group">
+                                        <input className="sidebar-annotation-textInput" value={editedCommentText}
+                                               onChange={handleCommentTextChange}/>
+                                        <div className="button-group">
+                                            <button className="sidebar-annotation-save"
+                                                    onClick={saveEditedComment}>Save
+                                            </button>
+                                            <button className="sidebar-annotation-cancel"
+                                                    onClick={cancelEditComment}>Cancel
+                                            </button>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="sidebar-annotation-comment-text">{comment[key].commentText}</div>
+                                )}
                             </div>
                         })}
                     </div>

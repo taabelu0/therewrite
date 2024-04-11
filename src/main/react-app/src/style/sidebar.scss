@@ -3,8 +3,8 @@
 .sidebar {
     position: fixed;
     right: 0;
-    top: calc(max($s-nav-min-height, $s-nav-height));
-    height: calc(100% - max($s-nav-min-height, $s-nav-height));
+    top: calc(max(calc($s-nav-min-height + 200px), calc($s-nav-height + 200px)));
+    height: calc(100% - max(calc($s-nav-min-height + 200px), calc($s-nav-height + 200px)));
     width: 480px;
     z-index: 9998;
     display: flex;
@@ -35,6 +35,22 @@
         overflow-y: auto;
     }
 
+    &-option {
+        &-delete {
+            &:hover {
+                background-color: $c-color-primary !important;
+                color: $c-light-primary;
+            }
+        }
+        &-edit {
+            transition: 0.1s;
+            &:hover {
+                background-color: $c-color-secondary !important;
+                color: $c-light-primary;
+            }
+        }
+    }
+
     &-annotation {
         position: relative;
         width: calc(100% - 1.5rem - 4px);
@@ -46,23 +62,62 @@
         display: flex;
         flex-direction: column;
 
-        &:hover > &-delete {
-            opacity: 1;
+        &-textInput {
+            width: 80%;
+            padding: 0.5rem;
+            border: 1px solid #ccc;
+            border-radius: 0.25rem;
+            font-size: 1rem;
+            line-height: 1.25rem;
+            resize: none;
         }
 
-        &-delete {
-
-            width: 1rem;
-            height: 1rem;
-            background-color: rgb(220, 100, 100);
-            border-radius: 0.25rem;
-            position: absolute;
-            top: -0.25rem;
-            right: -0.25rem;
+        &-cancel {
+            background-color: #f44336;
+            border: none;
+            color: white;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
             cursor: pointer;
+        }
+
+        &-save {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+        }
+
+        &-optionmenu {
+            z-index: 9999;
+            position: absolute;
+            top: 1.75rem;
+            right: 0;
+            border-radius: $s-border-radius;
             overflow: hidden;
-            opacity: 0;
-            transition: opacity 0.1s;
+            background-color: $c-light-primary;
+            box-shadow: 0 5px 15px rgba(37, 40, 43, 0.4);
+            width: 240px;
+            &-item {
+                padding: 0.5rem 0.75rem;
+                cursor: pointer;
+                border-bottom: 1px solid $c-light-secondary;
+                transition: 0.1s;
+                &:hover {
+                    background-color: $c-light-secondary;
+                }
+                &:last-of-type {
+                    border: none;
+                }
+            }
         }
 
         &-text {
@@ -76,24 +131,86 @@
         &-header {
 
             display: flex;
+            justify-content: space-between;
             align-items: center;
             height: 1.25rem;
             width: 100%;
 
-            &-user {
-                font-size: 0.75rem;
-                font-weight: 600;
+            &-info {
+                display: flex;
+
+                &-user {
+                    font-size: 0.75rem;
+                    font-weight: 600;
+                }
+
+                &-date {
+                    font-size: 0.75rem;
+                    font-weight: 200;
+                    margin-left: 0.5rem;
+                }
             }
 
-            &-date {
-                font-size: 0.75rem;
-                font-weight: 200;
-                margin-left: 0.5rem;
+            &-options {
+                height: 100%;
+                cursor: pointer;
+
+                svg {
+                    height: 100%;
+                }
+
+                &-definition {
+                    &-active, &:hover {
+                        svg {
+                            fill: $c-category-definition;
+                        }
+                    }
+                }
+
+                &-explosion {
+                    &-active, &:hover {
+                        svg {
+                            fill: $c-category-explosion;
+                        }
+                    }
+                }
+
+                &-deletion {
+                    &-active, &:hover {
+                        svg {
+                            fill: $c-category-deletion;
+                        }
+                    }
+                }
+
+                &-correction {
+                    &-active, &:hover {
+                        svg {
+                            fill: $c-category-correction;
+                        }
+                    }
+                }
+
+                &-speculation {
+                    &-active, &:hover {
+                        svg {
+                            fill: $c-category-speculation;
+                        }
+                    }
+                }
+
+                &-addition {
+                    &-active, &:hover {
+                        svg {
+                            fill: $c-category-addition;
+                        }
+                    }
+                }
             }
         }
 
         &-comment {
-
+            position: relative;
             font-size: 0.9rem;
             border-top: 2px solid;
             padding: 0.5rem;
@@ -104,8 +221,8 @@
             }
 
             &-header {
-
                 display: flex;
+                justify-content: space-between;
                 align-items: center;
                 height: 1.25rem;
                 width: 100%;
@@ -120,6 +237,51 @@
                     font-weight: 200;
                     margin-left: 0.5rem;
                 }
+
+                &-options {
+                    margin-left: auto;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    cursor: pointer;
+
+                    svg {
+                        width: 20px;
+                        height: 20px;
+                    }
+
+                    &:hover svg {
+                        fill: $c-light-secondary;
+                    }
+
+                    &-definition svg {
+                        fill: $c-category-definition;
+                    }
+
+                    &-explosion svg {
+                        fill: $c-category-explosion;
+                    }
+
+                    &-deletion svg {
+                        fill: $c-category-deletion;
+                    }
+
+                    &-correction svg {
+                        fill: $c-category-correction;
+                    }
+
+                    &-speculation svg {
+                        fill: $c-category-speculation;
+                    }
+
+                    &-addition svg {
+                        fill: $c-category-addition;
+                    }
+                }
+            }
+
+            &-edit {
+
             }
 
             &-input {
@@ -272,4 +434,58 @@
             }
         }
     }
+}
+
+.item {
+    &-definition {
+        color: $c-category-definition;
+        &:hover {
+            color: $c-light-primary;
+            background-color: $c-category-definition;
+        }
+    }
+
+    &-explosion {
+        color: $c-category-explosion;
+        &:hover {
+            color: $c-light-primary;
+            background-color: $c-category-explosion;
+        }
+    }
+
+    &-deletion {
+        color: $c-category-deletion;
+        &:hover {
+            color: $c-light-primary;
+            background-color: $c-category-deletion;
+        }
+    }
+
+    &-correction {
+        color: $c-category-correction;
+        &:hover {
+            color: $c-light-primary;
+            background-color: $c-category-correction;
+        }
+    }
+
+    &-speculation {
+        color: $c-category-speculation;
+        &:hover {
+            color: $c-light-primary;
+            background-color: $c-category-speculation;
+        }
+    }
+
+    &-addition {
+        color: $c-category-addition;
+        &:hover {
+            color: $c-light-primary;
+            background-color: $c-category-addition;
+        }
+    }
+}
+
+.selected-annotation-sidebar {
+    box-shadow: black 1px 2px;
 }
