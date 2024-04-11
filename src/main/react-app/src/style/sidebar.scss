@@ -37,7 +37,6 @@
 
     &-option {
         &-delete {
-            transition: 0.1s;
             &:hover {
                 background-color: $c-color-primary !important;
                 color: $c-light-primary;
@@ -111,6 +110,7 @@
                 padding: 0.5rem 0.75rem;
                 cursor: pointer;
                 border-bottom: 1px solid $c-light-secondary;
+                transition: 0.1s;
                 &:hover {
                     background-color: $c-light-secondary;
                 }
@@ -432,6 +432,56 @@
             .sidebar-annotation-comment {
                 border-color: $c-category-addition;
             }
+        }
+    }
+}
+
+.item {
+    &-definition {
+        color: $c-category-definition;
+        &:hover {
+            color: $c-light-primary;
+            background-color: $c-category-definition;
+        }
+    }
+
+    &-explosion {
+        color: $c-category-explosion;
+        &:hover {
+            color: $c-light-primary;
+            background-color: $c-category-explosion;
+        }
+    }
+
+    &-deletion {
+        color: $c-category-deletion;
+        &:hover {
+            color: $c-light-primary;
+            background-color: $c-category-deletion;
+        }
+    }
+
+    &-correction {
+        color: $c-category-correction;
+        &:hover {
+            color: $c-light-primary;
+            background-color: $c-category-correction;
+        }
+    }
+
+    &-speculation {
+        color: $c-category-speculation;
+        &:hover {
+            color: $c-light-primary;
+            background-color: $c-category-speculation;
+        }
+    }
+
+    &-addition {
+        color: $c-category-addition;
+        &:hover {
+            color: $c-light-primary;
+            background-color: $c-category-addition;
         }
     }
 }

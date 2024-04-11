@@ -485,7 +485,6 @@ function Noteboard({pdfID}) {
     function toggleSidebar() {
         setShowSidebar(!showSidebar);
     }
-
     function loadCommentsByAnno(annotationId) {
         commentAPI.getComments(annotationId).then((allComments) => {
             console.log(annotationId)
@@ -510,6 +509,31 @@ function Noteboard({pdfID}) {
                 })
             });
         });
+    }
+
+    async function updateAnnoCategory(id, category) {
+        let annoDetail;
+        setAnnotations(prevAnnotations => {
+            annoDetail = prevAnnotations[id];
+            return prevAnnotations;
+        });
+        // Delete unnecessary keys
+        delete annoDetail["id"];
+        delete annoDetail["text"];
+        delete annoDetail["timeCreated"];
+        delete annoDetail["category"];
+
+        annotationAPI.updateAnnotation(id, {
+            annotationDetail: JSON.stringify({
+                ...annoDetail,
+                category: category,
+            })
+        }).then((anno) => {
+            // prevAnnotations[id] = anno.data;
+            // applyAnnotationChanges(anno.data);
+            onAnnotationChange(anno.data);
+        });
+
     }
 
     function editAnnotation(id, currentText) {
@@ -646,11 +670,7 @@ function Noteboard({pdfID}) {
                 <button className="sidebar-arrow" onClick={toggleSidebar}></button>
                 <div className="sidebar-content">
                     {Object.keys(annotations).map(key => {
-                        return <SidebarAnnotation annotation={annotations[key]} comment={comments[key]}
-                                                  loadComments={loadCommentsByAnno} deleteAnnotation={deleteAnnotation}
-                                                  deleteComment={deleteComment} createComment={createComment}
-                                                  editAnnotation={editAnnotation} editComment={editComment}
-                                                  onChange={onAnnotationChange} onSelection={onSidebarSelection}/>
+                        return <SidebarAnnotation annotation={annotations[key]} comment={comments[key]} loadComments={loadCommentsByAnno} deleteAnnotation={deleteAnnotation} updateAnnoCategory={updateAnnoCategory} deleteComment={deleteComment} createComment={createComment} editAnnotation={editAnnotation} editComment={editComment} onChange={onAnnotationChange} onSelection={onSidebarSelection}/>
                     })}
                 </div>
             </section>
