@@ -70,6 +70,7 @@ export default function PostIt(props) {
         setPostitPosition(prevPosition => {
             const newX = prevPosition.dataX + event.dx;
             const newY = prevPosition.dataY + event.dy;
+            const { width, height } = postitSize;
 
             props.onChange({
                 idAnnotation: id,
@@ -77,17 +78,21 @@ export default function PostIt(props) {
                 annotationDetail: JSON.stringify({
                     ...props.annotation,
                     dataX: newX,
-                    dataY: newY
+                    dataY: newY,
+                    width: width,
+                    height: height
                 })
             });
 
             target.style.transform = `translate(${newX}px, ${newY}px)`;
 
+
+
             if (event.button === 0) {
                 updatePostItDetails(id, newX, newY, postitTextRef.current, category, postitSize.width, postitSize.height);
             }
 
-            return { dataX: newX, dataY: newY };
+            return { dataX: newX, dataY: newY, width: width, height: height};
         });
     }
 
@@ -98,8 +103,8 @@ export default function PostIt(props) {
                 category: category,
                 dataX: x,
                 dataY: y,
-                width,
-                height,
+                width: width,
+                height: height,
                 annotation: "PostIt"
             })
         }).then(postIt => {
