@@ -4,14 +4,14 @@ import interact from 'interactjs';
 import {annotationAPI} from "../../apis/annotationAPI";
 
 export default function TinyText(props) {
-    let {id, category, dataX, dataY, text, width, height }  = props.annotation;
+    let {id, category, dataX, dataY, text, propWidth, propHeight }  = props.annotation;
     const [tinyText, setTinyText] = useState(text);
     const tinyTextText = useRef(text);
     const tinyTextRef = useRef(null);
     const [tinyTextPosition, settinyTextPosition] = useState({ dataX: Number(dataX) || 0, dataY: Number(dataY) || 0 });
     const tinyTextPositionRef = useRef({ dataX: Number(dataX) || 0, dataY: Number(dataY) || 0 });
-    const [tinyTextSize, setTinyTextSize] = useState({ width: Number(width) || 200, height: Number(height) || 200 });
-    const tinyTextSizeRef = useRef({ width: Number(width) || 200, height: Number(height) || 200 });
+    const [tinyTextSize, setTinyTextSize] = useState({ width: Number(propWidth) || 200, height: Number(propHeight) || 200 });
+    const tinyTextSizeRef = useRef({ width: Number(propWidth) || 200, height: Number(propHeight) || 200 });
 
     useEffect(() => {
         interact(tinyTextRef.current)
@@ -53,7 +53,7 @@ export default function TinyText(props) {
                         outer: 'parent'
                     }),
                     interact.modifiers.restrictSize({
-                        min: { width: 100, height: 100 }
+                        min: { width: 100, height: 25 }
                     })
                 ],
                 inertia: true
@@ -62,7 +62,7 @@ export default function TinyText(props) {
 
     useEffect(() => {
         setTinyText(text);
-        setTinyTextSize({ width, height });
+        setTinyTextSize({ width: props.width, height: props.height });
         settinyTextPosition({ dataX: props.annotation.dataX, dataY: props.annotation.dataY })
     }, [props]);
 
@@ -109,7 +109,7 @@ export default function TinyText(props) {
         });
         target.style.transform = `translate(${dataX}px, ${dataY}px)`;
         if (event.button === 0) {
-            await updateTinyTextDetails(id, dataX, dataY, tinyTextText.current, category, tinyTextSizeRef.current.height, tinyTextSizeRef.current.width);
+            await updateTinyTextDetails(id, dataX, dataY, tinyTextText.current, category, tinyTextSizeRef.current.width, tinyTextSizeRef.current.height);
         }
     }
 
@@ -149,7 +149,9 @@ export default function TinyText(props) {
 
     return (
         <div id={id} className={`annotation-root tiny-text tiny-text-${category.toLowerCase()}`} ref={tinyTextRef} style={{
-            transform: `translate(${dataX}px, ${dataY}px)`
+            transform: `translate(${dataX}px, ${dataY}px)`,
+            width: `${tinyTextSize.width}px`,
+            height: `${tinyTextSize.height}px`
         }}>
             <div className="tiny-text-input-wrapper">
                 <input
@@ -161,6 +163,10 @@ export default function TinyText(props) {
                     onDoubleClick={enableTextEdit}
                     onBlur={disableTextEdit}
                     onChange={valueChange}
+                    style={{
+                        width: `${tinyTextSize.width}px`,
+                        height: `${tinyTextSize.height}px`
+                    }}
                 />
             </div>
         </div>

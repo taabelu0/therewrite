@@ -4,20 +4,24 @@
   position: absolute;
   height: 1.5rem;
   z-index: 19;
+  overflow: hidden;
 
   &-input {
 
     color: inherit;
     background-color: transparent;
     border: none;
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+    outline: none;
     padding: 0;
     resize: none;
     height: 100%;
     width: 100%;
-
+    cursor: inherit;
     font-family: 'Nunito Sans', sans-serif;
     font-size: 1.25rem;
-    cursor: grab;
     font-weight: 800;
 
     &-wrapper {
@@ -25,7 +29,7 @@
     }
 
     &-selected {
-      outline: 0.5rem solid $c-selected;
+      cursor: text;
     }
   }
 
