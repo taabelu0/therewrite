@@ -14,8 +14,6 @@ export default function PostIt(props) {
     const postitSizeRef = useRef({ width: Number(width) || 200, height: Number(height) || 200 });
 
     useEffect(() => {
-
-
         interact(postitRef.current)
             .draggable({
                 modifiers: [
