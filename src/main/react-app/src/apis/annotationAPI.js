@@ -2,8 +2,11 @@ import {api, baseURL} from "./config/axiosConfig"
 
 export const annotationAPI = {
     getList: async function (documentId) {
+        const accessToken = new URLSearchParams(window.location.search).get('documentAccessToken');
+        console.log(accessToken)
+        const append = accessToken ? "?documentAccessToken=" + accessToken : '';
         const response = await api.request({
-            url: `/api/annotation/all/${documentId}`,
+            url: `/api/annotation/all/${documentId + append}`,
             method: "GET",
         });
         return response.data

@@ -97,7 +97,7 @@ public class GuestFilter extends OncePerRequestFilter {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String docId = uri.substring(uri.lastIndexOf('/') + 1); // TODO: get id by other means
         boolean isDocUUID = false;
-
+        System.out.println("GUEST FILTER: " + uri);
         try{
             UUID uuid = UUID.fromString(docId);
             isDocUUID = uuid.toString().equals(docId) && new AntPathRequestMatcher("/view/*").matches(request);
@@ -125,8 +125,11 @@ public class GuestFilter extends OncePerRequestFilter {
             }
         }
         String token = request.getParameter("documentAccessToken");
+        System.out.println("TOKEN: " + token);
         if(token != null) {
+            System.out.println("VERIFY: " + docId);
             if(verifyToken(token, docId, request.getSession())) {
+                System.out.println("CREATE NEW GUEST");
                 response.setStatus(HttpServletResponse.SC_ACCEPTED);
                 List<SimpleGrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_GUEST"));
                 Authentication newAuth = new UsernamePasswordAuthenticationToken("guest", null, authorities);
