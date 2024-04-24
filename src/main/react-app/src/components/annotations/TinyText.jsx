@@ -10,8 +10,8 @@ export default function TinyText(props) {
     const tinyTextRef = useRef(null);
     const [tinyTextPosition, settinyTextPosition] = useState({ dataX: Number(dataX) || 0, dataY: Number(dataY) || 0 });
     const tinyTextPositionRef = useRef({ dataX: Number(dataX) || 0, dataY: Number(dataY) || 0 });
-    const [tinyTextSize, setTinyTextSize] = useState({ width: Number(propWidth) || 200, height: Number(propHeight) || 200 });
-    const tinyTextSizeRef = useRef({ width: Number(propWidth) || 200, height: Number(propHeight) || 200 });
+    const [tinyTextSize, setTinyTextSize] = useState({ width: Number(propWidth) || 150, height: Number(propHeight) || 30 });
+    const tinyTextSizeRef = useRef({ width: Number(propWidth) || 150, height: Number(propHeight) || 30 });
 
     useEffect(() => {
         interact(tinyTextRef.current)
@@ -154,7 +154,7 @@ export default function TinyText(props) {
             height: `${tinyTextSize.height}px`
         }}>
             <div className="tiny-text-input-wrapper">
-                <input
+                <textarea
                     type={"text"}
                     className="tiny-text-input"
                     readOnly={true}
