@@ -1,4 +1,4 @@
-import React, {Component, useState} from "react";
+import React, {Component, useEffect, useRef, useState} from "react";
 import {
     PdfLoader,
     PdfHighlighter
@@ -37,21 +37,31 @@ const initialUrl = {"url": ""};
 function PDFViewer() {
     let { pdfName } = useParams();
     initialUrl.url = pdfAPI.getUrl(pdfName);
+    const [globalSelection, setGlobalSelection] = useState({});
+
+    const notifyNoteboard = (selection) => {
+        setGlobalSelection(selection);
+    }
 
     return (
         <div>
-            <Core pdfName={pdfName}></Core>
-            <Noteboard pdfID={pdfName}
+            <Core notifyNoteboard={notifyNoteboard}></Core>
+            <Noteboard pdfID={pdfName} globalSelection={globalSelection}
             ></Noteboard>
         </div>
     );
 }
 
 class Core extends Component<> {
+    constructor(props) {
+        super(props);
+        this.state.notifyNoteboard = props.notifyNoteboard;
+    }
 
     state = {
         url: initialUrl.url,
         highlights: [],
+        notifyNoteboard: () => {}
     };
 
     resetHighlights = () => {
@@ -124,7 +134,14 @@ class Core extends Component<> {
                         pdfDocument={pdfDocument}
                         onScrollChange={resetHash}
                         enableAreaSelection={(event) => null}
-                        onSelectionFinished={(event) => null}
+                        onSelectionFinished={(
+                            position,
+                            content,
+                            hideTipAndSelection,
+                            transformSelection
+                        ) => {
+                            this.state.notifyNoteboard(position);
+                        }}
                         pdfScaleValue={1.39}
                         scrollRef={(scrollTo) => {
                             this.scrollViewerTo = scrollTo;

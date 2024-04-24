@@ -34,7 +34,7 @@ const ANNOTATION_COMPONENTS = {
 
 let stompClient = new StompJs.Client({brokerURL: `ws://${process.env.REACT_APP_WS_URL}/ws`})
 
-function Noteboard({pdfID}) {
+function Noteboard({pdfID, globalSelection}) {
     const [creatingComponent, setCreatingComponent] = useState(null);
     const [annotations, setAnnotations] = useState({});
     const [comments, setComments] = useState({});
@@ -48,9 +48,10 @@ function Noteboard({pdfID}) {
     let height = useRef("100%");
     const [selectedCategory, setSelectedCategory] = useState("Definition");
     const [toggleAnnotationCategories,setToggleAnnotationCategories] = useState(false);
-
     const currentCategory = useRef(selectedCategory);
-
+    const annotationQueue = useRef([]);
+    const forceCreation = useRef("");
+    const globalSelectionRef = useRef(globalSelection);
     const annoationCategories = [
         {
             name:"Definition",
@@ -104,6 +105,16 @@ function Noteboard({pdfID}) {
     useEffect(() => {
         setShowCommentBox(tempHighlight != null);
     }, [tempHighlight]);
+
+    useEffect(() => {
+        globalSelectionRef.current = globalSelection;
+
+        console.log("GLOBAL SELECTION CHANGED")
+        while (annotationQueue.current.length > 0) {
+            annotationQueue.current.shift()();
+            console.log(annotationQueue.current.length)
+        }
+    }, [globalSelection, forceCreation.current]);
 
     function applyAnnotationChanges(msgAnnotation) {
         if (!msgAnnotation) {
@@ -252,16 +263,25 @@ function Noteboard({pdfID}) {
         const rect = noteboard.getBoundingClientRect();
         const x = clientX - rect.left;
         const y = clientY - rect.top;
-        if(creatingComponent === "PostIt" || creatingComponent === "TinyText") {
-            setCreatingComponent(null);
-        }
-        setTimeout(async () => {
-            let newAnno = await ADDING_COMPONENT[creatingComponent](selectedCategory, x, y);
+        const component = creatingComponent + "";
+        annotationQueue.current.push(async () => {
+            let newAnno = await ADDING_COMPONENT[component](selectedCategory, x, y);
             document.getSelection().deleteFromDocument();
             if(!newAnno) return;
             sendMessage(newAnno); // notifies websocket
-            setAnnotationCoordinates({x, y});
-        }, 50);
+            setAnnotationCoordinates({x, y})
+        });
+        if(creatingComponent === "PostIt" || creatingComponent === "TinyText") {
+            setCreatingComponent(null);
+            forceCreation.current = crypto.randomUUID();
+        }
+        // setTimeout(async () => {
+        //     let newAnno = await ADDING_COMPONENT[creatingComponent](selectedCategory, x, y);
+        //     document.getSelection().deleteFromDocument();
+        //     if(!newAnno) return;
+        //     sendMessage(newAnno); // notifies websocket
+        //     setAnnotationCoordinates({x, y});
+        // }, 50);
     }
 
     useEffect(() => {
@@ -345,7 +365,15 @@ function Noteboard({pdfID}) {
             category: currentCategory.current,
             annotation: "HighlightAnnotation"
         };
+        console.log(globalSelectionRef.current, "highlights")
         BoundingBoxCalc(props);
+        console.log(props, "props")
+        props.rects = [];
+        for(let i in globalSelectionRef.current.rects) {
+            let r = globalSelectionRef.current.rects[i];
+            let rect = { height: r.y2 - r.y1, width: r.x2 - r.x1, top: r.y1 + props.scrollY, left: r.x1 +  props.scrollX}
+            props.rects.push(rect)
+        }
         return await annotationAPI.saveAnnotation(pdfID, "", props)
             .then(saveAnnotationCB(props))
             .then((data) => {
