@@ -10,6 +10,7 @@ import '../style/react-viewer.scss';
 import {useParams} from "react-router-dom";
 import Noteboard from "./Noteboard";
 import {pdfAPI} from "../apis/pdfAPI";
+import MetaHeader from "./MetaHeader";
 
 
 const getNextId = () => String(Math.random()).slice(2);
@@ -40,6 +41,7 @@ function PDFViewer() {
 
     return (
         <div>
+            <MetaHeader pdfName={pdfName}></MetaHeader>
             <Core pdfName={pdfName}></Core>
             <Noteboard pdfID={pdfName}
             ></Noteboard>
