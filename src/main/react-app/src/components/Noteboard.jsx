@@ -15,7 +15,7 @@ import * as StompJs from "@stomp/stompjs";
 import {getPagesFromRange} from "react-pdf-highlighter/dist/cjs/lib/pdfjs-dom";
 import {Squiggly} from "./annotations/Squiggly";
 import {commentAPI} from "../apis/commentAPI";
-import '../style/demo.scss';
+import '../style/demo_.scss';
 import HighlightIcon from "./annotations/icons/HighlightIcon";
 import UnderlineIcon from "./annotations/icons/UnderlineIcon";
 import PostItIcon from "./annotations/icons/PostItIcon";

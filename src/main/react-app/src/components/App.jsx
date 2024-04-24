@@ -8,12 +8,8 @@ import Navigation from "./Navigation";
 import NotFound from "./404";
 function App() {
 
-    const isLandingPage = window.location.pathname === '/';
-    const renderNavigation = !isLandingPage ? <Navigation /> : null;
-
     return (
         <Router>
-            {renderNavigation}
             <Routes>
                 <Route path="/" element={<LandingPage/>}/>
                 <Route path="/demo/:pdfName" element={<Demo/>}/>
