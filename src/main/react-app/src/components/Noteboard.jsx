@@ -48,6 +48,7 @@ function Noteboard({pdfID}) {
     let height = useRef("100%");
     const [selectedCategory, setSelectedCategory] = useState("Definition");
     const [toggleAnnotationCategories,setToggleAnnotationCategories] = useState(false);
+    const mouseClickOver = useRef(false);
 
     const currentCategory = useRef(selectedCategory);
 
@@ -434,7 +435,9 @@ function Noteboard({pdfID}) {
 
     function registerAnnotationSelect() {
         const listener = e => {
-            const allAnnos = document.querySelectorAll('.annotation');
+            if(mouseClickOver.current) return;
+            mouseClickOver.current = true;
+            const allAnnos = document.querySelectorAll('.annotation-root');
             allAnnos.forEach(element => element.style.pointerEvents = 'auto'); // enable pointer events
             const elements = document.elementsFromPoint(e.clientX, e.clientY); // get elements at mouse position
             allAnnos.forEach(element => element.style.pointerEvents = 'none'); // disable them again
@@ -446,34 +449,43 @@ function Noteboard({pdfID}) {
                     if (parent) annotationElements.push(parent); // add parent if parent is annotation
                 }
             });
+            console.log(annotationElements)
             if (annotationElements.length <= 0) return;
-            setSelectedAnnotations(prevAnnos => {
-                if (prevAnnos.length === annotationElements.length) {
-                    if (prevAnnos.filter(pA => !annotationElements.includes(pA)).length === 0) { // if they are equal
-                        if (annotationElements.length > 1) {
-                            let prevFirst = prevAnnos.shift();
-                            prevAnnos.push(prevFirst);
-                            changeSelected(selectedAnnotationRef.current, 'remove');
-                            selectedAnnotationRef.current = prevAnnos[0];
-                            changeSelected(selectedAnnotationRef.current);
-                            console.log(selectedAnnotationRef.current, "CURRENT")
-                        }
-                        return prevAnnos;
-                    }
-                }
-                if (selectedAnnotationRef.current !== annotationElements[0]) {
-                    changeSelected(selectedAnnotationRef.current, 'remove');
-                    selectedAnnotationRef.current = annotationElements[0];
-                    changeSelected(selectedAnnotationRef.current);
-                }
-                return annotationElements;
-            });
+            setSelectedAnnotations(getCurAnnotationSetter(annotationElements));
             let sidebarElement = document.getElementById('sidebar-' + selectedAnnotationRef.current.id);
             if(sidebarElement) sidebarElement.scrollIntoView({behavior: "smooth"}); // scroll on sidebar
 
         };
         document.removeEventListener('mousedown', listener);
-        document.addEventListener('mousedown', listener, {passive: true, once: true});
+        document.addEventListener('mousedown', listener, {passive: true});
+        document.addEventListener('mouseup', function(event) {
+            event.stopImmediatePropagation();
+            mouseClickOver.current = false;
+        });
+    }
+
+    function getCurAnnotationSetter(annotationElements) {
+        return prevAnnos => {
+            if (prevAnnos.length === annotationElements.length) {
+                if (prevAnnos.filter(pA => !annotationElements.includes(pA)).length === 0) { // if they are equal
+                    if (annotationElements.length > 1) {
+                        let prevFirst = prevAnnos.shift();
+                        prevAnnos.push(prevFirst);
+                        changeSelected(selectedAnnotationRef.current, 'remove');
+                        selectedAnnotationRef.current = prevAnnos[0];
+                        changeSelected(selectedAnnotationRef.current);
+                        console.log(selectedAnnotationRef.current, "CURRENT")
+                    }
+                    return prevAnnos;
+                }
+            }
+            if (selectedAnnotationRef.current !== annotationElements[0]) {
+                changeSelected(selectedAnnotationRef.current, 'remove');
+                selectedAnnotationRef.current = annotationElements[0];
+                changeSelected(selectedAnnotationRef.current);
+            }
+            return annotationElements;
+        }
     }
 
     function changeSelected(element, keyword = 'add') {
@@ -574,6 +586,12 @@ function Noteboard({pdfID}) {
         });
     }
 
+    function changeCreatingComponent(newComp) {
+        setCreatingComponent(prev => {
+            return (prev !== null && newComp === prev) ? null : newComp;
+        });
+    }
+
 
     return (
         <section
@@ -612,25 +630,25 @@ function Noteboard({pdfID}) {
                             <div
                                 className={`demo-tool demo-add-post-it ${creatingComponent === "HighlightAnnotation" ? "demo-add-tool-active-" + selectedCategory : ""} ${'demo-tool-' + selectedCategory}`}
                                 id="add-post-it-green"
-                                onClick={() => setCreatingComponent("HighlightAnnotation")}
+                                onClick={() => changeCreatingComponent("HighlightAnnotation")}
                             >
                                 <HighlightIcon/>
                             </div>
                             <div
                                 className={`demo-tool demo-add-post-it ${creatingComponent === "UnderlineAnnotation" ? "demo-add-tool-active-" + selectedCategory : ""} ${'demo-tool-' + selectedCategory}`}
-                                onClick={() => setCreatingComponent("UnderlineAnnotation")}
+                                onClick={() => changeCreatingComponent("UnderlineAnnotation")}
                             >
                                 <UnderlineIcon/>
                             </div>
                             <div
                                 className={`demo-tool demo-add-post-it ${creatingComponent === "Squiggly" ? "demo-add-tool-active-" + selectedCategory : ""} ${'demo-tool-' + selectedCategory}`}
-                                onClick={() => setCreatingComponent("Squiggly")}
+                                onClick={() => changeCreatingComponent("Squiggly")}
                             >
                                 <SquigglyIcon/>
                             </div>
                             <div
                                 className={`demo-tool demo-add-post-it ${creatingComponent === "ParagraphSideBar" ? "demo-add-tool-active-" + selectedCategory : ""} ${'demo-tool-' + selectedCategory}`}
-                                onClick={() => setCreatingComponent("ParagraphSideBar")}
+                                onClick={() => changeCreatingComponent("ParagraphSideBar")}
                             >
                                 <ParagraphSidebarIcon/>
                             </div>
@@ -638,14 +656,14 @@ function Noteboard({pdfID}) {
                         <div className={`demo-styles ${'demo-styles-' + selectedCategory}`}>
                             <div
                                 className={`demo-tool demo-add-post-it ${creatingComponent === "PostIt" ? "demo-add-tool-active-" + selectedCategory : ""} ${'demo-tool-' + selectedCategory}`}
-                                onClick={() => setCreatingComponent("PostIt")}
+                                onClick={() => changeCreatingComponent("PostIt")}
                             >
                                 <PostItIcon/>
                             </div>
                             <div
                                 className={`demo-tool demo-add-post-it ${creatingComponent === "TinyText" ? "demo-add-tool-active-" + selectedCategory : ""} ${'demo-tool-' + selectedCategory}`}
                                 id="add-post-it-yellow"
-                                onClick={() => setCreatingComponent("TinyText")}
+                                onClick={() => changeCreatingComponent("TinyText")}
                             >
                                 <TinyTextIcon/>
                             </div>
