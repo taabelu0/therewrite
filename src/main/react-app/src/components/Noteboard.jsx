@@ -449,19 +449,19 @@ function Noteboard({pdfID}) {
                     if (parent) annotationElements.push(parent); // add parent if parent is annotation
                 }
             });
-            console.log(annotationElements)
             if (annotationElements.length <= 0) return;
+            const mouseupListener = function(event) {
+                event.stopImmediatePropagation();
+                mouseClickOver.current = false;
+            }
+            document.addEventListener('mouseup', mouseupListener);
             setSelectedAnnotations(getCurAnnotationSetter(annotationElements));
             let sidebarElement = document.getElementById('sidebar-' + selectedAnnotationRef.current.id);
             if(sidebarElement) sidebarElement.scrollIntoView({behavior: "smooth"}); // scroll on sidebar
-
+            document.removeEventListener('mouseup', mouseupListener);
         };
         document.removeEventListener('mousedown', listener);
         document.addEventListener('mousedown', listener, {passive: true});
-        document.addEventListener('mouseup', function(event) {
-            event.stopImmediatePropagation();
-            mouseClickOver.current = false;
-        });
     }
 
     function getCurAnnotationSetter(annotationElements) {
