@@ -48,7 +48,6 @@ function Noteboard({pdfID}) {
     let height = useRef("100%");
     const [selectedCategory, setSelectedCategory] = useState("Definition");
     const [toggleAnnotationCategories,setToggleAnnotationCategories] = useState(false);
-    const mouseClickOver = useRef(false);
 
     const currentCategory = useRef(selectedCategory);
 
@@ -438,28 +437,31 @@ function Noteboard({pdfID}) {
 
     function registerAnnotationSelect() {
         const listener = e => {
-            if(mouseClickOver.current) return;
-            mouseClickOver.current = true;
-            const allAnnos = document.querySelectorAll('.annotation-root');
-            allAnnos.forEach(element => { if(element.style.pointerEvents === 'none') { element.style.pointerEvents = 'auto' };}); // enable pointer events
+            e.stopImmediatePropagation();
+            const allAnnos = document.querySelectorAll('.annotation');
+            allAnnos.forEach(element => element.style.pointerEvents = 'auto' ); // enable pointer events
             const elements = document.elementsFromPoint(e.clientX, e.clientY); // get elements at mouse position
-            allAnnos.forEach(element => { if(element.style.pointerEvents === 'auto') { element.style.pointerEvents = 'none' };}); // disable them again
+            allAnnos.forEach(element => element.style.pointerEvents = 'none'); // disable them again
             const annotationElements = [];
             elements.map(el => {
                 if (el.classList.contains("annotation-root")) annotationElements.push(el); // classList uses contains instead of includes
                 else {
                     let parent = el.closest(".annotation-root");
-                    if (parent) annotationElements.push(parent); // add parent if parent is annotation
+                    if (parent && !annotationElements.includes(parent)) annotationElements.push(parent); // add parent if parent is annotation
                 }
             });
-            if (annotationElements.length <= 0) { mouseClickOver.current = false; return; }
+            if (annotationElements.length <= 0) { attachAnnotationSelectListener(listener); return; }
             setSelectedAnnotations(getCurAnnotationSetter(annotationElements));
             let sidebarElement = document.getElementById('sidebar-' + selectedAnnotationRef.current.id);
             if(sidebarElement) sidebarElement.scrollIntoView({behavior: "smooth"}); // scroll on sidebar
-            mouseClickOver.current = false;
+            attachAnnotationSelectListener(listener);
         };
         document.removeEventListener('mousedown', listener);
-        document.addEventListener('mousedown', listener, {});
+        attachAnnotationSelectListener(listener);
+    }
+
+    function attachAnnotationSelectListener(listener) {
+        document.addEventListener('mousedown', listener, {once: true});
     }
 
     function getCurAnnotationSetter(annotationElements) {
@@ -476,7 +478,7 @@ function Noteboard({pdfID}) {
                     return prevAnnos;
                 }
             }
-            else if (selectedAnnotationRef.current !== annotationElements[0]) {
+            if (selectedAnnotationRef.current !== annotationElements[0]) {
                 changeSelected(selectedAnnotationRef.current, 'remove');
                 selectedAnnotationRef.current = annotationElements[0];
                 changeSelected(selectedAnnotationRef.current);

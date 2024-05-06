@@ -10,7 +10,7 @@ export class HighlightAnnotation extends Annotation {
 
     render() {
         return (
-            <div className={"annotation-root annotation"} id={this.state.key}>
+            <div className={"annotation-root"} id={this.state.key}>
                 {this.state.currentRects.map((rect, index) => {
                     return (
                         <div
@@ -21,7 +21,7 @@ export class HighlightAnnotation extends Annotation {
                                 height: rect.height,
                                 width: rect.width,
                             }}
-                            className={"highlight highlight-" + this.state.currentCategory.toLowerCase()}
+                            className={"annotation highlight highlight-" + this.state.currentCategory.toLowerCase()}
                         ></div>
                     );
                 })}

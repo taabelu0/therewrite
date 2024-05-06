@@ -204,7 +204,7 @@ export default function TinyText(props) {
             width: `${tinyTextSize.width}px`,
             height: `${tinyTextSize.height}px`
         }}>
-            <div className="tiny-text-input-wrapper">
+            <div className="tiny-text-input-wrapper annotation">
                 <textarea
                     type={"text"}
                     className="tiny-text-input"

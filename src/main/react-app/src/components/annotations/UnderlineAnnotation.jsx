@@ -10,7 +10,7 @@ export class UnderlineAnnotation extends Annotation {
 
     render() {
         return (
-            <div id={this.state.key} className={"annotation-root annotation"}>
+            <div id={this.state.key} className={"annotation-root"}>
                 {this.state.currentRects.map((rect, index) => {
                     return (
                         <div
@@ -21,7 +21,7 @@ export class UnderlineAnnotation extends Annotation {
                                 height: rect.height,
                                 width: rect.width,
                             }}
-                            className={"underline underline-" + this.state.currentCategory.toLowerCase()}
+                            className={"annotation underline underline-" + this.state.currentCategory.toLowerCase()}
                         ></div>
                     );
                 })}
