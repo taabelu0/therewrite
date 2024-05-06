@@ -36,21 +36,44 @@ public class UserController {
     }
 
     @PostMapping("")
-    public User saveUser(@RequestBody RegistrationData rd) {
+    public ResponseEntity<User> saveUser(@RequestBody RegistrationData rd) {
+        try {
+            BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+            String hashedPassword = encoder.encode(rd.password);
 
-        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-        String hashedPassword = encoder.encode(rd.password);
+            User u = new User();
+            u.setUsername(rd.username);
+            u.setEmail(rd.email);
+            u.setPassword(hashedPassword);
 
-        User u = new User();
-        u.setUsername(rd.username);
-        u.setEmail(rd.email);
-        u.setPassword(hashedPassword);
+            u = userRepository.save(u);
+            return ResponseEntity.status(HttpStatus.OK).body(u);
+        }
+        catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+    }
 
-        return userRepository.save(u);
+    @PostMapping("/login")
+    public ResponseEntity<User> Login(@RequestBody LoginData ld) {
+
+        User u = userRepository.findByEmail(ld.email);
+        if(u != null) {
+            BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+            if(encoder.matches(ld.password, u.getPassword())) {
+                return ResponseEntity.status(HttpStatus.OK).body(u);
+            }
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
     }
 
     public static class RegistrationData {
         public String username;
+        public String email;
+        public String password;
+    }
+
+    public static class LoginData {
         public String email;
         public String password;
     }

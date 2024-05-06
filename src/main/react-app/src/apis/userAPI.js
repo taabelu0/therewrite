@@ -15,10 +15,21 @@ export const userAPI = {
     },
 
     getUser: async function (userId) {
-        const response = await api.request({
+        return await api.request({
             url: `/api/user/${userId}`,
             method: "GET",
         });
-        return response.data
+    },
+
+    login: async function (email, password) {
+        const user = {
+            email: email,
+            password: password
+        };
+        return api.post(`/api/user/login`, user)
+            .then(response => { return response })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
     },
 }
