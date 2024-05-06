@@ -2,6 +2,7 @@ package ch.fhnw.therewrite;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
@@ -36,7 +37,7 @@ public class AppConfigProperties {
         return access.split(SEPARATOR);
     }
 
-    @Bean
+
     public CorsFilter corsConfigurationSource() {
         if(this.url == null) return new CorsFilter(new UrlBasedCorsConfigurationSource());
         CorsConfiguration configuration = new CorsConfiguration();

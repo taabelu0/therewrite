@@ -433,16 +433,16 @@ function Noteboard({pdfID}) {
     }
 
     function registerAnnotationSelect() {
-        document.addEventListener('mousedown', e => {
+        const listener = e => {
             const allAnnos = document.querySelectorAll('.annotation');
             allAnnos.forEach(element => element.style.pointerEvents = 'auto'); // enable pointer events
             const elements = document.elementsFromPoint(e.clientX, e.clientY); // get elements at mouse position
             allAnnos.forEach(element => element.style.pointerEvents = 'none'); // disable them again
             const annotationElements = [];
-            elements.map(e => {
-                if (e.classList.contains("annotation-root")) annotationElements.push(e); // classList uses contains instead of includes
+            elements.map(el => {
+                if (el.classList.contains("annotation-root")) annotationElements.push(e); // classList uses contains instead of includes
                 else {
-                    let parent = e.closest(".annotation-root");
+                    let parent = el.closest(".annotation-root");
                     if (parent) annotationElements.push(parent); // add parent if parent is annotation
                 }
             });
@@ -456,6 +456,7 @@ function Noteboard({pdfID}) {
                             changeSelected(selectedAnnotationRef.current, 'remove');
                             selectedAnnotationRef.current = prevAnnos[0];
                             changeSelected(selectedAnnotationRef.current);
+                            console.log(selectedAnnotationRef.current, "CURRENT")
                         }
                         return prevAnnos;
                     }
@@ -470,7 +471,9 @@ function Noteboard({pdfID}) {
             let sidebarElement = document.getElementById('sidebar-' + selectedAnnotationRef.current.id);
             if(sidebarElement) sidebarElement.scrollIntoView({behavior: "smooth"}); // scroll on sidebar
 
-        }, {passive: true});
+        };
+        document.removeEventListener('mousedown', listener);
+        document.addEventListener('mousedown', listener, {passive: true, once: true});
     }
 
     function changeSelected(element, keyword = 'add') {

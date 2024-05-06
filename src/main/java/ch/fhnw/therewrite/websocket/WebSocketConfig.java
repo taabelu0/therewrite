@@ -1,5 +1,6 @@
 package ch.fhnw.therewrite.websocket;
 
+import ch.fhnw.therewrite.AppConfigProperties;
 import org.apache.catalina.Context;
 import org.apache.catalina.connector.Connector;
 import org.apache.tomcat.util.descriptor.web.SecurityCollection;
@@ -15,10 +16,13 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @Configuration
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
-
+    private final AppConfigProperties appConfig;
+    public WebSocketConfig(AppConfigProperties appConfig){
+        this.appConfig = appConfig;
+    }
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/ws").setAllowedOriginPatterns("*");
+        registry.addEndpoint("/ws").setAllowedOriginPatterns("*").setAllowedOrigins(appConfig.getUrl());
     }
 
     @Override

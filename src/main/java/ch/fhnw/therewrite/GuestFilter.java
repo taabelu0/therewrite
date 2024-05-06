@@ -97,7 +97,6 @@ public class GuestFilter extends OncePerRequestFilter {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String docId = uri.substring(uri.lastIndexOf('/') + 1); // TODO: get id by other means
         boolean isDocUUID = false;
-
         try{
             UUID uuid = UUID.fromString(docId);
             isDocUUID = uuid.toString().equals(docId) && new AntPathRequestMatcher("/view/*").matches(request);
