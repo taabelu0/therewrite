@@ -29,6 +29,8 @@ public class SecurityConfiguration {
     private final DocumentAccessTokenRepository documentAccessTokenRepository;
     private final AppConfigProperties appConfig;
     public static final List<String> permitAllMatchers = List.of(
+            "/api/user",
+            "/api/user/**",
             "/api/document/**",
             "/api/document/",
             "/api/documentAccessToken/create",

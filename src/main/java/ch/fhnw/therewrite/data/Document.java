@@ -1,6 +1,7 @@
 package ch.fhnw.therewrite.data;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -19,6 +20,10 @@ public class Document {
     @JsonIgnore
     private List<Guest> guests = new ArrayList<>();
 
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<User> users = new ArrayList<>();
+
     @OneToMany(mappedBy = "documentId", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JsonIgnore
     private List<DocumentAccessToken> accessTokens = new ArrayList<>();
@@ -32,10 +37,6 @@ public class Document {
 
     @JsonIgnore
     private String path;
-
-    @ManyToOne
-    @JoinColumn(name = "userId")
-    private User userId;
 
     public void setId(UUID id) {
         this.id = id;
@@ -88,6 +89,14 @@ public class Document {
     public void addAnnotation(Annotation annotation) {
         this.annotations.add(annotation);
         annotation.setDocument(this);
+    }
+
+    public List<User> getUsers() {
+        return users;
+    }
+
+    public void setUsers(List<User> users) {
+        this.users = users;
     }
 
     public void removeAnnotation(Annotation annotation) {

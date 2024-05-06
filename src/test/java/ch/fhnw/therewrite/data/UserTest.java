@@ -19,9 +19,9 @@ public class UserTest {
 
         UUID id = UUID.randomUUID();
 
-        user.setId(id);
+        user.setIdUser(id);
 
-        UUID retrievedId = user.getId();
+        UUID retrievedId = user.getIdUser();
 
         Assertions.assertEquals(id, retrievedId);
     }
