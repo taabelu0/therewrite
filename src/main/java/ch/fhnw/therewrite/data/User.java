@@ -20,8 +20,10 @@ public class User {
     @Column(name = "id")
     private UUID idUser;
 
+    @Column(unique = true)
     private String username;
 
+    @Column(unique = true)
     private String email;
 
     @JsonIgnore

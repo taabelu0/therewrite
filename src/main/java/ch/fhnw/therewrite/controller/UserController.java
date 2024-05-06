@@ -8,6 +8,7 @@ import ch.fhnw.therewrite.repository.GuestRepository;
 import ch.fhnw.therewrite.repository.UserRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -36,10 +37,15 @@ public class UserController {
 
     @PostMapping("")
     public User saveUser(@RequestBody RegistrationData rd) {
+
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        String hashedPassword = encoder.encode(rd.password);
+
         User u = new User();
         u.setUsername(rd.username);
         u.setEmail(rd.email);
-        u.setPassword(rd.password); // TODO: needs hashing
+        u.setPassword(hashedPassword);
+
         return userRepository.save(u);
     }
 
