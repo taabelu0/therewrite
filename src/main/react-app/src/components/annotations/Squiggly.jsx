@@ -16,7 +16,7 @@ export class Squiggly extends Annotation {
 
     render() {
         return (
-            <div id={this.state.key} className={"annotation-root"}>
+            <div id={this.state.key} className={"annotation-root annotation"}>
                 {this.state.currentRects.map((rect, index) => {
                     return (
                         <div

@@ -6,7 +6,7 @@
 }
 
 .annotation-root {
-  pointer-events: none;
+  pointer-events: inherit;
 }
 
 .selected-annotation, .selected-annotation > div {

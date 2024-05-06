@@ -4,14 +4,22 @@ import interact from 'interactjs';
 import {annotationAPI} from "../../apis/annotationAPI";
 
 export default function TinyText(props) {
-    let {id, category, dataX, dataY, text, propWidth, propHeight }  = props.annotation;
+    let {id, category, dataX, dataY, text} = props.annotation;
+    let propWidth = props.annotation.width;
+    let propHeight = props.annotation.height;
     const [tinyText, setTinyText] = useState(text);
     const tinyTextText = useRef(text);
     const tinyTextRef = useRef(null);
-    const [tinyTextPosition, settinyTextPosition] = useState({ dataX: Number(dataX) || 0, dataY: Number(dataY) || 0 });
-    const tinyTextPositionRef = useRef({ dataX: Number(dataX) || 0, dataY: Number(dataY) || 0 });
-    const [tinyTextSize, setTinyTextSize] = useState({ width: Number(propWidth) || 150, height: Number(propHeight) || 30 });
-    const tinyTextSizeRef = useRef({ width: Number(propWidth) || 150, height: Number(propHeight) || 30 });
+    const [tinyTextPosition, settinyTextPosition] = useState({dataX: Number(dataX) || 0, dataY: Number(dataY) || 0});
+    const tinyTextPositionRef = useRef({dataX: Number(dataX) || 0, dataY: Number(dataY) || 0});
+    const [tinyTextSize, setTinyTextSize] = useState({
+        width: Number(propWidth),
+        height: Number(propHeight)
+    });
+    const tinyTextSizeRef = useRef({width: Number(propWidth), height: Number(propHeight)});
+    const [tinyTextCategory, setTinyTextCategory] = useState(props.annotation.category);
+    const tinyTextCategoryRef = useRef(props.annotation.category);
+    const resizeCounter = useRef(0);
 
     useEffect(() => {
         interact(tinyTextRef.current)
@@ -22,30 +30,39 @@ export default function TinyText(props) {
                         endOnly: true
                     })
                 ],
-                listeners: { move: dragMoveListener }
+                listeners: {move: dragMoveListener}
             })
             .resizable({
-                edges: { left: false, right: true, bottom: true, top: false },
+                edges: {left: false, right: true, bottom: true, top: false},
                 listeners: {
                     move(event) {
-                        const { width, height } = event.rect;
-
-                        event.target.style.width = `${width}px`;
-                        event.target.style.height = `${height}px`;
-
-                        const target = event.target;
-
-                        const x = tinyTextPositionRef.current.dataX
-                        const y = tinyTextPositionRef.current.dataY
-
-                        target.style.transform = `translate(${x}px, ${y}px)`;
-
-                        target.setAttribute('data-x', x);
-                        target.setAttribute('data-y', y);
-
-                        setTinyTextSize({ width, height });
-
-                        updateTinyTextDetails(id, x, y, tinyTextText.current, category, width, height).finally();
+                        const count = ++resizeCounter.current;
+                        const {x, y, width, height} = resize(event)
+                        const timeout = 150;
+                        props.onChange({
+                            idAnnotation: id,
+                            annotationText: tinyTextText.current,
+                            annotationDetail: JSON.stringify({
+                                ...props.annotation,
+                                dataX: x,
+                                dataY: y,
+                                width,
+                                height,
+                                category: tinyTextCategoryRef.current
+                            })
+                        });
+                        const saveResize = () => {
+                            if (count !== resizeCounter.current) {
+                                setTimeout(saveResize, timeout)
+                                return;
+                            }
+                            const xSave = tinyTextPositionRef.current.dataX;
+                            const ySave = tinyTextPositionRef.current.dataY;
+                            const widthSave = tinyTextSizeRef.current.width;
+                            const heightSave = tinyTextSizeRef.current.height;
+                            updateTinyTextDetails(id, xSave, ySave, tinyTextText.current, tinyTextCategoryRef.current, widthSave, heightSave).finally();
+                        }
+                        setTimeout(saveResize, timeout)
                     }
                 },
                 modifiers: [
@@ -53,7 +70,7 @@ export default function TinyText(props) {
                         outer: 'parent'
                     }),
                     interact.modifiers.restrictSize({
-                        min: { width: 100, height: 25 }
+                        min: {width: 100, height: 25}
                     })
                 ],
                 inertia: true
@@ -62,16 +79,21 @@ export default function TinyText(props) {
 
     useEffect(() => {
         setTinyText(text);
-        setTinyTextSize({ width: props.width, height: props.height });
-        settinyTextPosition({ dataX: props.annotation.dataX, dataY: props.annotation.dataY })
-    }, [props]);
+        setTinyTextSize({width: props.annotation.width, height: props.annotation.height});
+        settinyTextPosition({dataX: props.annotation.dataX, dataY: props.annotation.dataY})
+        setTinyTextCategory(props.annotation.category);
+    }, [props.annotation]);
+
+    useEffect(() => {
+        if(tinyTextCategory) tinyTextCategoryRef.current = tinyTextCategory;
+    }, [tinyTextCategory])
 
     useEffect(() => {
         tinyTextText.current = tinyText;
     }, [tinyText]);
 
     useEffect(() => {
-        tinyTextSizeRef.current = tinyTextSize;
+        if (tinyTextSize.width && tinyTextSize.height) tinyTextSizeRef.current = tinyTextSize;
     }, [tinyTextSize]);
 
     useEffect(() => {
@@ -86,16 +108,39 @@ export default function TinyText(props) {
         textArea.classList.add("tiny-text-input-selected");
     }
 
+    function resize(event) {
+        event.preventDefault();
+        event.stopImmediatePropagation()
+        const {width, height} = event.rect;
+
+        event.target.style.width = `${width}px`;
+        event.target.style.height = `${height}px`;
+
+        const target = event.target;
+
+        const x = tinyTextPositionRef.current.dataX
+        const y = tinyTextPositionRef.current.dataY
+
+        target.style.transform = `translate(${x}px, ${y}px)`;
+
+        target.setAttribute('data-x', x);
+        target.setAttribute('data-y', y);
+
+        setTinyTextSize({width, height});
+        return {x, y, width, height};
+    }
+
     async function disableTextEdit(event) {
         let textArea = event.target;
         textArea.readOnly = true;
         textArea.style.userSelect = false;
         textArea.classList.remove("tiny-text-input-selected");
-        await updateTinyTextDetails(id, dataX, dataY, textArea.value, category, tinyTextSizeRef.current.height, tinyTextSizeRef.current.width);
+        await updateTinyTextDetails(id, dataX, dataY, textArea.value, tinyTextCategoryRef.current, tinyTextSizeRef.current.width, tinyTextSizeRef.current.height);
     }
-    
+
     async function dragMoveListener(event) {
         const target = event.target;
+        let {dataX, dataY} = tinyTextPositionRef.current;
         dataX += event.dx;
         dataY += event.dy;
         props.onChange({
@@ -105,11 +150,15 @@ export default function TinyText(props) {
                 ...props.annotation,
                 dataX: dataX,
                 dataY: dataY,
+                width: tinyTextSizeRef.current.width,
+                height: tinyTextSizeRef.current.height,
+                category: tinyTextCategoryRef.current
             })
         });
         target.style.transform = `translate(${dataX}px, ${dataY}px)`;
+        settinyTextPosition({dataX, dataY});
         if (event.button === 0) {
-            await updateTinyTextDetails(id, dataX, dataY, tinyTextText.current, category, tinyTextSizeRef.current.width, tinyTextSizeRef.current.height);
+            await updateTinyTextDetails(id, dataX, dataY, tinyTextText.current, tinyTextCategoryRef.current, tinyTextSizeRef.current.width, tinyTextSizeRef.current.height);
         }
     }
 
@@ -142,13 +191,15 @@ export default function TinyText(props) {
             annotationText: event.target.value,
             annotationDetail: JSON.stringify({
                 ...props.annotation,
+                category: tinyTextCategoryRef.current
             })
         });
         setTinyText(event.target.value)
     }
 
     return (
-        <div id={id} className={`annotation-root tiny-text tiny-text-${category.toLowerCase()}`} ref={tinyTextRef} style={{
+        <div id={id} className={`annotation-root annotation tiny-text tiny-text-${tinyTextCategory.toLowerCase()}`}
+             ref={tinyTextRef} style={{
             transform: `translate(${dataX}px, ${dataY}px)`,
             width: `${tinyTextSize.width}px`,
             height: `${tinyTextSize.height}px`
