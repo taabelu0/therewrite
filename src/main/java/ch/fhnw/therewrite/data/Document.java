@@ -33,6 +33,12 @@ public class Document {
     @JsonIgnore
     private String path;
 
+    @Column(name = "source", columnDefinition="TEXT")
+    private String source;
+
+    @Column(name = "copy_right", columnDefinition="TEXT")
+    private String copyRight;
+
     @ManyToOne
     @JoinColumn(name = "userId")
     private User userId;
