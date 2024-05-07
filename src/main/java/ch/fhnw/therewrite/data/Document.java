@@ -100,4 +100,20 @@ public class Document {
         this.annotations.remove(annotation);
         annotation.setDocument(null);
     }
+
+    public void setSource(String source) {
+        this.source = source;
+    }
+
+    public String getSource() {
+        return source;
+    }
+
+    public void setCopyRight(String copyRight) {
+        this.copyRight = copyRight;
+    }
+
+    public String getCopyRight() {
+        return copyRight;
+    }
 }
