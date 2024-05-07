@@ -53,9 +53,18 @@ function Home() {
         });
     }
 
-    function handleDetailsSubmission(source, copyright) {
-        console.log(source, copyright);
+    function handleDetailsSubmission(source, copyRight) {
+        console.log(source, copyRight);
         setShowDetailsPopUp(false);
+
+        pdfAPI.updateDocument(currentPdf.id, source, copyRight)
+            .then(() => {
+                displayInviteLink(currentPdf);
+            })
+            .catch(error => {
+                console.error('Error updating document:', error);
+            });
+
         displayInviteLink(currentPdf);
     }
 

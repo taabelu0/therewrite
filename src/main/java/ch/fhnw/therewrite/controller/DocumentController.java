@@ -109,6 +109,17 @@ public class DocumentController {
         }
     }
 
+    @PatchMapping("/{documentId}")
+    public ResponseEntity<Document> updateDocument(@PathVariable UUID documentId, @RequestBody Document updateDetails) {
+        return documentRepository.findById(documentId).map(document -> {
+            document.setSource(updateDetails.getSource());
+            document.setCopyRight(updateDetails.getCopyRight());
+            documentRepository.save(document);
+            return ResponseEntity.ok(document);
+        }).orElse(ResponseEntity.notFound().build());
+    }
+
+
     @DeleteMapping("/{documentId}")
     public void deleteDocument(@PathVariable(value="documentId") String documentId) {
         UUID dId = UUID.fromString(documentId);

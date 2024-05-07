@@ -36,8 +36,9 @@ public class Document {
     @Column(name = "source", columnDefinition="TEXT")
     private String source;
 
-    @Column(name = "copy_right", columnDefinition="TEXT")
+    @Column(name = "copyRight", columnDefinition="TEXT")
     private String copyRight;
+
 
     @ManyToOne
     @JoinColumn(name = "userId")
