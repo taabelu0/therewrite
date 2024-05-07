@@ -1,7 +1,7 @@
 @import "variables";
 
 
-#demo-workspace-scroll {
+#workspace-scroll {
   height: calc(100% - 14vh - 3em);
   max-height: calc(100% - 14vh - 3em);
   overflow: scroll;
@@ -10,7 +10,7 @@
   padding-top: 100px;
 }
 
-#demo-sidebar-nav {
+#topbar-nav {
   display: flex;
   flex-direction: column;
   position: fixed;
@@ -19,10 +19,11 @@
   width: 100%;
   z-index: 9999;
   align-items: center;
-  top: 17px;
+  top: $s-nav-height;
   box-shadow: 0 0 1rem $c-light-secondary;
   background-color: $c-light-primary;
   border-bottom: 1px solid #d3d3d3;
+
 }
 
 .toggleCategoriesBtn{
@@ -44,7 +45,7 @@
   margin: 0;
 }
 
-#demo-category-selection{
+#category-selected{
   display: flex;
   flex-direction: row;
   margin: 15px 0 0 0;
@@ -53,7 +54,7 @@
   overflow: hidden;
 }
 
-.demo-category{
+.category{
   width: 127px;
 
   display: flex;
@@ -73,7 +74,7 @@
   cursor: pointer;
   transition: 300ms ease-in-out;
 
-  .demo-category-title{
+  .category-title{
     align-self: flex-start;
     margin-bottom: 0;
   }
@@ -82,7 +83,7 @@
     margin: 0;
   }
 
-  .demo-category-desc{
+  .category-desc{
     display: none;
     color:grey;
     font-size: 12px;
@@ -91,32 +92,34 @@
   }
 }
 
-#demo-toolbar {
+#tools {
   padding: 0.5rem;
   display: flex;
   flex-direction: row;
+  justify-content: center;
+  align-items: center;
   width: fit-content;
 
   border-radius:  0 0.25rem 0.25rem 0;
   overflow: hidden;
 }
 
-.demo-categories-open{
+.categories-open{
   width: 200px;
 
-  .demo-category-desc{
+  .category-desc{
     display: block;
   }
 
-  .demo-category-title{
+  .category-title{
     margin-bottom: 10px;
   }
 }
 
-.demo-category-definition {
+.category-definition {
   border-color: $c-category-definition;
 
-  .demo-category-title{
+  .category-title{
     color: $c-category-definition;
   }
 
@@ -125,9 +128,9 @@
   }
 }
 
-.demo-category-explosion {
+.category-explosion {
   border-color: $c-category-explosion;
-  .demo-category-title {
+  .category-title {
     color: $c-category-explosion;
   }
 
@@ -136,9 +139,9 @@
   }
 }
 
-.demo-category-deletion {
+.category-deletion {
   border-color: $c-category-deletion;
-  .demo-category-title {
+  .category-title {
     color: $c-category-deletion;
   }
 
@@ -147,9 +150,9 @@
   }
 }
 
-.demo-category-correction {
+.category-correction {
   border-color: $c-category-correction;
-  .demo-category-title {
+  .category-title {
     color: $c-category-correction;
   }
 
@@ -158,9 +161,9 @@
   }
 }
 
-.demo-category-speculation {
+.category-speculation {
   border-color: $c-category-speculation;
-  .demo-category-title{
+  .category-title{
     color: $c-category-speculation;
   }
 
@@ -169,10 +172,10 @@
   }
 }
 
-.demo-category-addition {
+.category-addition {
   border-color: $c-category-addition;
 
-  .demo-category-title {
+  .category-title {
     color: $c-category-addition;
   }
   &.category-active {
@@ -180,7 +183,7 @@
   }
 }
 
-.demo-styles{
+.styles{
   margin-right: 20px;
   display: flex;
   flex-direction: row;
@@ -188,42 +191,38 @@
 }
 
 //Add Styles-Addition etc for each of the class
-.demo-styles-Definition{
+.styles-Definition{
   border: 0.5px solid $c-category-definition;
 }
 
-.demo-styles-Explosion{
+.styles-Explosion{
   border: 0.5px solid $c-category-explosion;
 }
 
-.demo-styles-Deletion{
+.styles-Deletion{
   border: 0.5px solid $c-category-deletion;
 }
 
-.demo-styles-Correction{
+.styles-Correction{
   border: 0.5px solid $c-category-correction;
 }
 
-.demo-styles-Speculation{
+.styles-Speculation{
   border: 0.5px solid $c-category-speculation;
 }
 
-.demo-styles-Addition{
+.styles-Addition{
   border: 0.5px solid $c-category-addition;
 }
 
-.demo-tool {
-  position: relative; // Add relative positioning to the parent container
-
-  // Add absolute positioning to the SVG elements
+.toolbarItem {
+  position: relative;
   svg {
     position: absolute;
     top: 0;
     left: 0;
     transform: scale(0.8);
   }
-
-  // Rest of your existing styling...
   aspect-ratio: 1 / 1;
   overflow: hidden;
   text-align: center;
@@ -241,7 +240,7 @@
   }
 }
 
-.demo-tool-Definition{
+.tool-Definition{
   svg:first-child {
     .cls-1{
       fill: color-mix(in srgb, $c-category-definition, white 40%);
@@ -249,7 +248,7 @@
   }
 }
 
-.demo-tool-Explosion{
+.tool-Explosion{
   svg:first-child {
     .cls-1{
       fill: color-mix(in srgb, $c-category-explosion, white 40%);
@@ -257,7 +256,7 @@
   }
 }
 
-.demo-tool-Deletion{
+.tool-Deletion{
   svg:first-child {
     .cls-1{
       fill: color-mix(in srgb, $c-category-deletion, white 40%);
@@ -265,7 +264,7 @@
   }
 }
 
-.demo-tool-Correction{
+.tool-Correction{
   svg:first-child {
     .cls-1{
       fill: color-mix(in srgb, $c-category-correction, white 40%);
@@ -273,7 +272,7 @@
   }
 }
 
-.demo-tool-Speculation{
+.tool-Speculation{
   //Target first SVG in the tool
   svg:first-child {
     .cls-1{
@@ -283,7 +282,7 @@
 
 }
 
-.demo-tool-Addition{
+.tool-Addition{
   //Target first SVG in the tool
   svg:first-child {
     .cls-1{
@@ -293,11 +292,11 @@
 
 }
 
-.demo-add-post-it:hover {
+.add-post-it:hover {
   cursor: pointer;
 }
 
-.demo-add-tool-active-Definition{
+.add-tool-item-active-Definition{
   background-color: rgba(77, 180, 213, 0.2);
   svg:first-child {
     .cls-1{
@@ -306,7 +305,7 @@
   }
 }
 
-.demo-add-tool-active-Explosion{
+.add-tool-item-active-Explosion{
   background-color:rgba(255, 165, 0, 0.2);
   svg:first-child {
     .cls-1{
@@ -315,7 +314,7 @@
   }
 }
 
-.demo-add-tool-active-Deletion{
+.add-tool-item-active-Deletion{
   background-color: rgba(255, 69, 0, 0.2);
   svg:first-child {
     .cls-1{
@@ -324,7 +323,7 @@
   }
 }
 
-.demo-add-tool-active-Correction{
+.add-tool-item-active-Correction{
   background-color: rgba(168, 70, 168, 0.2);
   svg:first-child {
     .cls-1{
@@ -333,7 +332,7 @@
   }
 }
 
-.demo-add-tool-active-Speculation {
+.add-tool-item-active-Speculation {
   background-color: rgba(175, 138, 77, 0.2);
   svg:first-child {
     .cls-1 {
@@ -342,7 +341,7 @@
   }
 }
 
-.demo-add-tool-active-Addition{
+.add-tool-item-active-Addition{
   background-color: rgba(60, 179, 113, 0.2);
   svg:first-child {
     .cls-1{

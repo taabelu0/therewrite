@@ -15,13 +15,15 @@ import * as StompJs from "@stomp/stompjs";
 import {getPagesFromRange} from "react-pdf-highlighter/dist/cjs/lib/pdfjs-dom";
 import {Squiggly} from "./annotations/Squiggly";
 import {commentAPI} from "../apis/commentAPI";
-import '../style/demo.scss';
+import '../style/toolbar.scss';
 import HighlightIcon from "./annotations/icons/HighlightIcon";
 import UnderlineIcon from "./annotations/icons/UnderlineIcon";
 import PostItIcon from "./annotations/icons/PostItIcon";
 import TinyTextIcon from "./annotations/icons/TinyTextIcon";
 import SquigglyIcon from "./annotations/icons/SquigglyIcon";
 import ParagraphSidebarIcon from "./annotations/icons/ParagraphSidebarIcon";
+import MetaHeader from "./MetaHeader";
+import Toolbar from "./Toolbar";
 
 const ANNOTATION_COMPONENTS = {
     'HighlightAnnotation': HighlightAnnotation,
@@ -48,6 +50,7 @@ function Noteboard({pdfID}) {
     let height = useRef("100%");
     const [selectedCategory, setSelectedCategory] = useState("Definition");
     const [toggleAnnotationCategories, setToggleAnnotationCategories] = useState(false);
+    const [scrollPosition, setScrollPosition] = useState(0);
 
     const currentCategory = useRef(selectedCategory);
 
@@ -78,10 +81,6 @@ function Noteboard({pdfID}) {
         }
     ]
 
-    const toggleCategories = () => {
-        setToggleAnnotationCategories(prevState => !prevState);
-    }
-
     const ADDING_COMPONENT = {
         "ParagraphSideBar": addParagraphAnnotation,
         "PostIt": addPostIt,
@@ -90,6 +89,18 @@ function Noteboard({pdfID}) {
         'Squiggly': addSquigglyAnnotation,
         'UnderlineAnnotation': addUnderlineAnnotation
     }
+
+    useEffect(() => {
+        const handleScroll = () => {
+            setScrollPosition(window.pageYOffset);
+        };
+
+        window.addEventListener('scroll', handleScroll);
+
+        return () => {
+            window.removeEventListener('scroll', handleScroll);
+        };
+    }, []);
 
     useEffect(() => {
         currentCategory.current = selectedCategory;
@@ -588,12 +599,6 @@ function Noteboard({pdfID}) {
         });
     }
 
-    function changeCreatingComponent(newComp) {
-        setCreatingComponent(prev => {
-            return (prev !== null && newComp === prev) ? null : newComp;
-        });
-    }
-
 
     return (
         <section
@@ -611,66 +616,18 @@ function Noteboard({pdfID}) {
                     onCancel={() => setShowCommentBox(false)}
                 />
             )}
-            <nav id="demo-sidebar-nav">
-                <button className="toggleCategoriesBtn" onClick={toggleCategories}>Annotation Categories</button>
-                <p className="category-text">Select a category while annotating to mark your highlights and
-                    notes.</p>
-                <div id="demo-category-selection">
-                    {annoationCategories.map((cat, key) => (
-                        <div
-                            className={`demo-category demo-category-${cat.name.toLowerCase()} ${selectedCategory === cat.name ? "category-active" : ""} ${toggleAnnotationCategories ? 'demo-categories-open' : ''}`}
-                            key={key}
-                            onClick={() => setSelectedCategory(`${cat.name}`)}
-                        >
-                            <p className={"demo-category-title"}>{cat.name}</p>
-                            <p className={`demo-category-desc`}>{cat.description}</p>
-                        </div>
-                    ))}
-                </div>
-                <div id="demo-toolbar">
-                    <div className={`demo-styles ${'demo-styles-' + selectedCategory}`}>
-                        <div
-                            className={`demo-tool demo-add-post-it ${creatingComponent === "HighlightAnnotation" ? "demo-add-tool-active-" + selectedCategory : ""} ${'demo-tool-' + selectedCategory}`}
-                            id="add-post-it-green"
-                            onClick={() => changeCreatingComponent("HighlightAnnotation")}
-                        >
-                            <HighlightIcon/>
-                        </div>
-                        <div
-                            className={`demo-tool demo-add-post-it ${creatingComponent === "UnderlineAnnotation" ? "demo-add-tool-active-" + selectedCategory : ""} ${'demo-tool-' + selectedCategory}`}
-                            onClick={() => changeCreatingComponent("UnderlineAnnotation")}
-                        >
-                            <UnderlineIcon/>
-                        </div>
-                        <div
-                            className={`demo-tool demo-add-post-it ${creatingComponent === "Squiggly" ? "demo-add-tool-active-" + selectedCategory : ""} ${'demo-tool-' + selectedCategory}`}
-                            onClick={() => changeCreatingComponent("Squiggly")}
-                        >
-                            <SquigglyIcon/>
-                        </div>
-                        <div
-                            className={`demo-tool demo-add-post-it ${creatingComponent === "ParagraphSideBar" ? "demo-add-tool-active-" + selectedCategory : ""} ${'demo-tool-' + selectedCategory}`}
-                            onClick={() => changeCreatingComponent("ParagraphSideBar")}
-                        >
-                            <ParagraphSidebarIcon/>
-                        </div>
-                    </div>
-                    <div className={`demo-styles ${'demo-styles-' + selectedCategory}`}>
-                        <div
-                            className={`demo-tool demo-add-post-it ${creatingComponent === "PostIt" ? "demo-add-tool-active-" + selectedCategory : ""} ${'demo-tool-' + selectedCategory}`}
-                            onClick={() => changeCreatingComponent("PostIt")}
-                        >
-                            <PostItIcon/>
-                        </div>
-                        <div
-                            className={`demo-tool demo-add-post-it ${creatingComponent === "TinyText" ? "demo-add-tool-active-" + selectedCategory : ""} ${'demo-tool-' + selectedCategory}`}
-                            id="add-post-it-yellow"
-                            onClick={() => changeCreatingComponent("TinyText")}
-                        >
-                            <TinyTextIcon/>
-                        </div>
-                    </div>
-                </div>
+            <nav id="meta-header-nav">
+                <MetaHeader/>
+            </nav>
+            <nav>
+                <Toolbar annoationCategories={annoationCategories}
+                         selectedCategory={selectedCategory}
+                         creatingComponent={creatingComponent}
+                         toggleAnnotationCategories={toggleAnnotationCategories}
+                         setSelectedCategory={setSelectedCategory}
+                         setCreatingComponent={setCreatingComponent}
+                         setToggleAnnotationCategories={setToggleAnnotationCategories}
+                ></Toolbar>
             </nav>
             <div id={"noteboard"}>
                 <div id={"annotation-absolute"}>
