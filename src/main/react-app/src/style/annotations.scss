@@ -19,7 +19,7 @@
   background-color: #0a84ff;
   height: 50px;
   width: 10px;
-  z-index: 100;
+  z-index: 20;
   &-definition {
     background-color: $c-category-definition;
   }
@@ -43,7 +43,7 @@
 
 .paragraph-custom {
   position: absolute;
-  z-index: 100;
+  z-index: 20;
 }
 .squiggly-paragraph {
   background-repeat: repeat;
