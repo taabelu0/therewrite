@@ -47,18 +47,17 @@ function Noteboard({pdfID}) {
     let width = useRef("100%");
     let height = useRef("100%");
     const [selectedCategory, setSelectedCategory] = useState("Definition");
-    const [toggleAnnotationCategories,setToggleAnnotationCategories] = useState(false);
-    const mouseClickOver = useRef(false);
+    const [toggleAnnotationCategories, setToggleAnnotationCategories] = useState(false);
 
     const currentCategory = useRef(selectedCategory);
 
     const annoationCategories = [
         {
-            name:"Definition",
-            description:"Select this category to add definitions of terms you found in the documents."
+            name: "Definition",
+            description: "Select this category to add definitions of terms you found in the documents."
         },
         {
-            name:"Explosion",
+            name: "Explosion",
             description: "Select to add terms, notes and descriptions or external resources, e.g. links to material you feel needs to included in the document."
         },
         {
@@ -66,7 +65,7 @@ function Noteboard({pdfID}) {
             description: "Select to signal that you would like to delete specific terms in the document altogether. Add some thoughts or links to sources that explain why you feel the term should be deleted."
         },
         {
-            name:"Correction",
+            name: "Correction",
             description: "Select to propose changes to the term in question. Note that correction has an authoritative connotation: you're suggesting a definitive replacement!"
         },
         {
@@ -253,13 +252,13 @@ function Noteboard({pdfID}) {
         const rect = noteboard.getBoundingClientRect();
         const x = clientX - rect.left;
         const y = clientY - rect.top;
-        if(creatingComponent === "PostIt" || creatingComponent === "TinyText") {
+        if (creatingComponent === "PostIt" || creatingComponent === "TinyText") {
             setCreatingComponent(null);
         }
         setTimeout(async () => {
             let newAnno = await ADDING_COMPONENT[creatingComponent](selectedCategory, x, y);
-            document.getSelection().deleteFromDocument();
-            if(!newAnno) return;
+            if (!newAnno) return;
+            document.getSelection().collapse(null);
             sendMessage(newAnno); // notifies websocket
             setAnnotationCoordinates({x, y});
         }, 50);
@@ -360,6 +359,8 @@ function Noteboard({pdfID}) {
             category: category,
             dataX: x,
             dataY: y,
+            width: 150,
+            height: 30,
             annotation: "TinyText"
         };
         return await annotationAPI.saveAnnotation(pdfID, "type here...", newTinyText)
@@ -413,11 +414,12 @@ function Noteboard({pdfID}) {
     }
 
     function scrollToAnnotation(element) {
+        if (!element) return;
         const OFFSET = 100;
         let vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0);
         let vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
-        let top = (element.firstChild ? element.firstChild.getBoundingClientRect().top : element.getBoundingClientRect().top ) + window.scrollY;
-        let left = (element.firstChild ? element.firstChild.getBoundingClientRect().left : element.getBoundingClientRect().left ) + window.scrollX;
+        let top = (element.firstChild ? element.firstChild.getBoundingClientRect().top : element.getBoundingClientRect().top) + window.scrollY;
+        let left = (element.firstChild ? element.firstChild.getBoundingClientRect().left : element.getBoundingClientRect().left) + window.scrollX;
         window.scroll({
             top: top - (vh / 2) + OFFSET,
             left: left - (vw / 2) + OFFSET,
@@ -433,35 +435,35 @@ function Noteboard({pdfID}) {
         sendMessage(annotation);
     }
 
-    function registerAnnotationSelect() {
-        const listener = e => {
-            if(mouseClickOver.current) return;
-            mouseClickOver.current = true;
-            const allAnnos = document.querySelectorAll('.annotation-root');
-            allAnnos.forEach(element => element.style.pointerEvents = 'auto'); // enable pointer events
-            const elements = document.elementsFromPoint(e.clientX, e.clientY); // get elements at mouse position
-            allAnnos.forEach(element => element.style.pointerEvents = 'none'); // disable them again
-            const annotationElements = [];
-            elements.map(el => {
-                if (el.classList.contains("annotation-root")) annotationElements.push(e); // classList uses contains instead of includes
-                else {
-                    let parent = el.closest(".annotation-root");
-                    if (parent) annotationElements.push(parent); // add parent if parent is annotation
-                }
-            });
-            if (annotationElements.length <= 0) return;
-            const mouseupListener = function(event) {
-                event.stopImmediatePropagation();
-                mouseClickOver.current = false;
+    function selectListener(e) {
+        e.stopImmediatePropagation();
+        const allAnnos = document.querySelectorAll('.annotation');
+        allAnnos.forEach(element => element.style.pointerEvents = 'auto'); // enable pointer events
+        const elements = document.elementsFromPoint(e.clientX, e.clientY); // get elements at mouse position
+        allAnnos.forEach(element => element.style.pointerEvents = 'none'); // disable them again
+        const annotationElements = [];
+        elements.map(el => {
+            if (el.classList.contains("annotation-root")) annotationElements.push(el); // classList uses contains instead of includes
+            else {
+                let parent = el.closest(".annotation-root");
+                if (parent && !annotationElements.includes(parent)) annotationElements.push(parent); // add parent if parent is annotation
             }
-            document.addEventListener('mouseup', mouseupListener);
+        });
+        if (annotationElements.length > 0) {
             setSelectedAnnotations(getCurAnnotationSetter(annotationElements));
-            let sidebarElement = document.getElementById('sidebar-' + selectedAnnotationRef.current.id);
-            if(sidebarElement) sidebarElement.scrollIntoView({behavior: "smooth"}); // scroll on sidebar
-            document.removeEventListener('mouseup', mouseupListener);
-        };
-        document.removeEventListener('mousedown', listener);
-        document.addEventListener('mousedown', listener, {passive: true});
+            let sidebarElement = document.getElementById('sidebar-' + selectedAnnotationRef.current?.id);
+            if (sidebarElement) sidebarElement.scrollIntoView({behavior: "smooth"}); // scroll on sidebar
+        }
+        attachAnnotationSelectListener();
+    }
+
+    function registerAnnotationSelect() {
+        // document.removeEventListener('mousedown', selectListener);
+        attachAnnotationSelectListener();
+    }
+
+    function attachAnnotationSelectListener() {
+        document.addEventListener('mousedown', selectListener, {once: true});
     }
 
     function getCurAnnotationSetter(annotationElements) {
@@ -474,7 +476,6 @@ function Noteboard({pdfID}) {
                         changeSelected(selectedAnnotationRef.current, 'remove');
                         selectedAnnotationRef.current = prevAnnos[0];
                         changeSelected(selectedAnnotationRef.current);
-                        console.log(selectedAnnotationRef.current, "CURRENT")
                     }
                     return prevAnnos;
                 }
@@ -493,13 +494,14 @@ function Noteboard({pdfID}) {
             element.classList[keyword]("selected-annotation");
             // also change class on sidebar element
             let sidebarElement = document.getElementById('sidebar-' + element.id);
-            if(sidebarElement) sidebarElement.classList[keyword]("selected-annotation-sidebar");
+            if (sidebarElement) sidebarElement.classList[keyword]("selected-annotation-sidebar");
         }
     }
 
     function toggleSidebar() {
         setShowSidebar(!showSidebar);
     }
+
     function loadCommentsByAnno(annotationId) {
         commentAPI.getComments(annotationId).then((allComments) => {
             console.log(annotationId)
@@ -609,67 +611,67 @@ function Noteboard({pdfID}) {
                     onCancel={() => setShowCommentBox(false)}
                 />
             )}
-                <nav id="demo-sidebar-nav">
-                    <button className="toggleCategoriesBtn" onClick={toggleCategories}>Annotation Categories</button>
-                    <p className="category-text">Select a category while annotating to mark your highlights and
-                        notes.</p>
-                    <div id="demo-category-selection">
-                        {annoationCategories.map((cat, key) => (
-                            <div
-                                className={`demo-category demo-category-${cat.name.toLowerCase()} ${selectedCategory === cat.name ? "category-active" : ""} ${toggleAnnotationCategories ? 'demo-categories-open' : ''}`}
-                                key={key}
-                                onClick={() => setSelectedCategory(`${cat.name}`)}
-                            >
-                                <p className={"demo-category-title"}>{cat.name}</p>
-                                <p className={`demo-category-desc`}>{cat.description}</p>
-                            </div>
-                        ))}
-                    </div>
-                    <div id="demo-toolbar">
-                        <div className={`demo-styles ${'demo-styles-' + selectedCategory}`}>
-                            <div
-                                className={`demo-tool demo-add-post-it ${creatingComponent === "HighlightAnnotation" ? "demo-add-tool-active-" + selectedCategory : ""} ${'demo-tool-' + selectedCategory}`}
-                                id="add-post-it-green"
-                                onClick={() => changeCreatingComponent("HighlightAnnotation")}
-                            >
-                                <HighlightIcon/>
-                            </div>
-                            <div
-                                className={`demo-tool demo-add-post-it ${creatingComponent === "UnderlineAnnotation" ? "demo-add-tool-active-" + selectedCategory : ""} ${'demo-tool-' + selectedCategory}`}
-                                onClick={() => changeCreatingComponent("UnderlineAnnotation")}
-                            >
-                                <UnderlineIcon/>
-                            </div>
-                            <div
-                                className={`demo-tool demo-add-post-it ${creatingComponent === "Squiggly" ? "demo-add-tool-active-" + selectedCategory : ""} ${'demo-tool-' + selectedCategory}`}
-                                onClick={() => changeCreatingComponent("Squiggly")}
-                            >
-                                <SquigglyIcon/>
-                            </div>
-                            <div
-                                className={`demo-tool demo-add-post-it ${creatingComponent === "ParagraphSideBar" ? "demo-add-tool-active-" + selectedCategory : ""} ${'demo-tool-' + selectedCategory}`}
-                                onClick={() => changeCreatingComponent("ParagraphSideBar")}
-                            >
-                                <ParagraphSidebarIcon/>
-                            </div>
+            <nav id="demo-sidebar-nav">
+                <button className="toggleCategoriesBtn" onClick={toggleCategories}>Annotation Categories</button>
+                <p className="category-text">Select a category while annotating to mark your highlights and
+                    notes.</p>
+                <div id="demo-category-selection">
+                    {annoationCategories.map((cat, key) => (
+                        <div
+                            className={`demo-category demo-category-${cat.name.toLowerCase()} ${selectedCategory === cat.name ? "category-active" : ""} ${toggleAnnotationCategories ? 'demo-categories-open' : ''}`}
+                            key={key}
+                            onClick={() => setSelectedCategory(`${cat.name}`)}
+                        >
+                            <p className={"demo-category-title"}>{cat.name}</p>
+                            <p className={`demo-category-desc`}>{cat.description}</p>
                         </div>
-                        <div className={`demo-styles ${'demo-styles-' + selectedCategory}`}>
-                            <div
-                                className={`demo-tool demo-add-post-it ${creatingComponent === "PostIt" ? "demo-add-tool-active-" + selectedCategory : ""} ${'demo-tool-' + selectedCategory}`}
-                                onClick={() => changeCreatingComponent("PostIt")}
-                            >
-                                <PostItIcon/>
-                            </div>
-                            <div
-                                className={`demo-tool demo-add-post-it ${creatingComponent === "TinyText" ? "demo-add-tool-active-" + selectedCategory : ""} ${'demo-tool-' + selectedCategory}`}
-                                id="add-post-it-yellow"
-                                onClick={() => changeCreatingComponent("TinyText")}
-                            >
-                                <TinyTextIcon/>
-                            </div>
+                    ))}
+                </div>
+                <div id="demo-toolbar">
+                    <div className={`demo-styles ${'demo-styles-' + selectedCategory}`}>
+                        <div
+                            className={`demo-tool demo-add-post-it ${creatingComponent === "HighlightAnnotation" ? "demo-add-tool-active-" + selectedCategory : ""} ${'demo-tool-' + selectedCategory}`}
+                            id="add-post-it-green"
+                            onClick={() => changeCreatingComponent("HighlightAnnotation")}
+                        >
+                            <HighlightIcon/>
+                        </div>
+                        <div
+                            className={`demo-tool demo-add-post-it ${creatingComponent === "UnderlineAnnotation" ? "demo-add-tool-active-" + selectedCategory : ""} ${'demo-tool-' + selectedCategory}`}
+                            onClick={() => changeCreatingComponent("UnderlineAnnotation")}
+                        >
+                            <UnderlineIcon/>
+                        </div>
+                        <div
+                            className={`demo-tool demo-add-post-it ${creatingComponent === "Squiggly" ? "demo-add-tool-active-" + selectedCategory : ""} ${'demo-tool-' + selectedCategory}`}
+                            onClick={() => changeCreatingComponent("Squiggly")}
+                        >
+                            <SquigglyIcon/>
+                        </div>
+                        <div
+                            className={`demo-tool demo-add-post-it ${creatingComponent === "ParagraphSideBar" ? "demo-add-tool-active-" + selectedCategory : ""} ${'demo-tool-' + selectedCategory}`}
+                            onClick={() => changeCreatingComponent("ParagraphSideBar")}
+                        >
+                            <ParagraphSidebarIcon/>
                         </div>
                     </div>
-                </nav>
+                    <div className={`demo-styles ${'demo-styles-' + selectedCategory}`}>
+                        <div
+                            className={`demo-tool demo-add-post-it ${creatingComponent === "PostIt" ? "demo-add-tool-active-" + selectedCategory : ""} ${'demo-tool-' + selectedCategory}`}
+                            onClick={() => changeCreatingComponent("PostIt")}
+                        >
+                            <PostItIcon/>
+                        </div>
+                        <div
+                            className={`demo-tool demo-add-post-it ${creatingComponent === "TinyText" ? "demo-add-tool-active-" + selectedCategory : ""} ${'demo-tool-' + selectedCategory}`}
+                            id="add-post-it-yellow"
+                            onClick={() => changeCreatingComponent("TinyText")}
+                        >
+                            <TinyTextIcon/>
+                        </div>
+                    </div>
+                </div>
+            </nav>
             <div id={"noteboard"}>
                 <div id={"annotation-absolute"}>
                     <div id={"annotation-container"}>
@@ -691,7 +693,12 @@ function Noteboard({pdfID}) {
                 <button className="sidebar-arrow" onClick={toggleSidebar}></button>
                 <div className="sidebar-content">
                     {Object.keys(annotations).map(key => {
-                        return <SidebarAnnotation annotation={annotations[key]} comment={comments[key]} loadComments={loadCommentsByAnno} deleteAnnotation={deleteAnnotation} updateAnnoCategory={updateAnnoCategory} deleteComment={deleteComment} createComment={createComment} editAnnotation={editAnnotation} editComment={editComment} onChange={onAnnotationChange} onSelection={onSidebarSelection}/>
+                        return <SidebarAnnotation annotation={annotations[key]} comment={comments[key]}
+                                                  loadComments={loadCommentsByAnno} deleteAnnotation={deleteAnnotation}
+                                                  updateAnnoCategory={updateAnnoCategory} deleteComment={deleteComment}
+                                                  createComment={createComment} editAnnotation={editAnnotation}
+                                                  editComment={editComment} onChange={onAnnotationChange}
+                                                  onSelection={onSidebarSelection}/>
                     })}
                 </div>
             </section>

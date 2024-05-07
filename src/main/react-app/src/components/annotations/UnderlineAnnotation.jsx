@@ -21,7 +21,7 @@ export class UnderlineAnnotation extends Annotation {
                                 height: rect.height,
                                 width: rect.width,
                             }}
-                            className={"underline underline-" + this.state.currentCategory.toLowerCase()}
+                            className={"annotation underline underline-" + this.state.currentCategory.toLowerCase()}
                         ></div>
                     );
                 })}

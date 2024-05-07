@@ -21,7 +21,7 @@ export class HighlightAnnotation extends Annotation {
                                 height: rect.height,
                                 width: rect.width,
                             }}
-                            className={"highlight highlight-" + this.state.currentCategory.toLowerCase()}
+                            className={"annotation highlight highlight-" + this.state.currentCategory.toLowerCase()}
                         ></div>
                     );
                 })}

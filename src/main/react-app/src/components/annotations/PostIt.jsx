@@ -12,6 +12,9 @@ export default function PostIt(props) {
     const postitPositionRef = useRef({ dataX: Number(dataX) || 0, dataY: Number(dataY) || 0 });
     const [postitSize, setPostitSize] = useState({ width: Number(width) || 200, height: Number(height) || 200 });
     const postitSizeRef = useRef({ width: Number(width) || 200, height: Number(height) || 200 });
+    const [postitCategory, setPostitCategory] = useState(props.annotation.category);
+    const postitCategoryRef = useRef(props.annotation.category);
+    const resizeCounter = useRef(0);
 
     useEffect(() => {
         interact(postitRef.current)
@@ -28,24 +31,33 @@ export default function PostIt(props) {
                 edges: { left: false, right: true, bottom: true, top: false },
                 listeners: {
                     move(event) {
-                        const { width, height } = event.rect;
-
-                        event.target.style.width = `${width}px`;
-                        event.target.style.height = `${height}px`;
-
-                        const target = event.target;
-
-                        const x = postitPositionRef.current.dataX
-                        const y = postitPositionRef.current.dataY
-
-                        target.style.transform = `translate(${x}px, ${y}px)`;
-
-                        target.setAttribute('data-x', x);
-                        target.setAttribute('data-y', y);
-
-                        setPostitSize({ width, height });
-
-                        updatePostItDetails(id, x, y, postitTextRef.current, category, width, height);
+                        const count = ++resizeCounter.current;
+                        const {x, y, width, height} = resize(event)
+                        const timeout = 150;
+                        props.onChange({
+                            idAnnotation: id,
+                            annotationText: postitTextRef.current,
+                            annotationDetail: JSON.stringify({
+                                ...props.annotation,
+                                dataX: x,
+                                dataY: y,
+                                width,
+                                height,
+                                category: postitCategoryRef.current
+                            })
+                        });
+                        const saveResize = () => {
+                            if (count !== resizeCounter.current) {
+                                setTimeout(saveResize, timeout)
+                                return;
+                            }
+                            const xSave = postitPositionRef.current.dataX;
+                            const ySave = postitPositionRef.current.dataY;
+                            const widthSave = postitSizeRef.current.width;
+                            const heightSave = postitSizeRef.current.height;
+                            updatePostItDetails(id, xSave, ySave, postitTextRef.current, postitCategoryRef.current, widthSave, heightSave).finally();
+                        }
+                        setTimeout(saveResize, timeout)
                     }
                 },
                 modifiers: [
@@ -62,9 +74,14 @@ export default function PostIt(props) {
 
     useEffect(() => {
         setPostitText(text);
-        setPostitSize({ width, height });
+        setPostitSize({ width: props.annotation.width, height: props.annotation.height });
         setPostitPosition({ dataX: props.annotation.dataX, dataY: props.annotation.dataY })
-    }, [props]);
+        setPostitCategory(props.annotation.category)
+    }, [props.annotation]);
+
+    useEffect(() => {
+        postitCategoryRef.current = postitCategory;
+    }, [postitCategory]);
 
     useEffect(() => {
         postitTextRef.current = postitText;
@@ -78,6 +95,26 @@ export default function PostIt(props) {
         postitPositionRef.current = postitPosition;
     }, [postitPosition]);
 
+    function resize(event) {
+        const { width, height } = event.rect;
+
+        event.target.style.width = `${width}px`;
+        event.target.style.height = `${height}px`;
+
+        const target = event.target;
+
+        const x = postitPositionRef.current.dataX
+        const y = postitPositionRef.current.dataY
+
+        target.style.transform = `translate(${x}px, ${y}px)`;
+
+        target.setAttribute('data-x', x);
+        target.setAttribute('data-y', y);
+
+        setPostitSize({ width, height });
+        return {x, y, width, height};
+    }
+
     async function dragMoveListener(event) {
         const target = event.target;
 
@@ -90,12 +127,15 @@ export default function PostIt(props) {
                 annotationDetail: JSON.stringify({
                     ...props.annotation,
                     dataX: newX,
-                    dataY: newY
+                    dataY: newY,
+                    width: postitSizeRef.current.width,
+                    height: postitSizeRef.current.height,
+                    category: postitCategoryRef.current
                 })
             });
             target.style.transform = `translate(${newX}px, ${newY}px)`;
             if (event.button === 0) {
-                updatePostItDetails(id, newX, newY, postitTextRef.current, category, postitSizeRef.current.width, postitSizeRef.current.height);
+                updatePostItDetails(id, newX, newY, postitTextRef.current, postitCategoryRef.current, postitSizeRef.current.width, postitSizeRef.current.height);
             }
             return {dataX: newX, dataY: newY};
         });
@@ -106,7 +146,7 @@ export default function PostIt(props) {
         await annotationAPI.updateAnnotation(id, {
             annotationText: text,
             annotationDetail: JSON.stringify({
-                category: category,
+                category: postitCategoryRef.current,
                 dataX: x,
                 dataY: y,
                 width: w,
@@ -142,11 +182,11 @@ export default function PostIt(props) {
         textArea.readOnly = true;
         textArea.style.userSelect = 'none';
         textArea.classList.remove("post-it-input-selected");
-        await updatePostItDetails(id, postitPosition.dataX, postitPosition.dataY, postitTextRef.current, category, postitSizeRef.current.width, postitSizeRef.current.height);
+        await updatePostItDetails(id, postitPosition.dataX, postitPosition.dataY, postitTextRef.current, postitCategoryRef.current, postitSizeRef.current.width, postitSizeRef.current.height);
     }
 
     return (
-        <div id={id} className={`annotation-root post-it post-it-${category.toLowerCase()}`} ref={postitRef} style={{
+        <div id={id} className={`annotation-root post-it post-it-${postitCategory.toLowerCase()}`} ref={postitRef} style={{
             transform: `translate(${postitPosition.dataX}px, ${postitPosition.dataY}px)`,
             width: `${postitSize.width}px`,
             height: `${postitSize.height}px`
