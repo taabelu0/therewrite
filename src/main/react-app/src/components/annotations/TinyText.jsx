@@ -198,13 +198,13 @@ export default function TinyText(props) {
     }
 
     return (
-        <div id={id} className={`annotation-root annotation tiny-text tiny-text-${tinyTextCategory.toLowerCase()}`}
+        <div id={id} className={`annotation-root tiny-text tiny-text-${tinyTextCategory.toLowerCase()}`}
              ref={tinyTextRef} style={{
             transform: `translate(${dataX}px, ${dataY}px)`,
             width: `${tinyTextSize.width}px`,
             height: `${tinyTextSize.height}px`
         }}>
-            <div className="tiny-text-input-wrapper annotation">
+            <div className="tiny-text-input-wrapper">
                 <textarea
                     type={"text"}
                     className="tiny-text-input"

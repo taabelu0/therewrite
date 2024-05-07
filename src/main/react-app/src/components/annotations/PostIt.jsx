@@ -191,7 +191,7 @@ export default function PostIt(props) {
             width: `${postitSize.width}px`,
             height: `${postitSize.height}px`
         }}>
-            <div className="post-it-inner annotation">
+            <div className="post-it-inner">
                 <div className="post-it-card" />
                 <textarea
                     className="post-it-input"
