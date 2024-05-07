@@ -1,11 +1,17 @@
+@import "variables";
+
 .annotation {
   position: absolute;
   pointer-events: none;
 }
 
+.annotation-root {
+
+}
+
 .selected-annotation, .selected-annotation > div {
   z-index: 101;
-  box-shadow: 0px 0px 2px black;
+  box-shadow: 0px 0px 3px black;
 }
 
 .paragraph-sidebar {
@@ -13,31 +19,31 @@
   background-color: #0a84ff;
   height: 50px;
   width: 10px;
-  z-index: 100;
+  z-index: 20;
   &-definition {
-    background-color: #4DB4D5;
+    background-color: $c-category-definition;
   }
   &-explosion {
-    background-color: #FFA500;
+    background-color: $c-category-explosion;
   }
   &-deletion {
-    background-color: #FF4500;
+    background-color: $c-category-deletion;
   }
   &-correction {
-    background-color: #A846A8;
+    background-color: $c-category-correction;
   }
   &-speculation {
-    background-color: #AF8A4D;
+    background-color: $c-category-speculation;
   }
   &-addition {
-    background-color: #3CB371;
+    background-color: $c-category-addition;
   }
 }
 
 
 .paragraph-custom {
   position: absolute;
-  z-index: 100;
+  z-index: 20;
 }
 .squiggly-paragraph {
   background-repeat: repeat;
@@ -46,7 +52,7 @@
   width: 100%;
   height: 100%;
   opacity: 0.8;
-
+  pointer-events: none;
 }
 
 .content-clipper {
@@ -59,44 +65,44 @@
   position: absolute;
   border-bottom: 1px solid red;
   &-definition {
-    border-color: #4DB4D5;
+    border-color: $c-category-definition;
   }
   &-explosion {
-    border-color: #FFA500;
+    border-color: $c-category-explosion;
   }
   &-deletion {
-    border-color: #FF4500;
+    border-color: $c-category-deletion;
   }
   &-correction {
-    border-color: #A846A8;
+    border-color: $c-category-correction;
   }
   &-speculation {
-    border-color: #AF8A4D;
+    border-color: $c-category-speculation;
   }
   &-addition {
-    border-color: #3CB371;
+    border-color: $c-category-addition;
   }
 }
 
 .highlight {
   position: absolute;
-  opacity: 0.5;
+  opacity: 0.2;
   &-definition {
-    background-color: #4DB4D5;
+    background-color: $c-category-definition;
   }
   &-explosion {
-    background-color: #FFA500;
+    background-color: $c-category-explosion;
   }
   &-deletion {
-    background-color: #FF4500;
+    background-color: $c-category-deletion;
   }
   &-correction {
-    background-color: #A846A8;
+    background-color: $c-category-correction;
   }
   &-speculation {
-    background-color: #AF8A4D;
+    background-color: $c-category-speculation;
   }
   &-addition {
-    background-color: #3CB371;
+    background-color: $c-category-addition;
   }
 }

@@ -18,7 +18,7 @@ export class ParagraphCustom extends Annotation {
             left: this.state.currentLeft,
             height: this.state.currentHeight,
             width: this.state.currentWidth
-        }} className={"annotation-root paragraph-custom annotation"}>
+        }} className={"annotation-root annotation paragraph-custom annotation"}>
             <div className="squiggly-paragraph" style={{
                 backgroundSize: `${40 * (this.state.currentHeight / 100)}px ${this.state.currentHeight}px`,
                 backgroundImage: `url(${this.state.currentSVG})`
