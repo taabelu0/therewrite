@@ -5,13 +5,15 @@ import {userAPI} from "../apis/userAPI";
 
 function Login() {
 
-    const [email, setEmail] = useState("");
+    const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
 
     const trySend = async () => {
-        const response = await userAPI.login(email, password);
+        const response = await userAPI.login(username, password);
+        console.log(response)
         if(response.status === 200) {
-            window.location.href = "/home";
+            // window.location.href = "/home";
+            console.log(response.data)
         }
         else {
             // TODO: throw error
@@ -23,8 +25,8 @@ function Login() {
             <form className="login-form">
                 <h1>Welcome!</h1>
                 <div className="input-group">
-                    <label htmlFor="email">Email</label>
-                    <input type="email" id="email" onChange={e => setEmail(e.target.value)} required />
+                    <label htmlFor="username">Username</label>
+                    <input type="username" id="username" onChange={e => setUsername(e.target.value)} required />
                 </div>
                 <div className="input-group">
                     <label htmlFor="password">Password</label>

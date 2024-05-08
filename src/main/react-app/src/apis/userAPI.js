@@ -21,12 +21,17 @@ export const userAPI = {
         });
     },
 
-    login: async function (email, password) {
-        const user = {
-            email: email,
-            password: password
-        };
-        return api.post(`/api/user/login`, user)
+    login: async function (username, password) {
+        // const user = {
+        //     email: email,
+        //     password: password
+        // };
+        const fd = new FormData()
+        fd.append('username', username);
+        fd.append('password', password)
+        return api.post(`/api/user/login`, fd, {
+            headers: { "Content-Type": "multipart/form-data" }
+        })
             .then(response => { return response })
             .catch((error) => {
                 console.error('Error:', error);
