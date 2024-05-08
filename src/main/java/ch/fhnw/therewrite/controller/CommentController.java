@@ -1,16 +1,21 @@
 package ch.fhnw.therewrite.controller;
 
+import ch.fhnw.therewrite.AccessHelper;
 import ch.fhnw.therewrite.data.Annotation;
 import ch.fhnw.therewrite.data.Comment;
 import ch.fhnw.therewrite.data.Document;
 import ch.fhnw.therewrite.data.User;
 import ch.fhnw.therewrite.repository.AnnotationRepository;
 import ch.fhnw.therewrite.repository.CommentRepository;
+import ch.fhnw.therewrite.repository.DocumentRepository;
 import ch.fhnw.therewrite.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -27,22 +32,39 @@ public class CommentController {
     @Autowired
     private AnnotationRepository annotationRepository;
 
+    @Autowired
+    private UserRepository userRepository;
 
+    @Autowired
+    private DocumentRepository documentRepository;
+
+
+    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_GUEST')")
     @PostMapping
-    public ResponseEntity<Comment> createComment(@RequestBody Comment comment) {
-        //Optional<User> user = userRepository.findById(comment.getUserId().getId());
+    public ResponseEntity<Comment> createComment(@RequestBody Comment comment, @AuthenticationPrincipal UserDetails currentUser) {
+        Document document = comment.getAnnotationId().getDocument();
+        if(currentUser == null || AccessHelper.verifyUserRights(currentUser.getUsername(), document.getId().toString(), documentRepository)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
+        User user = userRepository.findByUsername(currentUser.getUsername());
         //if (user.isPresent()) {
-            //comment.setUserId(user.get());
-            Comment savedComment = commentRepository.save(comment);
-            return ResponseEntity.ok(savedComment);
+        comment.setUserId(user);
+        Comment savedComment = commentRepository.save(comment);
+        return ResponseEntity.ok(savedComment);
         //} else {
         //    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         //}
     }
 
+    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_GUEST')")
     @Modifying
     @PatchMapping("")
-    public ResponseEntity<Comment> patchComment(@RequestBody Comment update) {
+    public ResponseEntity<Comment> patchComment(@RequestBody Comment update, @AuthenticationPrincipal UserDetails currentUser) {
+        if(currentUser != null) return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        User user = userRepository.findByUsername(currentUser.getUsername());
+        if(update.getUserId().getIdUser().equals(user.getIdUser())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
         Optional<Comment> optionalComment = commentRepository.findById(update.getIdComment());
         if(optionalComment.isPresent()) {
             Comment comm = optionalComment.get();
@@ -53,8 +75,15 @@ public class CommentController {
         return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(null);
     }
 
+    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_GUEST')")
     @DeleteMapping("/{commId}")
-    public ResponseEntity<Comment> deleteComment(@PathVariable String commId) {
+    public ResponseEntity<Comment> deleteComment(@PathVariable String commId, @AuthenticationPrincipal UserDetails currentUser) {
+        Comment comment = commentRepository.getReferenceById(UUID.fromString(commId));
+        if(currentUser != null) return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        User user = userRepository.findByUsername(currentUser.getUsername());
+        if(comment.getUserId().getIdUser().equals(user.getIdUser())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
         UUID aId = UUID.fromString(commId);
         Optional<Comment> a = commentRepository.findById(aId);
         if(a.isPresent()) {
@@ -66,10 +95,13 @@ public class CommentController {
     }
 
     @GetMapping("/all/{annotationId}")
-    public ResponseEntity<List<Comment>> getAnnotationsByDocumentId(@PathVariable String annotationId) {
+    public ResponseEntity<List<Comment>> getCommentsByAnnotationId(@PathVariable String annotationId, @AuthenticationPrincipal UserDetails currentUser) {
         UUID aId = UUID.fromString(annotationId);
         Optional<Annotation> a = annotationRepository.findById(aId);
         if(a.isPresent()) {
+            if(currentUser == null || AccessHelper.verifyUserRights(currentUser.getUsername(), a.get().getDocument().getId().toString(), documentRepository)) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+            }
             List<Comment> c = commentRepository.findAllByAnnotationId(a.get());
             return ResponseEntity.status(HttpStatus.OK).body(c);
         }

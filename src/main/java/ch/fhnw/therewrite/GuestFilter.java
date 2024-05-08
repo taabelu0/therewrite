@@ -18,6 +18,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.stereotype.Component;
@@ -92,16 +93,24 @@ public class GuestFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        System.out.println(request.getRequestURI());
+        HttpSession session = request.getSession(false);
+        SecurityContextImpl sci = (SecurityContextImpl) session.getAttribute("SPRING_SECURITY_CONTEXT");
+        if(sci != null && sci.getAuthentication().isAuthenticated()) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+        System.out.println("gotcha: " + request.getRequestURI());
         response.setStatus(HttpServletResponse.SC_FORBIDDEN); // default
-        String uri = request.getRequestURI();
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String docId = uri.substring(uri.lastIndexOf('/') + 1); // TODO: get id by other means
+        String uri = request.getRequestURI();
+        String docId = uri.substring(uri.lastIndexOf('/') + 1);
         boolean isDocUUID = false;
         try{
             UUID uuid = UUID.fromString(docId);
-            isDocUUID = uuid.toString().equals(docId) && new AntPathRequestMatcher("/view/*").matches(request);
+            isDocUUID = uuid.toString().equals(docId);
         } catch (IllegalArgumentException ignored){}
-        if(!isDocUUID) { // TODO: change to check for resources dynamically (additional filter)
+        if(!isDocUUID) {
             if (!(authentication instanceof AnonymousAuthenticationToken) && authentication != null && authentication.getPrincipal().equals("guest")) {
                 Object guestId = request.getSession().getAttribute("guestId");
                 if(guestId instanceof UUID && verifyGuest(guestId.toString())) {
@@ -111,7 +120,7 @@ public class GuestFilter extends OncePerRequestFilter {
                 }
             }
         }
-         // assumes we are accessing a pdf resource which uses the pdf-id in its URI!!
+         // assumes we are accessing a pdf resource which uses the pdf-id in its URI
         if (!(authentication instanceof AnonymousAuthenticationToken) && authentication != null && authentication.getPrincipal().equals("guest")) {
             Object guestId = request.getSession().getAttribute("guestId");
             if(guestId instanceof UUID && verifyGuest(guestId.toString(), docId)) {
@@ -124,7 +133,10 @@ public class GuestFilter extends OncePerRequestFilter {
             }
         }
         String token = request.getParameter("documentAccessToken");
+        System.out.println(token);
         if(token != null) {
+            System.out.println(docId);
+            System.out.println(request.getSession());
             if(verifyToken(token, docId, request.getSession())) {
                 response.setStatus(HttpServletResponse.SC_ACCEPTED);
                 List<SimpleGrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_GUEST"));

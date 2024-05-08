@@ -3,13 +3,10 @@ package ch.fhnw.therewrite;
 import ch.fhnw.therewrite.repository.DocumentAccessTokenRepository;
 import ch.fhnw.therewrite.repository.DocumentRepository;
 import ch.fhnw.therewrite.repository.GuestRepository;
-import jakarta.servlet.*;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import org.apache.catalina.filters.CorsFilter;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
+import org.springframework.core.Ordered;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -20,10 +17,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.DefaultSecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.filter.OncePerRequestFilter;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 @Configuration
@@ -42,7 +36,8 @@ public class SecurityConfiguration {
             "/api/document/",
             "/api/documentAccessToken/create",
             "/",
-            "login",
+            "/login",
+            "/registration",
             "/home",
             "/static/**"
     );
@@ -63,21 +58,20 @@ public class SecurityConfiguration {
                     }
                     auth.anyRequest().authenticated();
                 })
-                .authenticationManager(authenticationManager())
+                .addFilterBefore(
+                        new GuestFilter(guestRepository, documentRepository, documentAccessTokenRepository),
+                        UsernamePasswordAuthenticationFilter.class
+                )
                 .formLogin(form -> form
                         .loginPage("/login")
                         .loginProcessingUrl("/api/user/login")
-                        .defaultSuccessUrl("/")
+                        .successHandler(appAuthenticationSuccessHandler())
                         .permitAll()
                 )
+                .authenticationManager(authenticationManager())
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement((session) -> session
                         .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
-                )
-                // authorization without login (guest):
-                .addFilterAfter(
-                        new GuestFilter(guestRepository, documentRepository, documentAccessTokenRepository),
-                        UsernamePasswordAuthenticationFilter.class
                 )
                 .addFilterBefore(
                         appConfig.corsConfigurationSource(),
@@ -91,8 +85,13 @@ public class SecurityConfiguration {
 
     @Bean
     public AuthenticationManager authenticationManager() {
-        DaoAuthenticationProvider authProvider = new DaoAuthProv(passwordEncoder());
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(passwordEncoder());
         authProvider.setUserDetailsService(this.cuds);
         return new ProviderManager(authProvider);
+    }
+
+    @Bean
+    public AuthenticationSuccessHandler appAuthenticationSuccessHandler(){
+        return new AuthenticationSuccessHandler();
     }
 }

@@ -1,5 +1,6 @@
 package ch.fhnw.therewrite.controller;
 
+import ch.fhnw.therewrite.AccessHelper;
 import ch.fhnw.therewrite.data.Annotation;
 import ch.fhnw.therewrite.data.Document;
 import ch.fhnw.therewrite.data.Guest;
@@ -16,6 +17,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -40,11 +44,15 @@ public class DocumentController {
         this.storageService = storageService;
     }
 
+    @PreAuthorize("hasRole('ROLE_USER')")
     @GetMapping(
             value = "/{documentId}",
             produces = MediaType.APPLICATION_PDF_VALUE
     )
-    public ResponseEntity<byte[]> getDocument(@PathVariable String documentId) {
+    public ResponseEntity<byte[]> getDocument(@PathVariable String documentId, @AuthenticationPrincipal UserDetails currentUser) {
+        if(currentUser == null || AccessHelper.verifyUserRights(currentUser.getUsername(), documentId, documentRepository)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
         UUID dId = UUID.fromString(documentId);
         Optional<Document> optionalDocument = documentRepository.findById(dId);
         if(optionalDocument.isPresent()) {
@@ -79,6 +87,7 @@ public class DocumentController {
         return null;
     }
 
+    @PreAuthorize("hasRole('ROLE_USER')") // TODO: change to role admin
     @PostMapping("")
     public ResponseEntity<Document> saveDocument(@RequestParam("file") MultipartFile file, RedirectAttributes redirectAttributes) {
         String extension = FilenameUtils.getExtension(file.getOriginalFilename());
@@ -109,8 +118,13 @@ public class DocumentController {
         }
     }
 
+
+    @PreAuthorize("hasRole('ROLE_USER')")
     @DeleteMapping("/{documentId}")
-    public void deleteDocument(@PathVariable(value="documentId") String documentId) {
+    public void deleteDocument(@PathVariable(value="documentId") String documentId, @AuthenticationPrincipal UserDetails currentUser) {
+        if(currentUser == null) {
+            return;
+        }
         UUID dId = UUID.fromString(documentId);
         documentRepository.deleteById(dId);
     }

@@ -5,7 +5,6 @@ import ch.fhnw.therewrite.repository.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -23,10 +22,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         if (user == null) {
             throw new UsernameNotFoundException("User not found");
         }
-        System.out.println(user.getEmail());
-        System.out.println(user.getPassword());
         return org.springframework.security.core.userdetails.User.builder()
-                .passwordEncoder(new BCryptPasswordEncoder()::encode)
                 .username(user.getUsername())
                 .password(user.getPassword())
                 .roles("USER")

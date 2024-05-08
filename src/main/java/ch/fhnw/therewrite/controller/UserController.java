@@ -9,6 +9,7 @@ import ch.fhnw.therewrite.repository.GuestRepository;
 import ch.fhnw.therewrite.repository.UserRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -46,8 +47,9 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
+    @PreAuthorize("hasRole('ROLE_USER')")
     @GetMapping("/{userId}")
-    public ResponseEntity<User> getAnnotationsByDocumentId(@PathVariable String userId) {
+    public ResponseEntity<User> getUser(@PathVariable String userId) {
         UUID uId = UUID.fromString(userId);
         Optional<User> u = userRepository.findById(uId);
         if(u.isPresent()) {
