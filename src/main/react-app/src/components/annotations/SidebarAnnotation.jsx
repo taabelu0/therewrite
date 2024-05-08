@@ -206,7 +206,7 @@ function SidebarAnnotation({
                             </div>
                         </div>
                     )}
-                    <div className="sidebar-annotation-cat">{annotation.category.toUpperCase()}</div>
+                    <div className="sidebar-annotation-cat">{annotation.category.toLowerCase()}</div>
                     <div className="sidebar-annotation-header-info">
                         <div className="sidebar-annotation-header-info-user">ExampleUser</div>
                     </div>
