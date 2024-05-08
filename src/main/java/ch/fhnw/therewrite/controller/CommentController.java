@@ -42,8 +42,8 @@ public class CommentController {
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_GUEST')")
     @PostMapping
     public ResponseEntity<Comment> createComment(@RequestBody Comment comment, @AuthenticationPrincipal UserDetails currentUser) {
-        Document document = comment.getAnnotationId().getDocument();
-        if(currentUser == null || AccessHelper.verifyUserRights(currentUser.getUsername(), document.getId().toString(), documentRepository)) {
+        Annotation annotation = annotationRepository.getReferenceById(comment.getAnnotationId().getIdAnnotation());
+        if(currentUser == null || !AccessHelper.verifyUserRights(currentUser.getUsername(), annotation.getDocument().getId().toString(), documentRepository)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
         }
         User user = userRepository.findByUsername(currentUser.getUsername());
@@ -99,7 +99,7 @@ public class CommentController {
         UUID aId = UUID.fromString(annotationId);
         Optional<Annotation> a = annotationRepository.findById(aId);
         if(a.isPresent()) {
-            if(currentUser == null || AccessHelper.verifyUserRights(currentUser.getUsername(), a.get().getDocument().getId().toString(), documentRepository)) {
+            if(currentUser == null || !AccessHelper.verifyUserRights(currentUser.getUsername(), a.get().getDocument().getId().toString(), documentRepository)) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
             }
             List<Comment> c = commentRepository.findAllByAnnotationId(a.get());

@@ -37,20 +37,22 @@ import java.util.UUID;
 public class DocumentController {
     private final DocumentRepository documentRepository;
     private final StorageService storageService;
+    private final UserRepository userRepository;
 
     @Autowired
-    public DocumentController(DocumentRepository documentRepository, StorageService storageService) {
+    public DocumentController(DocumentRepository documentRepository, StorageService storageService, UserRepository userRepository) {
         this.documentRepository = documentRepository;
         this.storageService = storageService;
+        this.userRepository = userRepository;
     }
 
-    @PreAuthorize("hasRole('ROLE_USER')")
+    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_GUEST')")
     @GetMapping(
             value = "/{documentId}",
             produces = MediaType.APPLICATION_PDF_VALUE
     )
     public ResponseEntity<byte[]> getDocument(@PathVariable String documentId, @AuthenticationPrincipal UserDetails currentUser) {
-        if(currentUser == null || AccessHelper.verifyUserRights(currentUser.getUsername(), documentId, documentRepository)) {
+        if(currentUser == null || !AccessHelper.verifyUserRights(currentUser.getUsername(), documentId, documentRepository)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
         }
         UUID dId = UUID.fromString(documentId);
@@ -69,11 +71,13 @@ public class DocumentController {
         return new ResponseEntity(HttpStatus.EXPECTATION_FAILED);
     }
 
+
     @GetMapping("/all")
     public List<Document> getDocumentList() {
         return documentRepository.findAll();
     }
 
+    @PreAuthorize("hasRole('ROLE_USER')")
     @GetMapping("/all/{userId}")
     public ResponseEntity<List<Document>> getDocumentListByUser(@PathVariable String userId) {
         /*System.out.println(userId);
@@ -89,7 +93,7 @@ public class DocumentController {
 
     @PreAuthorize("hasRole('ROLE_USER')") // TODO: change to role admin
     @PostMapping("")
-    public ResponseEntity<Document> saveDocument(@RequestParam("file") MultipartFile file, RedirectAttributes redirectAttributes) {
+    public ResponseEntity<Document> saveDocument(@RequestParam("file") MultipartFile file, @AuthenticationPrincipal UserDetails currentUser) {
         String extension = FilenameUtils.getExtension(file.getOriginalFilename());
         if(!Objects.equals(extension, "pdf")){
             return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE).body(null);
@@ -102,6 +106,10 @@ public class DocumentController {
             String fileName = document.getId().toString() + ".pdf";
             String filePath = Paths.get(fileName).toString();
             document.setPath(filePath);
+            List<User> users = document.getUsers();
+            User user = userRepository.findByUsername(currentUser.getUsername());
+            users.add(user);
+            document.setUsers(users);
             documentRepository.save(document);
             try {
                 MultipartFile storeFile = new MockMultipartFile(fileName,

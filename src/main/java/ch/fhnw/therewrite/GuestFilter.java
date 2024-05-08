@@ -100,7 +100,6 @@ public class GuestFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
             return;
         }
-        System.out.println("gotcha: " + request.getRequestURI());
         response.setStatus(HttpServletResponse.SC_FORBIDDEN); // default
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String uri = request.getRequestURI();
@@ -133,10 +132,7 @@ public class GuestFilter extends OncePerRequestFilter {
             }
         }
         String token = request.getParameter("documentAccessToken");
-        System.out.println(token);
         if(token != null) {
-            System.out.println(docId);
-            System.out.println(request.getSession());
             if(verifyToken(token, docId, request.getSession())) {
                 response.setStatus(HttpServletResponse.SC_ACCEPTED);
                 List<SimpleGrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_GUEST"));

@@ -1,5 +1,6 @@
 package ch.fhnw.therewrite.controller;
 
+import ch.fhnw.therewrite.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -36,13 +37,15 @@ public class DocumentControllerTest {
 
     @MockBean
     private AnnotationRepository annotationRepository;
+    @MockBean
+    private UserRepository userRepository;
 
     @Mock
     private StorageService storageService;
 
     @BeforeEach
     public void setup() {
-        documentController = new DocumentController(documentRepository, storageService);
+        documentController = new DocumentController(documentRepository, storageService, userRepository);
     }
 
     @Test

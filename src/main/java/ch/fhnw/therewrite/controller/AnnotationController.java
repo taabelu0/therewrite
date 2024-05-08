@@ -3,8 +3,10 @@ package ch.fhnw.therewrite.controller;
 import ch.fhnw.therewrite.AccessHelper;
 import ch.fhnw.therewrite.data.Annotation;
 import ch.fhnw.therewrite.data.Document;
+import ch.fhnw.therewrite.data.User;
 import ch.fhnw.therewrite.repository.AnnotationRepository;
 import ch.fhnw.therewrite.repository.DocumentRepository;
+import ch.fhnw.therewrite.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.http.HttpStatus;
@@ -25,16 +27,18 @@ import java.util.UUID;
 public class AnnotationController {
     private final AnnotationRepository annotationRepository;
     private final DocumentRepository documentRepository;
+    private final UserRepository userRepository;
 
     @Autowired
-    public AnnotationController(AnnotationRepository annotationRepository, DocumentRepository documentRepository) {
+    public AnnotationController(AnnotationRepository annotationRepository, DocumentRepository documentRepository, UserRepository userRepository) {
         this.annotationRepository = annotationRepository;
         this.documentRepository = documentRepository;
+        this.userRepository = userRepository;
     }
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_GUEST')")
     @GetMapping("/all/{documentId}")
     public ResponseEntity<List<Annotation>> getAnnotationsByDocumentId(@PathVariable String documentId, @AuthenticationPrincipal UserDetails currentUser) {
-        if(currentUser == null || AccessHelper.verifyUserRights(currentUser.getUsername(), documentId, documentRepository)) {
+        if(currentUser == null || !AccessHelper.verifyUserRights(currentUser.getUsername(), documentId, documentRepository)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
         }
         UUID dId = UUID.fromString(documentId);
@@ -48,14 +52,12 @@ public class AnnotationController {
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_GUEST')")
     @PostMapping("")
     public Annotation saveAnnotation(@RequestBody Annotation annotation, @AuthenticationPrincipal UserDetails currentUser) {
-        Optional<Annotation> optionalAnno = annotationRepository.findById(annotation.getIdAnnotation());
-        if(optionalAnno.isPresent()) {
-            if (currentUser == null || AccessHelper.verifyUserRights(currentUser.getUsername(), optionalAnno.get().getDocument().getId().toString(), documentRepository)) {
-                return null;
-            }
-            return annotationRepository.save(annotation);
+        if (currentUser == null || !AccessHelper.verifyUserRights(currentUser.getUsername(), annotation.getDocument().getId().toString(), documentRepository)) {
+            return null;
         }
-        return null;
+        User user = userRepository.findByUsername(currentUser.getUsername());
+        annotation.setUserCreator(user);
+        return annotationRepository.save(annotation);
     }
 
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_GUEST')")
@@ -64,7 +66,7 @@ public class AnnotationController {
     public ResponseEntity<Annotation> patchAnnotation(@RequestBody Annotation update, @AuthenticationPrincipal UserDetails currentUser) {
         Optional<Annotation> optionalAnno = annotationRepository.findById(update.getIdAnnotation());
         if(optionalAnno.isPresent()) {
-            if(currentUser == null || AccessHelper.verifyUserRights(currentUser.getUsername(), optionalAnno.get().getDocument().getId().toString(), documentRepository)) {
+            if(currentUser == null || !AccessHelper.verifyUserRights(currentUser.getUsername(), optionalAnno.get().getDocument().getId().toString(), documentRepository)) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
             }
             Annotation anno = optionalAnno.get();
@@ -81,7 +83,7 @@ public class AnnotationController {
         UUID aId = UUID.fromString(annoId);
         Optional<Annotation> a = annotationRepository.findById(aId);
         if(a.isPresent()) {
-            if(currentUser == null || AccessHelper.verifyUserRights(currentUser.getUsername(), a.get().getDocument().getId().toString(), documentRepository)) {
+            if(currentUser == null || !AccessHelper.verifyUserRights(currentUser.getUsername(), a.get().getDocument().getId().toString(), documentRepository)) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
             }
             Annotation oldAnno = a.get();
