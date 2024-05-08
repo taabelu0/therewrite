@@ -599,6 +599,11 @@ function Noteboard({pdfID}) {
         });
     }
 
+    const navStyle = {
+        top: `${-scrollPosition}px`,
+        transition: 'top'
+    };
+
 
     return (
         <section
@@ -616,10 +621,10 @@ function Noteboard({pdfID}) {
                     onCancel={() => setShowCommentBox(false)}
                 />
             )}
-            <nav id="meta-header-nav">
-                <MetaHeader/>
+            <nav id="meta-header-nav" style={navStyle}>
+                <MetaHeader pdfName={pdfID}/>
             </nav>
-            <nav>
+            <nav id="toolbar-header-nav" style={navStyle}>
                 <Toolbar annoationCategories={annoationCategories}
                          selectedCategory={selectedCategory}
                          creatingComponent={creatingComponent}

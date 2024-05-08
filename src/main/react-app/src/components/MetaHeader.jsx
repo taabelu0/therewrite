@@ -16,10 +16,18 @@ function MetaHeader({ pdfName }) {
         };
     }, []);
 
+    const headerStyle = {
+        top: `${-scrollPosition}px`,
+        transition: 'top 0.3s'
+    };
+
     return (
         <div className="meta-header">
             <div className="meta-header-title">
-
+                <h1 className="title">{pdfName}</h1>
+                <h2 className="subtitle">Copyright information</h2>
+                <p className="labelTitle">Source:</p>
+                <a className="source" href="https://web0.fhnw.ch/ht/informatik/ip34/24vt/therewrite/index.html">https://web0.fhnw.ch/ht/informatik/ip34/24vt/therewrite/index.html</a>
             </div>
         </div>
     );

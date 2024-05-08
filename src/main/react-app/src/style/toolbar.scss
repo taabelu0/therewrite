@@ -14,14 +14,28 @@
   padding-top: 100px;
 }
 
-#topbar-nav {
+#toolbar-header-nav {
   display: flex;
   flex-direction: column;
   position: fixed;
-  padding-top: 10px;
   left: 0;
   width: 100%;
-  z-index: 9999;
+  z-index: 9998;
+  align-items: center;
+  top: $s-nav-height;
+  box-shadow: 0 0 1rem $c-light-secondary;
+  background-color: $c-light-primary;
+  border-bottom: 1px solid #d3d3d3;
+}
+
+#topbar-nav {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  padding-top: $s-header-nav-height;
+  left: 0;
+  width: 100%;
+  z-index: 9998;
   align-items: center;
   top: $s-nav-height;
   box-shadow: 0 0 1rem $c-light-secondary;
@@ -29,6 +43,12 @@
   border-bottom: 1px solid #d3d3d3;
 
 }
+
+.toolbar-sticky {
+  position: fixed;
+  top: 0;
+}
+
 
 .toggleCategoriesBtn{
   font-size: 100%;
