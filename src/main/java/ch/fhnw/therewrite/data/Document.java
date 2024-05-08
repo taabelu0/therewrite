@@ -36,8 +36,9 @@ public class Document {
     @Column(name = "source", columnDefinition="TEXT")
     private String source;
 
-    @Column(name = "copy_right", columnDefinition="TEXT")
+    @Column(name = "copyRight", columnDefinition="TEXT")
     private String copyRight;
+
 
     @ManyToOne
     @JoinColumn(name = "userId")
@@ -99,5 +100,21 @@ public class Document {
     public void removeAnnotation(Annotation annotation) {
         this.annotations.remove(annotation);
         annotation.setDocument(null);
+    }
+
+    public void setSource(String source) {
+        this.source = source;
+    }
+
+    public String getSource() {
+        return source;
+    }
+
+    public void setCopyRight(String copyRight) {
+        this.copyRight = copyRight;
+    }
+
+    public String getCopyRight() {
+        return copyRight;
     }
 }
