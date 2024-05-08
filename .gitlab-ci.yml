@@ -67,7 +67,7 @@ coverage-jdk11:
   needs: ["test-jdk11"]
   artifacts:
     paths:
-      - coverage/cobertura-coverage.xml
+      - target/site/cobertura.xml
     reports:
       coverage_report:
         coverage_format: cobertura
