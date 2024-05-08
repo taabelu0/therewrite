@@ -1,5 +1,9 @@
 @import "variables";
+@import url('https://fonts.googleapis.com/css2?family=Source+Code+Pro&display=swap');
 
+* {
+  font-family: 'Source Code Pro', monospace;
+}
 
 #workspace-scroll {
   height: calc(100% - 14vh - 3em);
@@ -14,7 +18,7 @@
   display: flex;
   flex-direction: column;
   position: fixed;
-  padding-top: 60px;
+  padding-top: 10px;
   left: 0;
   width: 100%;
   z-index: 9999;
@@ -27,7 +31,7 @@
 }
 
 .toggleCategoriesBtn{
-  font-size: 80%;
+  font-size: 100%;
   border-width: 0;
   width: fit-content;
   font-weight: 500;
@@ -40,7 +44,7 @@
 }
 
 .category-text{
-  font-size: 0.8rem;
+  font-size: 1rem;
   color:rgba(0,0,0,0.45);
   margin: 0;
 }
