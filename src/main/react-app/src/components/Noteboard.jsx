@@ -53,27 +53,27 @@ function Noteboard({pdfID}) {
 
     const annoationCategories = [
         {
-            name:"Definition",
+            name:"DEFINITION",
             description:"Select this category to add definitions of terms you found in the documents."
         },
         {
-            name:"Explosion",
+            name:"EXPLOSION",
             description: "Select to add terms, notes and descriptions or external resources, e.g. links to material you feel needs to included in the document."
         },
         {
-            name: "Deletion",
+            name: "DELETION",
             description: "Select to signal that you would like to delete specific terms in the document altogether. Add some thoughts or links to sources that explain why you feel the term should be deleted."
         },
         {
-            name:"Correction",
+            name:"CORRECTION",
             description: "Select to propose changes to the term in question. Note that correction has an authoritative connotation: you're suggesting a definitive replacement!"
         },
         {
-            name: "Speculation",
+            name: "SPECULATION",
             description: "Select this category if you would like to avoid the authoritative connotation of correction. Speculation is future-oriented, open-ended, evocative and can involve uncertain trajectories."
         },
         {
-            name: "Addition",
+            name: "ADDITION",
             description: "For additions."
         }
     ]
@@ -598,7 +598,7 @@ function Noteboard({pdfID}) {
                     <div id="demo-category-selection">
                         {annoationCategories.map((cat, key) => (
                             <div
-                                className={`demo-category demo-category-${cat.name.toLowerCase()} ${selectedCategory === cat.name ? "category-active" : ""} ${toggleAnnotationCategories ? 'demo-categories-open' : ''}`}
+                                className={`demo-category demo-category-${cat.name.toUpperCase()} ${selectedCategory === cat.name ? "category-active" : ""} ${toggleAnnotationCategories ? 'demo-categories-open' : ''}`}
                                 key={key}
                                 onClick={() => setSelectedCategory(`${cat.name}`)}
                             >

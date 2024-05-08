@@ -1,7 +1,19 @@
 import React, {useEffect, useRef, useState} from 'react';
 import OptionsIcon from "./icons/OptionsIcon";
 
-function SidebarAnnotation({ annotation, comment, updateAnnoCategory, loadComments, deleteAnnotation, deleteComment, createComment, editAnnotation, editComment, onSelection, onChange }) {
+function SidebarAnnotation({
+                               annotation,
+                               comment,
+                               updateAnnoCategory,
+                               loadComments,
+                               deleteAnnotation,
+                               deleteComment,
+                               createComment,
+                               editAnnotation,
+                               editComment,
+                               onSelection,
+                               onChange
+                           }) {
 
     const [showInput, setShowInput] = useState(false);
     const [showOptions, setShowOptions] = useState(false);
@@ -36,7 +48,7 @@ function SidebarAnnotation({ annotation, comment, updateAnnoCategory, loadCommen
 
     useEffect(() => {
         console.log('comment prop:', comment)
-        if(comment) {
+        if (comment) {
             console.log('comment.id:', comment.idComment)
         }
         loadComments(annotation.id);
@@ -78,7 +90,7 @@ function SidebarAnnotation({ annotation, comment, updateAnnoCategory, loadCommen
     }
 
     const switchShowCategories = () => {
-        setShowOptions(!showOptions);
+        //setShowOptions(!showOptions);
         setShowCategories(!showCategories);
     }
 
@@ -91,7 +103,7 @@ function SidebarAnnotation({ annotation, comment, updateAnnoCategory, loadCommen
     }
 
     const setCurrentInput = (event) => {
-       setInput(event.target.value);
+        setInput(event.target.value);
     }
 
     const handleCreateComment = () => {
@@ -100,7 +112,7 @@ function SidebarAnnotation({ annotation, comment, updateAnnoCategory, loadCommen
                 setInput("");
                 switchShowInput();
                 loadComments(annotation.id);
-                if(!showComments) {
+                if (!showComments) {
                     switchShowComments();
                 }
             });
@@ -164,16 +176,42 @@ function SidebarAnnotation({ annotation, comment, updateAnnoCategory, loadCommen
         updateAnnoCategory(annotation.id, "Addition");
     }
 
-    if(annotation.timeCreated) {
+    if (annotation.timeCreated) {
         let date = new Date(annotation.timeCreated)
         return (
-            <div onClick={(event) => onSelection(event, annotation.id)} id={'sidebar-' + annotation.id} className={`sidebar-annotation sidebar-annotation-${annotation.category.toLowerCase()}`}>
+            <div onClick={(event) => onSelection(event, annotation.id)} id={'sidebar-' + annotation.id}
+                 className={`sidebar-annotation sidebar-annotation-${annotation.category.toLowerCase()}`}>
                 <div className="sidebar-annotation-header">
+                    <div className="sidebar-option-change" onClick={switchShowCategories}></div>
+                    {showCategories && (
+                        <div className="sidebar-annotation-optionmenu-cat"
+                             style={{display: `${showCategories ? "block" : "none"}`}}>
+                            <div className="sidebar-annotation-optionmenu-item item-definition"
+                                 onClick={setAnnoCatDefinition}>Definition
+                            </div>
+                            <div className="sidebar-annotation-optionmenu-item item-explosion"
+                                 onClick={setAnnoCatExplosion}>Explosion
+                            </div>
+                            <div className="sidebar-annotation-optionmenu-item item-deletion"
+                                 onClick={setAnnoCatDeletion}>Deletion
+                            </div>
+                            <div className="sidebar-annotation-optionmenu-item item-correction"
+                                 onClick={setAnnoCatCorrection}>Correction
+                            </div>
+                            <div className="sidebar-annotation-optionmenu-item item-speculation"
+                                 onClick={setAnnoCatSpeculation}>Speculation
+                            </div>
+                            <div className="sidebar-annotation-optionmenu-item item-addition"
+                                 onClick={setAnnoCatAddition}>Addition
+                            </div>
+                        </div>
+                    )}
+                    <div className="sidebar-annotation-cat">{annotation.category.toUpperCase()}</div>
                     <div className="sidebar-annotation-header-info">
                         <div className="sidebar-annotation-header-info-user">ExampleUser</div>
-                        <div className="sidebar-annotation-header-info-date">{date.toLocaleDateString("en-GB")}</div>
-
                     </div>
+                    <div className="sidebar-annotation-control-input"
+                         onClick={switchShowInput}>{showInput ? "Cancel" : "Add note"}</div>
                     <div
                         className={`sidebar-annotation-header-options sidebar-annotation-header-options-${annotation.category.toLowerCase()} ${showOptions ? `sidebar-annotation-header-options-${annotation.category.toLowerCase()}-active` : ""}`}
                         onClick={switchShowOptions}>
@@ -181,20 +219,13 @@ function SidebarAnnotation({ annotation, comment, updateAnnoCategory, loadCommen
                     </div>
                 </div>
                 {showOptions && (
-                <div className="sidebar-annotation-optionmenu" ref={optionMenuRef}>
-                    <div className="sidebar-annotation-optionmenu-item" onClick={switchShowCategories}>Change Category</div>
-                    <div className="sidebar-annotation-optionmenu-item sidebar-option-edit" onClick={startEditing}>Edit Annotation</div>
-                    <div className="sidebar-annotation-optionmenu-item sidebar-option-delete" onClick={deleteAnno}>Delete Annotation</div>
-                </div>
-                )}
-                {showCategories && (
-                    <div className="sidebar-annotation-optionmenu" style={{display: `${showCategories ? "block": "none"}`}}>
-                        <div className="sidebar-annotation-optionmenu-item item-definition" onClick={setAnnoCatDefinition}>Definition</div>
-                        <div className="sidebar-annotation-optionmenu-item item-explosion" onClick={setAnnoCatExplosion}>Explosion</div>
-                        <div className="sidebar-annotation-optionmenu-item item-deletion" onClick={setAnnoCatDeletion}>Deletion</div>
-                        <div className="sidebar-annotation-optionmenu-item item-correction" onClick={setAnnoCatCorrection}>Correction</div>
-                        <div className="sidebar-annotation-optionmenu-item item-speculation" onClick={setAnnoCatSpeculation}>Speculation</div>
-                        <div className="sidebar-annotation-optionmenu-item item-addition" onClick={setAnnoCatAddition}>Addition</div>
+                    <div className="sidebar-annotation-optionmenu" ref={optionMenuRef}>
+                        <div className="sidebar-annotation-optionmenu-item sidebar-option-edit"
+                             onClick={startEditing}>Edit Annotation
+                        </div>
+                        <div className="sidebar-annotation-optionmenu-item sidebar-option-delete"
+                             onClick={deleteAnno}>Delete Annotation
+                        </div>
                     </div>
                 )}
                 {isEditing ? (
@@ -222,17 +253,14 @@ function SidebarAnnotation({ annotation, comment, updateAnnoCategory, loadCommen
                                  onClick={switchShowComments}>{showComments ? "Hide Comments" : "Show Comments"}</div>
                         )}
                         <div className="sidebar-annotation-control-comments"></div>
-                        <div className="sidebar-annotation-control-input"
-                             onClick={switchShowInput}>{showInput ? "Cancel" : "Answer"}</div>
                     </div>
                     <div
                         className={`sidebar-annotation-comment-wrapper ${showComments ? "" : "sidebar-annotation-comment-wrapper-hidden"}`}>
                         {comment && Object.keys(comment).map(key => {
                             return <div className="sidebar-annotation-comment">
                                 <div className="sidebar-annotation-comment-header">
-                                    <div className="sidebar-annotation-comment-header-user">ExampleUser</div>
-                                    <div
-                                        className="sidebar-annotation-comment-header-date">{(new Date(comment[key].timeCreated)).toLocaleDateString("en-GB")}</div>
+                                    <div className="sidebar-annotation-comment-header-arrow"></div>
+                                    <div className="sidebar-annotation-comment-header-user">ExampleUserABC</div>
                                     <div
                                         className={`sidebar-annotation-comment-header-options sidebar-annotation-header-options-${annotation.category.toLowerCase()} ${shownCommentOptionsMenuId === comment[key].idComment ? `sidebar-annotation-header-options-${annotation.category.toLowerCase()}-active` : ""}`}
                                         onClick={() => toggleCommentOptionsMenu(comment[key].idComment)}>
