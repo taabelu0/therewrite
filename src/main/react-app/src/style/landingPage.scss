@@ -6,7 +6,45 @@ body {
   font-family: 'Poppins', sans-serif;
 }
 
+.landing-logo {
+  display: flex;
+  height: 40px;
+  width: 300px;
+}
 
+.svg-logo .cls-1,
+.svg-logo .cls-2 {
+  stroke-width: 0px;
+}
+
+.svg-logo .cls-1,
+.svg-logo .cls-3 {
+  mix-blend-mode: multiply;
+  opacity: 0.2;
+}
+
+.svg-logo .cls-4 {
+  isolation: isolate;
+}
+
+.svg-logo-hover .cls-1,
+.svg-logo-hover .cls-2 {
+  mix-blend-mode: multiply;
+}
+
+.svg-logo-hover .cls-2,
+.svg-logo-hover .cls-3,
+.svg-logo-hover .cls-4 {
+  stroke-width: 0px;
+}
+
+.svg-logo-hover .cls-5 {
+  isolation: isolate;
+}
+
+.svg-logo-hover .cls-4 {
+  fill: #ffffff;
+}
 
 .landing-container {
   display: flex;
@@ -18,6 +56,7 @@ body {
 }
 
 .landing-header {
+  margin-top: 10px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -59,4 +98,17 @@ body {
   margin-top: 15px;
   display: inline-block;
   text-decoration: none; /* Remove default anchor tag underline */
+}
+
+.share-icon {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  cursor: pointer;
+  font-size: 24px;
+  color: #666;
+
+  &:hover {
+    color: #000;
+  }
 }

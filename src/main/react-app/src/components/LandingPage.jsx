@@ -1,12 +1,21 @@
 // LandingPage.jsx
-import React from 'react';
+import React, {useState} from 'react';
 import '../style/landingPage.scss';
+import Logo from "./annotations/icons/Logo";
+import HoverLogo from "./annotations/icons/HoverLogo";
 
 function LandingPage() {
+    const [isHovered, setIsHovered] = useState(false);
+
     return (
         <div className="landing-container">
             <div className="landing-header">
-                <h1>The Rewrite</h1>
+                <div className="landing-logo"
+                    onMouseEnter={() => setIsHovered(true)}
+                    onMouseLeave={() => setIsHovered(false)}
+                >
+                    {isHovered ? <HoverLogo/> : <Logo/>}
+                </div>
                 <a href="/home" className="login-text">
                     Log In
                 </a>

@@ -1,5 +1,5 @@
 import React from "react";
-import optimizeClientRects from "react-pdf-highlighter/dist/cjs/lib/optimize-client-rects";
+import optimizeClientRects from "./OptimizeRectanglesCustom";
 import {getPagesFromRange} from "react-pdf-highlighter/dist/cjs/lib/pdfjs-dom";
 
 

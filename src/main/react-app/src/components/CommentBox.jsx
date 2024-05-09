@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { annotationAPI } from "../apis/annotationAPI";
+import React, {useEffect, useState} from 'react';
+import {annotationAPI} from "../apis/annotationAPI";
 
-function CommentBox({ annotation, onCancel, coordinates, onChange }) {
+function CommentBox({annotation, onCancel, coordinates, onChange}) {
     const [comment, setComment] = useState(annotation ? annotation.annotationText : '');
 
     const handleSave = () => {
@@ -9,8 +9,7 @@ function CommentBox({ annotation, onCancel, coordinates, onChange }) {
             if (comment !== annotation.annotationText) {
                 updateCommentDetails(annotation.idAnnotation, comment).then(r => console.log(r));
             }
-        }
-        else {
+        } else {
             console.log("Unable to save comment. Annotation is not defined.");
         }
     };
@@ -24,8 +23,10 @@ function CommentBox({ annotation, onCancel, coordinates, onChange }) {
     }
 
     return (
-        <div className="comment-box" style={{ top: `${coordinates.y}px`, left: `${coordinates.x}px`, position: 'absolute' }}>
+        <div className="comment-box"
+             style={{top: `${coordinates.y}px`, left: `${coordinates.x}px`, position: 'absolute'}}>
             <textarea
+                autoFocus
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
                 placeholder="Enter your comment here..."
