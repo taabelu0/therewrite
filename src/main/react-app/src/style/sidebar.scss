@@ -3,8 +3,8 @@
 .sidebar {
     position: sticky;
     left: 100%;
-    top: calc(max(calc($s-nav-min-height + 200px), calc($s-nav-height + 200px)));
-    height: calc(100% - max(calc($s-nav-min-height + 200px), calc($s-nav-height + 200px)));
+    top: calc(max(calc($s-nav-min-height), calc($s-nav-height + 130px)));
+    height: calc(100% - $s-nav-height - 150px);
     width: 480px;
     z-index: 9997;
     display: flex;

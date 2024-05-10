@@ -28,6 +28,7 @@ public class Document {
     @Column(name = "id")
     private UUID id;
 
+    @Column(name = "documentName")
     private String documentName;
 
     @JsonIgnore

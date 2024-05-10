@@ -46,10 +46,7 @@ function Toolbar({
 
 
     return (
-        <div id="topbar-nav" ref={toolbarRef}>
-            <button className="toggleCategoriesBtn" onClick={toggleCategories}>Annotation Categories</button>
-            <p className="category-text">Select a category while annotating to mark your highlights and
-                notes.</p>
+        <div id="topbarheader-nav" ref={toolbarRef}>
             <div id="category-selected">
                 {annotationCategories.map((cat, key) => (
                     <div

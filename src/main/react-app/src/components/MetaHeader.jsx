@@ -1,8 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import '../style/metaheader.scss';
+import {pdfAPI} from "../apis/pdfAPI";
 
-function MetaHeader({ pdfName }) {
+function MetaHeader({ pdfID }) {
     const [scrollPosition, setScrollPosition] = useState(0);
+    const [documentPDF, setDocumentPDF] = useState(null);
+
+    useEffect(() => {
+        fetchDocument().then(r => console.log(r));
+    }, []);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -16,18 +22,26 @@ function MetaHeader({ pdfName }) {
         };
     }, []);
 
-    const headerStyle = {
-        top: `${-scrollPosition}px`,
-        transition: 'top 0.3s'
+    const fetchDocument = async () => {
+        try {
+            const doc = pdfAPI.getDocument(pdfID).then(
+                r => setDocumentPDF(r)
+            ).catch(e => console.error(e));
+
+        } catch (error) {
+            console.error("Error fetching document", error);
+        }
     };
+
 
     return (
         <div className="meta-header">
             <div className="meta-header-title">
-                <h1 className="title">{pdfName}</h1>
-                <h2 className="subtitle">Copyright information</h2>
+                <button className="documentBtn">Document</button>
+                <h1 className="title" onClick={(r => console.log(documentPDF))}>{documentPDF?.documentName}</h1>
+                <h2 className="subtitle">{documentPDF?.copyRight}</h2>
                 <p className="labelTitle">Source:</p>
-                <a className="source" href="https://web0.fhnw.ch/ht/informatik/ip34/24vt/therewrite/index.html">https://web0.fhnw.ch/ht/informatik/ip34/24vt/therewrite/index.html</a>
+                <a className="source" href={documentPDF?.source}>{documentPDF?.source}</a>
             </div>
         </div>
     );

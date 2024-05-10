@@ -26,6 +26,20 @@
   color: $c-dark-secondary;
 }
 
+.documentBtn {
+  font-size: 100%;
+  border-width: 0;
+  width: fit-content;
+  font-weight: 500;
+  border-radius: 2rem;
+  padding: 15px;
+  margin-left: 10rem;
+  color: #F5F5F5;
+  background-color: #757575;
+  margin-top: 10px;
+  cursor: pointer;
+}
+
 #meta-header-nav {
   display: flex;
   flex-direction: column;

@@ -27,5 +27,12 @@ export const pdfAPI = {
                 copyRight
             }
         });
-    }
+    },
+    getDocument: async function (documentId) {
+        const response = await api.request({
+            url: `/api/document/get/${documentId}`,
+            method: "GET",
+        })
+        return response.data
+    },
 }

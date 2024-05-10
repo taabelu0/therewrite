@@ -79,6 +79,16 @@ public class DocumentController {
         return null;
     }
 
+    @GetMapping("/get/{documentId}")
+    public ResponseEntity<Document> getDocumentById(@PathVariable String documentId) {
+        UUID dId = UUID.fromString(documentId);
+        Optional<Document> optionalDocument = documentRepository.findById(dId);
+        if(optionalDocument.isPresent()) {
+            return ResponseEntity.status(HttpStatus.OK).body(optionalDocument.get());
+        }
+        return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(null);
+    }
+
     @PostMapping("")
     public ResponseEntity<Document> saveDocument(@RequestParam("file") MultipartFile file, RedirectAttributes redirectAttributes) {
         String extension = FilenameUtils.getExtension(file.getOriginalFilename());

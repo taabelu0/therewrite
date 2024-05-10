@@ -16,6 +16,7 @@ import {getPagesFromRange} from "react-pdf-highlighter/dist/cjs/lib/pdfjs-dom";
 import {Squiggly} from "./annotations/Squiggly";
 import {commentAPI} from "../apis/commentAPI";
 import '../style/toolbar.scss';
+import {pdfAPI} from "../apis/pdfAPI";
 import HighlightIcon from "./annotations/icons/HighlightIcon";
 import UnderlineIcon from "./annotations/icons/UnderlineIcon";
 import PostItIcon from "./annotations/icons/PostItIcon";
@@ -24,6 +25,7 @@ import SquigglyIcon from "./annotations/icons/SquigglyIcon";
 import ParagraphSidebarIcon from "./annotations/icons/ParagraphSidebarIcon";
 import MetaHeader from "./MetaHeader";
 import Toolbar from "./Toolbar";
+import ToolbarHeader from "./ToolbarHeader";
 
 const ANNOTATION_COMPONENTS = {
     'HighlightAnnotation': HighlightAnnotation,
@@ -618,7 +620,10 @@ function Noteboard({pdfID}) {
                 />
             )}
             <nav id="meta-header-nav">
-                <MetaHeader pdfName={pdfID}/>
+                <MetaHeader pdfID={pdfID}/>
+            </nav>
+            <nav id="toolbar-header-text">
+                <ToolbarHeader/>
             </nav>
             <nav id="toolbar-header-nav">
                 <Toolbar annotationCategories={annoationCategories}
