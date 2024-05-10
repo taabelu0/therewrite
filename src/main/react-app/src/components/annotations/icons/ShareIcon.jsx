@@ -1,17 +1,30 @@
 import React, { useState } from 'react';
 import Notify from "../../notification/Notify";
+import {accessTokenAPI} from "../../../apis/accessTokenAPI";
 
 const ShareIcon = () => {
     const [showToast, setShowToast] = useState(false);
 
-    const copyToClipboard = () => {
-        navigator.clipboard.writeText(window.location.href)
-            .then(() => {
-                setShowToast(true); // Show toast notification
-            }, (err) => {
-                console.error('Failed to copy text: ', err);
-            });
-    };
+
+    const copyToClipboard = async () => {
+
+        let accesstoken = localStorage.getItem('documentAccessToken');
+
+        const path = window.location.pathname;
+        const segments = path.split('/').filter(Boolean);
+
+        if (!accesstoken) {
+            accesstoken = await accessTokenAPI.get(segments.pop());
+            console.log('accesstoken', accesstoken);
+        }
+            navigator.clipboard.writeText(window.location.href + '?accessToken=' + accesstoken)
+                .then(() => {
+                    setShowToast(true); // Show toast notification
+                }, (err) => {
+                    console.error('Failed to copy text: ', err);
+                });
+        }
+        ;
 
     return (
         <>

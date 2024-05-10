@@ -1,9 +1,9 @@
 package ch.fhnw.therewrite;
-
 import ch.fhnw.therewrite.controller.GuestController;
 import ch.fhnw.therewrite.data.Document;
 import ch.fhnw.therewrite.data.DocumentAccessToken;
 import ch.fhnw.therewrite.data.Guest;
+import ch.fhnw.therewrite.data.User;
 import ch.fhnw.therewrite.repository.DocumentAccessTokenRepository;
 import ch.fhnw.therewrite.repository.DocumentRepository;
 import ch.fhnw.therewrite.repository.GuestRepository;
@@ -12,15 +12,11 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import org.springframework.data.domain.Example;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.context.SecurityContextImpl;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import org.springframework.security.web.util.matcher.RequestMatcher;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
@@ -28,22 +24,18 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-
-import static ch.fhnw.therewrite.SecurityConfiguration.permitAllMatchers;
-
 @Component
 public class GuestFilter extends OncePerRequestFilter {
     private final GuestRepository guestRepository;
     private final DocumentRepository documentRepository;
     private final DocumentAccessTokenRepository documentAccessTokenRepository;
-
-
-    public GuestFilter(GuestRepository guestRepository, DocumentRepository documentRepository, DocumentAccessTokenRepository documentAccessTokenRepository) {
+    private final CustomUserDetailsService customUserDetailsService;
+    public GuestFilter(GuestRepository guestRepository, DocumentRepository documentRepository, DocumentAccessTokenRepository documentAccessTokenRepository, CustomUserDetailsService customUserDetailsService) {
         this.guestRepository = guestRepository;
         this.documentRepository = documentRepository;
         this.documentAccessTokenRepository = documentAccessTokenRepository;
+        this.customUserDetailsService = customUserDetailsService;
     }
-
     public Document verifyToken(String documentAccessToken) {
         UUID token;
         try {
@@ -57,12 +49,14 @@ public class GuestFilter extends OncePerRequestFilter {
         if(dat.isPresent()) return dat.get().getDocumentId();
         return null;
     }
-
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         HttpSession session = request.getSession(false);
         String token = request.getParameter("documentAccessToken");
-        if(token != null) {
+        String username = request.getParameter("username");
+        UserDetails user = null;
+        if(username != null) user = customUserDetailsService.loadUserByUsername(username);
+        if(token != null &&  user == null) {
             Document document = verifyToken(token);
             if(document != null) {
                 GuestController gC = new GuestController(guestRepository, documentRepository);
@@ -71,6 +65,8 @@ public class GuestFilter extends OncePerRequestFilter {
                 List<SimpleGrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_GUEST"));
                 Authentication newAuth = new UsernamePasswordAuthenticationToken("guest", null, authorities);
                 SecurityContextHolder.getContext().setAuthentication(newAuth);
+                response.sendRedirect(request.getRequestURI());
+                return;
             }
         }
         filterChain.doFilter(request, response);

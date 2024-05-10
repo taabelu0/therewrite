@@ -54,7 +54,7 @@ public class SecurityConfiguration {
                     auth.anyRequest().authenticated();
                 })
                 .addFilterBefore(
-                        new GuestFilter(guestRepository, documentRepository, documentAccessTokenRepository),
+                        new GuestFilter(guestRepository, documentRepository, documentAccessTokenRepository, cuds),
                         UsernamePasswordAuthenticationFilter.class)
                 .formLogin(form -> form
                         .loginPage("/login")
