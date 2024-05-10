@@ -49,26 +49,4 @@ public class AccessHelper {
         return guests.stream().anyMatch(guest -> guest.getId().equals(gId));
     }
 
-    public static boolean verifyToken(String documentAccessToken, String documentId, HttpSession session, DocumentRepository documentRepository, GuestRepository guestRepository, DocumentAccessTokenRepository documentAccessTokenRepository) {
-        UUID dId;
-        try {
-            dId = UUID.fromString(documentId);
-        }
-        catch(IllegalArgumentException exception) {
-            return false;
-        }
-        Document document = documentRepository.getReferenceById(dId);
-        List<DocumentAccessToken> dats = documentAccessTokenRepository.findByDocumentId(document);
-        boolean valid = dats.stream()
-                .map(dat -> dat.getToken().toString())
-                .anyMatch(t -> t.equals(documentAccessToken));
-        if(valid) {
-            // create new guest if the token is valid
-            GuestController gC = new GuestController(guestRepository, documentRepository);
-            Guest guest = gC.createGuest(document);
-            session.setAttribute("guestId", guest.getId());
-        }
-        return valid;
-    }
-
 }

@@ -6,6 +6,7 @@ import ch.fhnw.therewrite.data.Document;
 import ch.fhnw.therewrite.data.User;
 import ch.fhnw.therewrite.repository.AnnotationRepository;
 import ch.fhnw.therewrite.repository.DocumentRepository;
+import ch.fhnw.therewrite.repository.GuestRepository;
 import ch.fhnw.therewrite.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.Modifying;
@@ -13,7 +14,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.parameters.P;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,19 +28,25 @@ public class AnnotationController {
     private final AnnotationRepository annotationRepository;
     private final DocumentRepository documentRepository;
     private final UserRepository userRepository;
+    private final GuestRepository guestRepository;
 
     @Autowired
-    public AnnotationController(AnnotationRepository annotationRepository, DocumentRepository documentRepository, UserRepository userRepository) {
+    public AnnotationController(AnnotationRepository annotationRepository, DocumentRepository documentRepository, UserRepository userRepository, GuestRepository guestRepository) {
         this.annotationRepository = annotationRepository;
         this.documentRepository = documentRepository;
         this.userRepository = userRepository;
+        this.guestRepository = guestRepository;
     }
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_GUEST')")
     @GetMapping("/all/{documentId}")
-    public ResponseEntity<List<Annotation>> getAnnotationsByDocumentId(@PathVariable String documentId, @AuthenticationPrincipal UserDetails currentUser) {
-        if(currentUser == null || !AccessHelper.verifyUserRights(currentUser.getUsername(), documentId, documentRepository)) {
+    public ResponseEntity<List<Annotation>> getAnnotationsByDocumentId(@PathVariable String documentId, @AuthenticationPrincipal UserDetails currentUser, @SessionAttribute("guestId") String guestId) {
+        System.out.println(guestId);
+        boolean unauthUser = currentUser == null || !AccessHelper.verifyUserRights(currentUser.getUsername(), documentId, documentRepository);
+        boolean unauthGuest = guestId == null || !AccessHelper.verifyGuest(guestId, documentId, documentRepository, guestRepository);
+        if(unauthUser && unauthGuest) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
         }
+        System.out.println("hell?");
         UUID dId = UUID.fromString(documentId);
         Optional<Document> d = documentRepository.findById(dId);
         if(d.isPresent()) {

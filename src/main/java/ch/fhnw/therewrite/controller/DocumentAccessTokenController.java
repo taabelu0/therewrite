@@ -42,7 +42,6 @@ public class DocumentAccessTokenController {
         } catch(IllegalArgumentException exception) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
-        // TODO: verify ownership of document (needs user management)
         DocumentAccessToken dat = new DocumentAccessToken();
         Document document = documentRepository.getReferenceById(dId);
         dat.setDocumentId(document);

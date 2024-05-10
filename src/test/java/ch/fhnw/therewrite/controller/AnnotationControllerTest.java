@@ -1,17 +1,16 @@
 package ch.fhnw.therewrite.controller;
 
-import org.springframework.boot.test.context.SpringBootTest;
+import ch.fhnw.therewrite.repository.GuestRepository;
+import ch.fhnw.therewrite.repository.UserRepository;
 import ch.fhnw.therewrite.data.Annotation;
 import ch.fhnw.therewrite.repository.AnnotationRepository;
 import ch.fhnw.therewrite.repository.DocumentRepository;
-import jakarta.annotation.security.RunAs;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,12 +28,17 @@ public class AnnotationControllerTest {
     @Mock
     private DocumentRepository documentRepository;
 
+    @Mock
     private AnnotationController annotationController;
+    @Mock
+    private UserRepository userRepository;
+    @Mock
+    private GuestRepository guestRepository;
 
     @BeforeEach
     public void setup() {
         MockitoAnnotations.openMocks(this);
-        annotationController = new AnnotationController(annotationRepository, documentRepository);
+        annotationController = new AnnotationController(annotationRepository, documentRepository, userRepository, guestRepository);
     }
 
     @Test
