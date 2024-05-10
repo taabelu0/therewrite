@@ -99,3 +99,16 @@ body {
   display: inline-block;
   text-decoration: none; /* Remove default anchor tag underline */
 }
+
+.share-icon {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  cursor: pointer;
+  font-size: 24px;
+  color: #666;
+
+  &:hover {
+    color: #000;
+  }
+}
