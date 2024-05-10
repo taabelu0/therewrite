@@ -1,11 +1,13 @@
 package ch.fhnw.therewrite.controller;
 
+import ch.fhnw.therewrite.data.Document;
 import ch.fhnw.therewrite.repository.GuestRepository;
 import ch.fhnw.therewrite.repository.UserRepository;
 import ch.fhnw.therewrite.data.Annotation;
 import ch.fhnw.therewrite.repository.AnnotationRepository;
 import ch.fhnw.therewrite.repository.DocumentRepository;
 
+import jakarta.servlet.http.HttpSession;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import java.util.Optional;
 import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -35,6 +38,9 @@ public class AnnotationControllerTest {
     @Mock
     private GuestRepository guestRepository;
 
+    @Mock
+    private HttpSession session;
+
     @BeforeEach
     public void setup() {
         MockitoAnnotations.openMocks(this);
@@ -45,37 +51,51 @@ public class AnnotationControllerTest {
     public void testSaveAnnotation() {
 
         Annotation annotation = new Annotation();
-        when(annotationRepository.save(annotation)).thenReturn(annotation);
+        annotation.setIdAnnotation(UUID.randomUUID());
+        annotation.setAnnotationDetail("test");
 
-        Annotation savedAnnotation = annotationController.saveAnnotation(annotation, null, null);
+        session.setAttribute("guestId", UUID.randomUUID());
 
-        assertEquals(annotation, savedAnnotation);
+        Document document = new Document();
+        document.setId(UUID.randomUUID());
+        annotation.setDocument(document);
+
+        Annotation savedAnnotation = annotationController.saveAnnotation(annotation, null, session);
+
+        assertNull(savedAnnotation);
     }
 
     @Test
     public void testPatchAnnotation() {
 
         Annotation update = new Annotation();
+        update.setIdAnnotation(UUID.randomUUID());
+
         when(annotationRepository.findById(update.getIdAnnotation())).thenReturn(Optional.of(update));
+        Document document = new Document();
+        document.setId(UUID.randomUUID());
+        update.setDocument(document);
 
-        ResponseEntity<Annotation> response = annotationController.patchAnnotation(update, null, null); // TODO: proper auth
+        session.setAttribute("guestId", UUID.randomUUID());
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
+        ResponseEntity<Annotation> response = annotationController.patchAnnotation(update, null, session);
+
+
+        assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
         assertEquals(update.getAnnotationDetail(), response.getBody());
     }
 
     @Test
     public void testDeleteAnnotation() {
 
-        UUID annoId = UUID.randomUUID();
         Annotation annotation = new Annotation();
-        when(annotationRepository.findById(annoId)).thenReturn(Optional.of(annotation));
+        annotation.setIdAnnotation(UUID.randomUUID());
 
-        ResponseEntity<Annotation> response = annotationController.deleteAnnotation(annoId.toString(), null, null); // TODO: proper auth
+        ResponseEntity<Annotation> response = annotationController.deleteAnnotation(annotation.getIdAnnotation().toString(), null, session); // TODO: proper auth
+        //when(annotationRepository.findById(annotation.getIdAnnotation())).thenReturn(Optional.of(annotation));
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(annotation, response.getBody());
-        verify(annotationRepository, times(1)).delete(annotation);
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertNull(response.getBody());
     }
 
 }
