@@ -29,7 +29,6 @@
 #meta-header-nav {
   display: flex;
   flex-direction: column;
-  position: fixed;
   left: 0;
   width: 100%;
   z-index: 9999;
@@ -41,7 +40,6 @@
 }
 
 .meta-header {
-  position: relative;
   top: 0;
   width: 100%;
   height: $s-header-nav-height;
