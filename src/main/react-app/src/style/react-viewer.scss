@@ -10,7 +10,7 @@ body {
   display: flex;
   margin-top: 250px;
   justify-content: center;
-  width: $s-workspace-width;
+  width: 100%;
   min-height: 100vh;
   transform-origin: top left; /* Only needed for transform: scale */
   background-color: white;

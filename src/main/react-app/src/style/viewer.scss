@@ -24,8 +24,8 @@
 #workspace {
     position: relative;
     justify-content: center;
-    width: $s-workspace-width;
-    min-height: 100vh;
+    width: 100%;
+    min-height: 300vh;
     transform-origin: top left;
 }
 

@@ -608,10 +608,6 @@ function Noteboard({pdfID}) {
     return (
         <section
             id={"workspace"}
-            style={{
-                width: width.current,
-                height: height.current,
-            }}
         >
             {showCommentBox && (
                 <CommentBox
