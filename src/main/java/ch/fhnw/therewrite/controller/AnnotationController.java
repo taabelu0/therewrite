@@ -70,8 +70,7 @@ public class AnnotationController {
         if(currentUser != null) {
             User user = userRepository.findByUsername(currentUser.getUsername());
             annotation.setUserCreator(user);
-        }
-        if(guestId != null) {
+        } else if(guestId != null) {
             Guest guest = guestRepository.getReferenceById(guestId);
             annotation.setGuestCreator(guest);
         }
