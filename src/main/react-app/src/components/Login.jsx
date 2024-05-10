@@ -13,7 +13,6 @@ function Login() {
         console.log(response)
         if(response.status === 200) {
             window.location.href = "/home";
-            console.log(response.data)
         }
         else {
             // TODO: throw error
