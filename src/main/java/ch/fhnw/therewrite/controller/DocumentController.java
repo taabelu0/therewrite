@@ -111,6 +111,7 @@ public class DocumentController {
             document.setPath(filePath);
             List<User> users = document.getUsers();
             User user = userRepository.findByUsername(currentUser.getUsername());
+            document.setUserCreator(user);
             users.add(user);
             document.setUsers(users);
             documentRepository.save(document);

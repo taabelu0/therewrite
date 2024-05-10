@@ -24,9 +24,13 @@ public class Document {
     @JsonIgnore
     private List<User> users = new ArrayList<>();
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    private User UserCreator;
+
     @OneToMany(mappedBy = "documentId", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JsonIgnore
     private List<DocumentAccessToken> accessTokens = new ArrayList<>();
+
     @jakarta.persistence.Id
     @GeneratedValue(generator = "uuid2")
     @GenericGenerator(name = "uuid2", strategy = "uuid2")
@@ -102,5 +106,13 @@ public class Document {
     public void removeAnnotation(Annotation annotation) {
         this.annotations.remove(annotation);
         annotation.setDocument(null);
+    }
+
+    public User getUserCreator() {
+        return UserCreator;
+    }
+
+    public void setUserCreator(User idUserCreator) {
+        UserCreator = idUserCreator;
     }
 }
