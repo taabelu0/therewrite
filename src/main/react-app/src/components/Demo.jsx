@@ -2,7 +2,7 @@ import {useParams} from "react-router-dom";
 import {pdfAPI} from "../apis/pdfAPI";
 import React, {Component, useState} from "react";
 import {PdfHighlighter, PdfLoader} from "react-pdf-highlighter";
-import '../style/demo.scss';
+import '../style/toolbar.scss';
 
 const annoationCategories = [
     {
@@ -45,27 +45,27 @@ function Demo() {
     return (
         <div>
             <Core pdfName={pdfName}></Core>
-            <section id={"demo-workspace-scroll"}>
-                <nav id="demo-sidebar-nav">
+            <section id={"workspace-scroll"}>
+                <nav id="sidebar-nav">
                     <button className="toggleCategoriesBtn" onClick={toggleCategories}>Annotation Categories</button>
                     <p className="category-text">Select a category while annotating to mark your highlights and
                         notes.</p>
-                    <div id="demo-category-selection">
+                    <div id="category-selection">
                         {annoationCategories.map((cat, key) => (
                             <div
-                                className={`demo-category demo-category-${cat.name.toLowerCase()} ${selectedCategory === cat.name ? "category-active" : ""} ${toggleAnnotationCategories ? 'demo-categories-open' : ''}`}
+                                className={`category category-${cat.name.toLowerCase()} ${selectedCategory === cat.name ? "category-active" : ""} ${toggleAnnotationCategories ? 'categories-open' : ''}`}
                                 key={key}
                                 onClick={() => setSelectedCategory(`${cat.name}`)}
                             >
-                                <p className={"demo-category-title"}>{cat.name}</p>
-                                <p className={`demo-category-desc`}>{cat.description}</p>
+                                <p className={"category-title"}>{cat.name}</p>
+                                <p className={`category-desc`}>{cat.description}</p>
                             </div>
                         ))}
                     </div>
-                    <div id="demo-toolbar">
-                        <div className={`demo-styles ${'demo-styles-' + selectedCategory}`}>
+                    <div id="toolbar">
+                        <div className={`styles ${'styles-' + selectedCategory}`}>
                             <div
-                                className={`demo-tool demo-add-post-it ${creatingComponent === "HighlightAnnotation" ? "demo-add-tool-active-" + selectedCategory : ""} ${'demo-tool-' + selectedCategory}`}
+                                className={`tool add-post-it ${creatingComponent === "HighlightAnnotation" ? "add-tool-active-" + selectedCategory : ""} ${'tool-' + selectedCategory}`}
                                 id="add-post-it-green"
                                 onClick={() => setCreatingComponent("HighlightAnnotation")}
                             >
@@ -79,7 +79,7 @@ function Demo() {
                                 </svg>
                             </div>
                             <div
-                                className={`demo-tool demo-add-post-it ${creatingComponent === "ParagraphCustom" ? "demo-add-tool-active-" + selectedCategory : ""} ${'demo-tool-' + selectedCategory}`}
+                                className={`tool add-post-it ${creatingComponent === "ParagraphCustom" ? "add-tool-active-" + selectedCategory : ""} ${'tool-' + selectedCategory}`}
                                 onClick={() => setCreatingComponent("ParagraphCustom")}
                             >
                                 <svg id="Effect_over" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 24">
@@ -104,7 +104,7 @@ function Demo() {
                                 </svg>
                             </div>
                             <div
-                                className={`demo-tool demo-add-post-it ${creatingComponent === "ParagraphSideBar" ? "demo-add-tool-active-" + selectedCategory : ""} ${'demo-tool-' + selectedCategory}`}
+                                className={`tool add-post-it ${creatingComponent === "ParagraphSideBar" ? "add-tool-active-" + selectedCategory : ""} ${'tool-' + selectedCategory}`}
                                 onClick={() => setCreatingComponent("ParagraphSideBar")}
                             >
                                 <svg id="Effect_over" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 24">
@@ -131,7 +131,7 @@ function Demo() {
                                 </svg>
                             </div>
                             <div
-                                className={`demo-tool demo-add-post-it ${creatingComponent === "UnderlineAnnotation" ? "demo-add-tool-active-" + selectedCategory : ""} ${'demo-tool-' + selectedCategory}`}
+                                className={`tool add-post-it ${creatingComponent === "UnderlineAnnotation" ? "add-tool-active-" + selectedCategory : ""} ${'tool-' + selectedCategory}`}
                                 onClick={() => setCreatingComponent("UnderlineAnnotation")}
                             >
                                 <svg id="Abc" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 24">
@@ -153,9 +153,9 @@ function Demo() {
                                 </svg>
                             </div>
                         </div>
-                        <div className={`demo-styles ${'demo-styles-' + selectedCategory}`}>
+                        <div className={`styles ${'styles-' + selectedCategory}`}>
                             <div
-                                className={`demo-tool demo-add-post-it ${creatingComponent === "PostIt" ? "demo-add-tool-active-" + selectedCategory : ""} ${'demo-tool-' + selectedCategory}`}
+                                className={`tool add-post-it ${creatingComponent === "PostIt" ? "add-tool-active-" + selectedCategory : ""} ${'tool-' + selectedCategory}`}
                                 onClick={() => setCreatingComponent("PostIt")}
                             >
                                 <svg id="Abc" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 24">
@@ -168,7 +168,7 @@ function Demo() {
                                 </svg>
                             </div>
                             <div
-                                className={`demo-tool demo-add-post-it ${creatingComponent === "TinyText" ? "demo-add-tool-active-" + selectedCategory : ""} ${'demo-tool-' + selectedCategory}`}
+                                className={`tool add-post-it ${creatingComponent === "TinyText" ? "add-tool-active-" + selectedCategory : ""} ${'tool-' + selectedCategory}`}
                                 id="add-post-it-yellow"
                                 onClick={() => setCreatingComponent("TinyText")}
                             >

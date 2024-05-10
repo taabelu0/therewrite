@@ -5,10 +5,10 @@ body {
   min-height: 100vh;
   margin: 0;
 
-  background-color: $c-light-secondary;
+  background-color: $c-light-primary;
   color: $c-dark-primary;
   font-size: 16px;
-  font-family: 'Nunito Sans', sans-serif;
+  font-family: "Source Code Pro", monospace, system-ui;
 }
 
 a {

@@ -54,6 +54,7 @@ public class Annotation implements Serializable {
     private Timestamp timeLastEdited = new Timestamp(System.currentTimeMillis());
 
     @JsonProperty
+    @Column(columnDefinition = "TEXT")
     private String annotationText;
 
     public UUID getIdAnnotation() {

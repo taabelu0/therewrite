@@ -6,25 +6,25 @@ const ShareIcon = () => {
     const [showToast, setShowToast] = useState(false);
 
 
-    const copyToClipboard = async () => {
-
+    const copyToClipboard = async (event) => {
+        event.stopPropagation();
+        event.preventDefault();
         let accesstoken = localStorage.getItem('documentAccessToken');
 
         const path = window.location.pathname;
         const segments = path.split('/').filter(Boolean);
-
+        let param = '';
         if (!accesstoken) {
             accesstoken = await accessTokenAPI.create(segments.pop());
-            console.log('accesstoken', accesstoken);
+            param = '?documentAccessToken=' + accesstoken;
         }
-            navigator.clipboard.writeText(window.location.href + '?documentAccessToken=' + accesstoken)
-                .then(() => {
-                    setShowToast(true); // Show toast notification
-                }, (err) => {
-                    console.error('Failed to copy text: ', err);
-                });
-        }
-        ;
+        navigator.clipboard.writeText(window.location.href + param)
+            .then(() => {
+                setShowToast(true); // Show toast notification
+            }, (err) => {
+                console.error('Failed to copy text: ', err);
+            });
+    };
 
     return (
         <>
