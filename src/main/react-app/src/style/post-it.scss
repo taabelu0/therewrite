@@ -18,11 +18,10 @@
   }
 
   &-inner {
-
     position: relative;
-    padding: 1rem;
+    padding-bottom: 2rem;
     height: calc(100% - 2rem);
-    width: calc(100% - 2rem);
+    width: calc(100%);
 
   }
 
@@ -41,7 +40,7 @@
     left: 0;
     display: flex;
     text-align: center;
-    width: calc(100% - 2rem);
+    width: 100%;
     height: calc(100% - 2rem);
     background-color: transparent;
     border: none;

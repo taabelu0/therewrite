@@ -1,7 +1,6 @@
 import React from "react";
-import optimizeClientRects from "react-pdf-highlighter/dist/cjs/lib/optimize-client-rects";
+import optimizeClientRects from "./OptimizeRectanglesCustom";
 import {getPagesFromRange} from "react-pdf-highlighter/dist/cjs/lib/pdfjs-dom";
-
 
 export class Annotation extends React.Component {
     constructor(props) {
@@ -20,6 +19,22 @@ export class Annotation extends React.Component {
             currentScrollY: props.annotation.scrollY,
         };
         this.incrementCount = this.incrementCount.bind(this)
+    }
+
+    componentDidUpdate(prevProps) {
+        if (this.props.annotation !== prevProps.annotation) {
+            this.setState({
+                key: this.props.annotation.id,
+                currentSelection: this.props.annotation.selection,
+                currentCategory: this.props.annotation.category,
+                currentHeight: this.props.annotation.height,
+                currentWidth: this.props.annotation.width,
+                currentTop: this.props.annotation.top,
+                currentLeft: this.props.annotation.left,
+                currentScrollX: this.props.annotation.scrollX,
+                currentScrollY: this.props.annotation.scrollY,
+            });
+        }
     }
 
     incrementCount() {
