@@ -60,9 +60,10 @@ public class CommentController {
     @Modifying
     @PatchMapping("")
     public ResponseEntity<Comment> patchComment(@RequestBody Comment update, @AuthenticationPrincipal UserDetails currentUser) {
-        if(currentUser != null) return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        if(currentUser == null) return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
         User user = userRepository.findByUsername(currentUser.getUsername());
-        if(update.getUserId().getIdUser().equals(user.getIdUser())) {
+        Comment comment = commentRepository.findById(update.getIdComment()).orElseThrow();
+        if(user == null || !user.getIdUser().equals(comment.getUserId().getIdUser())) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
         Optional<Comment> optionalComment = commentRepository.findById(update.getIdComment());
@@ -78,18 +79,20 @@ public class CommentController {
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_GUEST')")
     @DeleteMapping("/{commId}")
     public ResponseEntity<Comment> deleteComment(@PathVariable String commId, @AuthenticationPrincipal UserDetails currentUser) {
-        Comment comment = commentRepository.getReferenceById(UUID.fromString(commId));
-        if(currentUser != null) return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        if(currentUser == null) return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
         User user = userRepository.findByUsername(currentUser.getUsername());
-        if(comment.getUserId().getIdUser().equals(user.getIdUser())) {
+        Comment comment = commentRepository.getReferenceById(UUID.fromString(commId));
+        if(user == null || !user.getIdUser().equals(comment.getUserId().getIdUser())) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
         UUID aId = UUID.fromString(commId);
-        Optional<Comment> a = commentRepository.findById(aId);
-        if(a.isPresent()) {
-            Comment oldComm = a.get();
+        Comment oldComm = commentRepository.getReferenceById(aId);
+        if(oldComm != null) {
             commentRepository.delete(oldComm);
-            return ResponseEntity.status(HttpStatus.OK).body(oldComm);
+            Comment resp = new Comment();
+            resp.setIdComment(oldComm.getIdComment());
+            resp.setAnnotationId(oldComm.getAnnotationId());
+            return ResponseEntity.status(HttpStatus.OK).body(resp);
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
     }

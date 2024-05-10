@@ -22,11 +22,6 @@ public class GuestController {
         this.documentRepository = documentRepository;
     }
 
-    @PostMapping("")
-    public Guest saveGuest(@RequestBody Guest guest) {
-        return guestRepository.save(guest);
-    }
-
     public Guest createGuest(Document document) {
         Guest guest = new Guest();
         guest.setDocumentId(document);

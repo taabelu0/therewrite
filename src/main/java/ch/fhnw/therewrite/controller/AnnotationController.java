@@ -66,7 +66,8 @@ public class AnnotationController {
     public ResponseEntity<Annotation> patchAnnotation(@RequestBody Annotation update, @AuthenticationPrincipal UserDetails currentUser) {
         Optional<Annotation> optionalAnno = annotationRepository.findById(update.getIdAnnotation());
         if(optionalAnno.isPresent()) {
-            if(currentUser == null || !AccessHelper.verifyUserRights(currentUser.getUsername(), optionalAnno.get().getDocument().getId().toString(), documentRepository)) {
+            String documentId =  optionalAnno.get().getDocument().getId().toString();
+            if(currentUser == null || !AccessHelper.verifyUserRights(currentUser.getUsername(), documentId, documentRepository)) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
             }
             Annotation anno = optionalAnno.get();

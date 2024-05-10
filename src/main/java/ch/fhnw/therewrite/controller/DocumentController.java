@@ -46,13 +46,14 @@ public class DocumentController {
         this.userRepository = userRepository;
     }
 
-    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_GUEST')")
+
     @GetMapping(
             value = "/{documentId}",
             produces = MediaType.APPLICATION_PDF_VALUE
     )
     public ResponseEntity<byte[]> getDocument(@PathVariable String documentId, @AuthenticationPrincipal UserDetails currentUser) {
         if(currentUser == null || !AccessHelper.verifyUserRights(currentUser.getUsername(), documentId, documentRepository)) {
+            if(currentUser != null) System.out.println(currentUser.getUsername());
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
         }
         UUID dId = UUID.fromString(documentId);
@@ -127,7 +128,7 @@ public class DocumentController {
     }
 
 
-    @PreAuthorize("hasRole('ROLE_USER')")
+    @PreAuthorize("hasRole('ROLE_USER')") // TODO: change to admin
     @DeleteMapping("/{documentId}")
     public void deleteDocument(@PathVariable(value="documentId") String documentId, @AuthenticationPrincipal UserDetails currentUser) {
         if(currentUser == null) {

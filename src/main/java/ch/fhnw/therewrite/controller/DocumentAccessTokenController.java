@@ -32,6 +32,7 @@ public class DocumentAccessTokenController {
     @PostMapping("/create")
     public ResponseEntity<String> createAccessToken(@RequestBody Map<String, String> requestBody, @AuthenticationPrincipal UserDetails currentUser) {
         String documentId = requestBody.get("documentId");
+        if(documentId == null) return ResponseEntity.status(HttpStatus.PRECONDITION_FAILED).body(null);
         if(currentUser == null || !AccessHelper.verifyUserRights(currentUser.getUsername(), documentId, documentRepository)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
         }

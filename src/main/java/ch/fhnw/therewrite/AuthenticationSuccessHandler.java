@@ -11,6 +11,5 @@ import java.io.IOException;
 public class AuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
     protected void handle(HttpServletRequest request, HttpServletResponse response,
                           Authentication authentication) throws IOException, ServletException {
-        
     }
 }
