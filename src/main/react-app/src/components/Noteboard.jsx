@@ -58,27 +58,27 @@ function Noteboard({pdfID}) {
 
     const annoationCategories = [
         {
-            name: "Definition",
-            description: "Select this category to add definitions of terms you found in the documents."
+            name:"DEFINITION",
+            description:"Select this category to add definitions of terms you found in the documents."
         },
         {
-            name: "Explosion",
+            name:"EXPLOSION",
             description: "Select to add terms, notes and descriptions or external resources, e.g. links to material you feel needs to included in the document."
         },
         {
-            name: "Deletion",
+            name: "DELETION",
             description: "Select to signal that you would like to delete specific terms in the document altogether. Add some thoughts or links to sources that explain why you feel the term should be deleted."
         },
         {
-            name: "Correction",
+            name:"CORRECTION",
             description: "Select to propose changes to the term in question. Note that correction has an authoritative connotation: you're suggesting a definitive replacement!"
         },
         {
-            name: "Speculation",
+            name: "SPECULATION",
             description: "Select this category if you would like to avoid the authoritative connotation of correction. Speculation is future-oriented, open-ended, evocative and can involve uncertain trajectories."
         },
         {
-            name: "Addition",
+            name: "ADDITION",
             description: "For additions."
         }
     ]
@@ -265,13 +265,13 @@ function Noteboard({pdfID}) {
         const rect = noteboard.getBoundingClientRect();
         const x = clientX - rect.left;
         const y = clientY - rect.top;
-        if (creatingComponent === "PostIt" || creatingComponent === "TinyText") {
+        if(creatingComponent === "PostIt" || creatingComponent === "TinyText") {
             setCreatingComponent(null);
         }
         setTimeout(async () => {
             let newAnno = await ADDING_COMPONENT[creatingComponent](selectedCategory, x, y);
-            if (!newAnno) return;
-            document.getSelection().collapse(null);
+            document.getSelection().deleteFromDocument();
+            if(!newAnno) return;
             sendMessage(newAnno); // notifies websocket
             setAnnotationCoordinates({x, y});
         }, 50);
@@ -600,11 +600,6 @@ function Noteboard({pdfID}) {
             }
         });
     }
-
-/*    const navStyle = {
-        top: `${-scrollPosition}px`,
-        transition: 'top'
-    };*/
 
 
     return (
