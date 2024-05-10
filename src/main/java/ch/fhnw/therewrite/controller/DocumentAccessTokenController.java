@@ -54,8 +54,8 @@ public class DocumentAccessTokenController {
     @PreAuthorize("hasRole('ROLE_USER')")
     @PostMapping("/{documentId}")
     public ResponseEntity<String> getAccessToken(@PathVariable("documentId") String documentId, @AuthenticationPrincipal UserDetails currentUser) {
-        System.out.println(currentUser);
         if(documentId == null) return ResponseEntity.status(HttpStatus.PRECONDITION_FAILED).body(null);
+        System.out.println(currentUser + ", " + documentId);
         if(currentUser == null || !AccessHelper.verifyUserRights(currentUser.getUsername(), documentId, documentRepository)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
         }

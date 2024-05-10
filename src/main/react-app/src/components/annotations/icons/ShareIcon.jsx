@@ -14,10 +14,10 @@ const ShareIcon = () => {
         const segments = path.split('/').filter(Boolean);
 
         if (!accesstoken) {
-            accesstoken = await accessTokenAPI.get(segments.pop());
+            accesstoken = await accessTokenAPI.create(segments.pop());
             console.log('accesstoken', accesstoken);
         }
-            navigator.clipboard.writeText(window.location.href + '?accessToken=' + accesstoken)
+            navigator.clipboard.writeText(window.location.href + '?documentAccessToken=' + accesstoken)
                 .then(() => {
                     setShowToast(true); // Show toast notification
                 }, (err) => {

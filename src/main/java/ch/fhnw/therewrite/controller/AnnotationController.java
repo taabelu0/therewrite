@@ -48,7 +48,6 @@ public class AnnotationController {
         if(unauthUser && unauthGuest) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
         }
-        System.out.println("hell?");
         UUID dId = UUID.fromString(documentId);
         Optional<Document> d = documentRepository.findById(dId);
         if(d.isPresent()) {
