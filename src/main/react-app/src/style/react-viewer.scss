@@ -3,6 +3,7 @@
 body {
   width: 100%;
   height: calc(100vh - max($s-nav-min-height, $s-nav-height));
+  overflow-x: hidden;
 }
 
 .PdfHighlighter {
