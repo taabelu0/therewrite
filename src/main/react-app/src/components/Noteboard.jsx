@@ -648,7 +648,6 @@ function Noteboard({pdfID}) {
                 </div>
             </div>
             <section className={"sidebar " + ((showSidebar) ? "sidebar-deactivated" : "")}>
-                <button className="sidebar-arrow" onClick={toggleSidebar}></button>
                 <div className="sidebar-content">
                     {Object.keys(annotations).map(key => {
                         return <SidebarAnnotation annotation={annotations[key]} comment={comments[key]}

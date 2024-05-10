@@ -20,10 +20,11 @@ body {
 
 .pdfViewer {
 
-  background-color: $c-light-secondary;
+  background-color: $c-light-primary;
   padding: 2rem;
 }
 
 .pdfViewer.removePageBorders .page {
   margin: 0 0 2rem 0;
+  border: 1px solid $c-light-secondary;
 }
