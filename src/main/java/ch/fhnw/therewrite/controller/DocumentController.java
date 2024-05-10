@@ -111,10 +111,10 @@ public class DocumentController {
             document.setPath(filePath);
             List<User> users = document.getUsers();
             User user = userRepository.findByUsername(currentUser.getUsername());
-            document.setUserCreator(user);
             users.add(user);
+            document.setUserCreator(user);
             document.setUsers(users);
-            documentRepository.save(document);
+            Document resp = documentRepository.save(document);
             try {
                 MultipartFile storeFile = new MockMultipartFile(fileName,
                         fileName,
@@ -126,7 +126,8 @@ public class DocumentController {
             catch(IOException exception) {
                 // TODO: log
             }
-            return ResponseEntity.status(HttpStatus.OK).body(document);
+            resp.setUserCreator(user);
+            return ResponseEntity.status(HttpStatus.OK).body(resp);
         }
     }
 

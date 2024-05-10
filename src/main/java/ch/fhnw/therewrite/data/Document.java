@@ -24,7 +24,8 @@ public class Document {
     @JsonIgnore
     private List<User> users = new ArrayList<>();
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JsonProperty
     private User UserCreator;
 
     @OneToMany(mappedBy = "documentId", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
@@ -112,7 +113,7 @@ public class Document {
         return UserCreator;
     }
 
-    public void setUserCreator(User idUserCreator) {
-        UserCreator = idUserCreator;
+    public void setUserCreator(User userCreator) {
+        UserCreator = userCreator;
     }
 }
