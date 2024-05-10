@@ -28,10 +28,18 @@ public class Document {
     @Column(name = "id")
     private UUID id;
 
+    @Column(name = "documentName")
     private String documentName;
 
     @JsonIgnore
     private String path;
+
+    @Column(name = "source", columnDefinition="TEXT")
+    private String source;
+
+    @Column(name = "copyRight", columnDefinition="TEXT")
+    private String copyRight;
+
 
     @ManyToOne
     @JoinColumn(name = "userId")
@@ -93,5 +101,21 @@ public class Document {
     public void removeAnnotation(Annotation annotation) {
         this.annotations.remove(annotation);
         annotation.setDocument(null);
+    }
+
+    public void setSource(String source) {
+        this.source = source;
+    }
+
+    public String getSource() {
+        return source;
+    }
+
+    public void setCopyRight(String copyRight) {
+        this.copyRight = copyRight;
+    }
+
+    public String getCopyRight() {
+        return copyRight;
     }
 }
