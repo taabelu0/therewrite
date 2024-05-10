@@ -47,7 +47,7 @@ public class AnnotationControllerTest {
         Annotation annotation = new Annotation();
         when(annotationRepository.save(annotation)).thenReturn(annotation);
 
-        Annotation savedAnnotation = annotationController.saveAnnotation(annotation, null);
+        Annotation savedAnnotation = annotationController.saveAnnotation(annotation, null, null);
 
         assertEquals(annotation, savedAnnotation);
     }
@@ -58,7 +58,7 @@ public class AnnotationControllerTest {
         Annotation update = new Annotation();
         when(annotationRepository.findById(update.getIdAnnotation())).thenReturn(Optional.of(update));
 
-        ResponseEntity<Annotation> response = annotationController.patchAnnotation(update, null); // TODO: proper auth
+        ResponseEntity<Annotation> response = annotationController.patchAnnotation(update, null, null); // TODO: proper auth
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(update.getAnnotationDetail(), response.getBody());
@@ -71,7 +71,7 @@ public class AnnotationControllerTest {
         Annotation annotation = new Annotation();
         when(annotationRepository.findById(annoId)).thenReturn(Optional.of(annotation));
 
-        ResponseEntity<Annotation> response = annotationController.deleteAnnotation(annoId.toString(), null); // TODO: proper auth
+        ResponseEntity<Annotation> response = annotationController.deleteAnnotation(annoId.toString(), null, null); // TODO: proper auth
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(annotation, response.getBody());

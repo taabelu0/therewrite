@@ -30,10 +30,6 @@ public class SecurityConfiguration {
     public static final List<String> permitAllMatchers = List.of(
             "/api/user",
             "/api/user/login",
-            "/api/user/**",
-            "/api/document/**",
-            "/api/document/",
-            "/api/documentAccessToken/create",
             "/",
             "/login",
             "/registration",
@@ -59,7 +55,7 @@ public class SecurityConfiguration {
                 })
                 .addFilterBefore(
                         new GuestFilter(guestRepository, documentRepository, documentAccessTokenRepository),
-                        ExceptionTranslationFilter.class)
+                        UsernamePasswordAuthenticationFilter.class)
                 .formLogin(form -> form
                         .loginPage("/login")
                         .loginProcessingUrl("/api/user/login")

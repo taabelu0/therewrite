@@ -3,7 +3,6 @@ package ch.fhnw.therewrite.controller;
 import ch.fhnw.therewrite.AccessHelper;
 import ch.fhnw.therewrite.data.Annotation;
 import ch.fhnw.therewrite.data.Comment;
-import ch.fhnw.therewrite.data.Document;
 import ch.fhnw.therewrite.data.User;
 import ch.fhnw.therewrite.repository.AnnotationRepository;
 import ch.fhnw.therewrite.repository.CommentRepository;
@@ -63,7 +62,7 @@ public class CommentController {
         if(currentUser == null) return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
         User user = userRepository.findByUsername(currentUser.getUsername());
         Comment comment = commentRepository.findById(update.getIdComment()).orElseThrow();
-        if(user == null || !user.getIdUser().equals(comment.getUserId().getIdUser())) {
+        if(user == null || !user.getId().equals(comment.getUserId().getId())) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
         Optional<Comment> optionalComment = commentRepository.findById(update.getIdComment());
@@ -82,7 +81,7 @@ public class CommentController {
         if(currentUser == null) return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
         User user = userRepository.findByUsername(currentUser.getUsername());
         Comment comment = commentRepository.getReferenceById(UUID.fromString(commId));
-        if(user == null || !user.getIdUser().equals(comment.getUserId().getIdUser())) {
+        if(user == null || !user.getId().equals(comment.getUserId().getId())) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
         UUID aId = UUID.fromString(commId);

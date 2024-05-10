@@ -29,6 +29,11 @@ public class Annotation implements Serializable {
     @JsonProperty
     private User userCreator;
 
+    @ManyToOne
+    @JoinColumn(name = "idUserCreatorGuest")
+    @JsonProperty
+    private Guest guestCreator;
+
     @ManyToOne(fetch = FetchType.EAGER) // needs eager
     @JoinColumn(name = "documentId", nullable = false)
     @JsonProperty
@@ -53,6 +58,14 @@ public class Annotation implements Serializable {
 
     public UUID getIdAnnotation() {
         return idAnnotation;
+    }
+
+    public Guest getGuestCreator() {
+        return guestCreator;
+    }
+
+    public void setGuestCreator(Guest guestCreator) {
+        this.guestCreator = guestCreator;
     }
 
     public void setIdAnnotation(UUID idAnnotation) {

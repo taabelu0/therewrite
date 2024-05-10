@@ -1,11 +1,9 @@
 package ch.fhnw.therewrite.controller;
 
+import ch.fhnw.therewrite.repository.GuestRepository;
 import ch.fhnw.therewrite.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 
 import ch.fhnw.therewrite.data.Document;
 import ch.fhnw.therewrite.repository.AnnotationRepository;
@@ -19,10 +17,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 
-import org.aspectj.lang.annotation.Before;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 
@@ -35,17 +30,18 @@ public class DocumentControllerTest {
     @Mock
     private DocumentRepository documentRepository;
 
-    @MockBean
+    @Mock
     private AnnotationRepository annotationRepository;
-    @MockBean
+    @Mock
     private UserRepository userRepository;
-
+    @Mock
+    GuestRepository guestRepository;
     @Mock
     private StorageService storageService;
 
     @BeforeEach
     public void setup() {
-        documentController = new DocumentController(documentRepository, storageService, userRepository);
+        documentController = new DocumentController(documentRepository, storageService, userRepository, guestRepository);
     }
 
     @Test

@@ -1,15 +1,14 @@
 package ch.fhnw.therewrite.controller;
 
 import ch.fhnw.therewrite.AccessHelper;
-import ch.fhnw.therewrite.data.Annotation;
 import ch.fhnw.therewrite.data.Document;
-import ch.fhnw.therewrite.data.Guest;
 import ch.fhnw.therewrite.data.User;
 import ch.fhnw.therewrite.repository.DocumentRepository;
 import ch.fhnw.therewrite.repository.GuestRepository;
 import ch.fhnw.therewrite.repository.UserRepository;
 import ch.fhnw.therewrite.storage.StorageFileNotFoundException;
 import ch.fhnw.therewrite.storage.StorageService;
+import jakarta.servlet.http.HttpSession;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
@@ -22,7 +21,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Paths;
@@ -38,22 +37,25 @@ public class DocumentController {
     private final DocumentRepository documentRepository;
     private final StorageService storageService;
     private final UserRepository userRepository;
-
+    private final GuestRepository guestRepository;
     @Autowired
-    public DocumentController(DocumentRepository documentRepository, StorageService storageService, UserRepository userRepository) {
+    public DocumentController(DocumentRepository documentRepository, StorageService storageService, UserRepository userRepository, GuestRepository guestRepository) {
         this.documentRepository = documentRepository;
         this.storageService = storageService;
         this.userRepository = userRepository;
+        this.guestRepository = guestRepository;
     }
 
-
+    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_GUEST')")
     @GetMapping(
             value = "/{documentId}",
             produces = MediaType.APPLICATION_PDF_VALUE
     )
-    public ResponseEntity<byte[]> getDocument(@PathVariable String documentId, @AuthenticationPrincipal UserDetails currentUser) {
-        if(currentUser == null || !AccessHelper.verifyUserRights(currentUser.getUsername(), documentId, documentRepository)) {
-            if(currentUser != null) System.out.println(currentUser.getUsername());
+    public ResponseEntity<byte[]> getDocument(@PathVariable String documentId, @AuthenticationPrincipal UserDetails currentUser, HttpSession session) {
+        UUID guestId = (UUID) session.getAttribute("guestId");
+        boolean unauthUser = currentUser == null || !AccessHelper.verifyUserRights(currentUser.getUsername(), documentId, documentRepository);
+        boolean unauthGuest = guestId == null || !AccessHelper.verifyGuest(guestId.toString(), documentId, documentRepository, guestRepository);
+        if(unauthUser && unauthGuest) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
         }
         UUID dId = UUID.fromString(documentId);

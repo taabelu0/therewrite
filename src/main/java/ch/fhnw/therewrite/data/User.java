@@ -4,9 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import org.hibernate.annotations.GenericGenerator;
-import org.springframework.data.annotation.Id;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -18,7 +16,7 @@ public class User {
     @GeneratedValue(generator = "uuid2")
     @GenericGenerator(name = "uuid2", strategy = "uuid2")
     @Column(name = "id")
-    private UUID idUser;
+    private UUID id;
 
     @Column(unique = true)
     private String username;
@@ -33,12 +31,12 @@ public class User {
     @JsonProperty
     private List<Document> documents;
 
-    public UUID getIdUser() {
-        return idUser;
+    public UUID getId() {
+        return id;
     }
 
-    public void setIdUser(UUID idUser) {
-        this.idUser = idUser;
+    public void setId(UUID idUser) {
+        this.id = idUser;
     }
 
     public String getUsername() {

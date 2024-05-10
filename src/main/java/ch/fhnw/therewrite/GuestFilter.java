@@ -43,32 +43,6 @@ public class GuestFilter extends OncePerRequestFilter {
         this.documentRepository = documentRepository;
         this.documentAccessTokenRepository = documentAccessTokenRepository;
     }
-    public boolean verifyGuest(String guestId) {
-        UUID gId;
-        try {
-            gId = UUID.fromString(guestId);
-        }
-        catch(IllegalArgumentException exception) {
-            // TODO: log exception
-            return false;
-        }
-        return guestRepository.existsById(gId);
-    }
-    public boolean verifyGuest(String guestId, String documentId) {
-        UUID dId;
-        UUID gId;
-        try {
-            dId = UUID.fromString(documentId);
-            gId = UUID.fromString(guestId);
-        }
-        catch(IllegalArgumentException exception) {
-            // TODO: log exception
-            return false;
-        }
-        Document document = documentRepository.getReferenceById(dId);
-        List<Guest> guests = guestRepository.findByDocumentId(document);
-        return guests.stream().anyMatch(guest -> guest.getId().equals(gId));
-    }
 
     public Document verifyToken(String documentAccessToken) {
         UUID token;
@@ -100,15 +74,5 @@ public class GuestFilter extends OncePerRequestFilter {
             }
         }
         filterChain.doFilter(request, response);
-    }
-
-    @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) {
-        for (String matcher : permitAllMatchers) {
-            if(new AntPathRequestMatcher(matcher).matches(request)) {
-                return true;
-            }
-        }
-        return false;
     }
 }
