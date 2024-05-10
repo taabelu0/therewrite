@@ -65,8 +65,6 @@ public class GuestFilter extends OncePerRequestFilter {
                 List<SimpleGrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_GUEST"));
                 Authentication newAuth = new UsernamePasswordAuthenticationToken("guest", null, authorities);
                 SecurityContextHolder.getContext().setAuthentication(newAuth);
-                response.sendRedirect(request.getRequestURI());
-                return;
             }
         }
         filterChain.doFilter(request, response);
