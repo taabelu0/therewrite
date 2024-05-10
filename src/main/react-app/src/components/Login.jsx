@@ -12,7 +12,7 @@ function Login() {
         const response = await userAPI.login(username, password);
         console.log(response)
         if(response.status === 200) {
-            // window.location.href = "/home";
+            window.location.href = "/home";
             console.log(response.data)
         }
         else {
