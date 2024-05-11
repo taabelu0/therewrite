@@ -11,12 +11,12 @@ function LandingPage() {
         <div className="landing-container">
             <div className="landing-header">
                 <div className="landing-logo"
-                    onMouseEnter={() => setIsHovered(true)}
-                    onMouseLeave={() => setIsHovered(false)}
+                     onMouseEnter={() => setIsHovered(true)}
+                     onMouseLeave={() => setIsHovered(false)}
                 >
                     {isHovered ? <HoverLogo/> : <Logo/>}
                 </div>
-                <a href="/home" className="login-text">
+                <a href="/login" className="login-text">
                     Log In
                 </a>
             </div>
@@ -25,7 +25,7 @@ function LandingPage() {
                 <p>
                     Collectively annotate and diversify literature through discussions.
                 </p>
-                <a href="/home" className="signup-button">
+                <a href="/registration" className="signup-button">
                     Sign Up
                 </a>
             </div>

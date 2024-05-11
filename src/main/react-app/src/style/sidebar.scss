@@ -1,491 +1,700 @@
 @import "variables";
 
 .sidebar {
-    position: fixed;
-    right: 0;
-    top: calc(max(calc($s-nav-min-height + 200px), calc($s-nav-height + 200px)));
-    height: calc(100% - max(calc($s-nav-min-height + 200px), calc($s-nav-height + 200px)));
+    position: sticky;
+    left: 100%;
+    top: calc(max(calc($s-nav-min-height), calc($s-nav-height + 130px)));
+    height: calc(100% - $s-nav-height - 130px);
     width: 480px;
-    z-index: 9998;
+    z-index: 9997;
     display: flex;
     background-color: white;
 
-    &-deactivated {
-        width: 2rem;
-        .sidebar-content {
-            display: none;
-            width: 0;
-        }
+  &-deactivated {
+    width: 2rem;
+
+    .sidebar-content {
+      display: none;
+      width: 0;
+    }
+  }
+
+  &-arrow {
+    width: calc(1.5rem);
+    border: none;
+    padding: 0;
+    height: 100%;
+  }
+
+  &-content {
+    display: flex;
+    flex-direction: column;
+    width: calc(100%);
+    overflow-y: auto;
+    border-left: 1px solid $c-light-secondary;
+  }
+
+  &-option {
+    &-delete {
+      &:hover {
+        background-color: $c-color-primary !important;
+        color: $c-light-primary;
+      }
     }
 
-    &-arrow {
-        width: calc(2rem);
-        border: none;
-        padding: 0;
-        height: 100%;
-        background-color: $c-light-tertiary;
+    &-edit {
+      transition: 0.1s;
+
+      &:hover {
+        background-color: $c-color-secondary !important;
+        color: $c-light-primary;
+      }
+    }
+  }
+
+  &-annotation {
+    position: relative;
+    padding: 0.5rem;
+    margin-top: 9px;
+    display: flex;
+    flex-direction: column;
+
+    &:first-of-type {
+      margin-top: 1rem;
     }
 
-    &-content {
-
-        display: flex;
-        flex-direction: column;
-        width: calc(100% - 2rem - 2rem);
-        padding: 1rem;
-        overflow-y: auto;
+    &:hover {
+      background-color: $c-light-secondary;
     }
 
-    &-option {
-        &-delete {
-            &:hover {
-                background-color: $c-color-primary !important;
-                color: $c-light-primary;
-            }
-        }
-        &-edit {
-            transition: 0.1s;
-            &:hover {
-                background-color: $c-color-secondary !important;
-                color: $c-light-primary;
-            }
-        }
+    &-textInput {
+      margin-top: 1.15rem;
+      width: 100%;
+      font-family: "Source Serif 4", serif;
+      padding: 0.5rem;
+      border: 1px solid #ccc;
+      border-radius: 0.25rem;
+      font-size: 14px;
+      line-height: 1.25rem;
+      resize: none;
     }
 
-    &-annotation {
-        position: relative;
-        width: calc(100% - 1.5rem - 4px);
-        padding: 0.5rem;
-        border: 2px solid transparent;
-        border-radius: 0.25rem;
-        margin-bottom: 1rem;
+    &-cancel {
+      background-color: white;
+      border-radius: 4px;
+      color: #dc3545;
+      border: 1px solid #dc3545;
+      height: 28px;
+      width: 80px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 14px;
+      margin: 4px 2px;
+      cursor: pointer;
+      box-shadow: 0 0 0.5em rgba(0, 0, 0, 0.2);
 
-        display: flex;
-        flex-direction: column;
 
-        &-textInput {
-            width: 80%;
-            padding: 0.5rem;
-            border: 1px solid #ccc;
-            border-radius: 0.25rem;
-            font-size: 1rem;
-            line-height: 1.25rem;
-            resize: none;
-        }
+      &:hover {
+        background-color: #dc3545;
+        color: white;
+      }
+    }
 
-        &-cancel {
-            background-color: #f44336;
-            border: none;
-            color: white;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 16px;
-            margin: 4px 2px;
-            cursor: pointer;
-        }
+    &-save {
+      background-color: #007BFF;
+      font-family: "Source Code Pro", monospace, system-ui;
+      border-radius: 4px;
+      border: none;
+      height: 28px;
+      width: 80px;
+      color: white;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 14px;
+      margin-top: 11px;
+      margin-right: 6px;
+      box-shadow: 0 0 0.5em rgba(0, 0, 0, 0.2);
+      cursor: pointer;
 
-        &-save {
-            background-color: #4CAF50;
-            border: none;
-            color: white;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 16px;
-            margin: 4px 2px;
-            cursor: pointer;
-        }
+      &:hover {
+        background-color: #006cdf;
+      }
+    }
 
-        &-optionmenu {
-            z-index: 9999;
-            position: absolute;
-            top: 1.75rem;
-            right: 0;
-            border-radius: $s-border-radius;
-            overflow: hidden;
-            background-color: $c-light-primary;
-            box-shadow: 0 5px 15px rgba(37, 40, 43, 0.4);
-            width: 240px;
-            &-item {
-                padding: 0.5rem 0.75rem;
-                cursor: pointer;
-                border-bottom: 1px solid $c-light-secondary;
-                transition: 0.1s;
-                &:hover {
-                    background-color: $c-light-secondary;
-                }
-                &:last-of-type {
-                    border: none;
-                }
-            }
-        }
+    &-optionmenu {
+      z-index: 9999;
+      position: absolute;
+      top: 1.75rem;
+      right: 0;
+      border-radius: $s-border-radius;
+      overflow: hidden;
+      background-color: $c-light-primary;
+      box-shadow: 0 5px 15px rgba(37, 40, 43, 0.4);
+      width: 240px;
 
-        &-text {
-            line-height: 1.25rem;
+      &-item {
+        padding: 0.5rem 0.75rem;
+        cursor: pointer;
+        font-size: 12px;
+        border-bottom: 1px solid $c-light-secondary;
+        transition: 0.1s;
+
+        &:hover {
+          background-color: $c-light-secondary;
         }
 
         &:last-of-type {
-            margin-bottom: 0;
+          border: none;
         }
+      }
+    }
 
-        &-header {
+    &-text {
+      line-height: 1.25rem;
+    }
 
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            height: 1.25rem;
-            width: 100%;
+    &-header {
 
-            &-info {
-                display: flex;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      height: 1.25rem;
+      width: 100%;
 
-                &-user {
-                    font-size: 0.75rem;
-                    font-weight: 600;
-                }
+      &-info {
+        display: flex;
 
-                &-date {
-                    font-size: 0.75rem;
-                    font-weight: 200;
-                    margin-left: 0.5rem;
-                }
-            }
+        &-user {
+          font-weight: 500;
+          font-size: 11px;
+          letter-spacing: 0.15px;
+          font-family: "Source Code Pro", monospace, system-ui;
 
-            &-options {
-                height: 100%;
-                cursor: pointer;
-
-                svg {
-                    height: 100%;
-                }
-
-                &-definition {
-                    &-active, &:hover {
-                        svg {
-                            fill: $c-category-definition;
-                        }
-                    }
-                }
-
-                &-explosion {
-                    &-active, &:hover {
-                        svg {
-                            fill: $c-category-explosion;
-                        }
-                    }
-                }
-
-                &-deletion {
-                    &-active, &:hover {
-                        svg {
-                            fill: $c-category-deletion;
-                        }
-                    }
-                }
-
-                &-correction {
-                    &-active, &:hover {
-                        svg {
-                            fill: $c-category-correction;
-                        }
-                    }
-                }
-
-                &-speculation {
-                    &-active, &:hover {
-                        svg {
-                            fill: $c-category-speculation;
-                        }
-                    }
-                }
-
-                &-addition {
-                    &-active, &:hover {
-                        svg {
-                            fill: $c-category-addition;
-                        }
-                    }
-                }
-            }
+          color: rgba(0, 0, 0, 0.4);
         }
+      }
 
-        &-comment {
-            position: relative;
-            font-size: 0.9rem;
-            border-top: 2px solid;
-            padding: 0.5rem;
-            margin-top: 0.5rem;
+      &-options {
+        height: 100%;
+        cursor: pointer;
 
-            &:last-of-type {
-                padding-bottom: 0;
-            }
-
-            &-header {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                height: 1.25rem;
-                width: 100%;
-
-                &-user {
-                    font-size: 0.75rem;
-                    font-weight: 600;
-                }
-
-                &-date {
-                    font-size: 0.75rem;
-                    font-weight: 200;
-                    margin-left: 0.5rem;
-                }
-
-                &-options {
-                    margin-left: auto;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    cursor: pointer;
-
-                    svg {
-                        width: 20px;
-                        height: 20px;
-                    }
-
-                    &:hover svg {
-                        fill: $c-light-secondary;
-                    }
-
-                    &-definition svg {
-                        fill: $c-category-definition;
-                    }
-
-                    &-explosion svg {
-                        fill: $c-category-explosion;
-                    }
-
-                    &-deletion svg {
-                        fill: $c-category-deletion;
-                    }
-
-                    &-correction svg {
-                        fill: $c-category-correction;
-                    }
-
-                    &-speculation svg {
-                        fill: $c-category-speculation;
-                    }
-
-                    &-addition svg {
-                        fill: $c-category-addition;
-                    }
-                }
-            }
-
-            &-edit {
-
-            }
-
-            &-input {
-
-                display: flex;
-                height: 1.75rem;
-                margin: 0.25rem 0;
-                width: 100%;
-                justify-content: space-between;
-
-                &-hidden {
-                    display: none;
-                }
-
-                input {
-                    font-size: 0.75rem;
-                    width: calc(100% - 6rem);
-                    border: none;
-                    border-bottom: 1px solid $c-light-tertiary;
-                    border-radius: 0.125rem;
-                    font-family: inherit;
-                }
-
-                &-send {
-                    font-size: 0.75rem;
-                    height: 1.25rem;
-                    width: 4rem;
-                    padding: 0.25rem 0.5rem;
-                    background-color: $c-light-secondary;
-                    border-radius: 0.125rem;
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-
-                    &:hover {
-                        background-color: $c-light-tertiary;
-                        cursor: pointer;
-                    }
-                }
-            }
-
-            &-wrapper {
-                &-hidden {
-                    display: none;
-                }
-            }
-        }
-
-        &-control {
-
-            display: flex;
-            justify-content: space-between;
-            width: 100%;
-
-            &-input {
-                font-size: 0.75rem;
-                height: 1.25rem;
-                width: 4rem;
-                padding: 0.25rem 0.5rem;
-                background-color: $c-light-secondary;
-                border-radius: 0.125rem;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-
-                &:hover {
-                    background-color: $c-light-tertiary;
-                    cursor: pointer;
-                }
-            }
-
-            &-comments {
-                font-size: 0.75rem;
-                height: 1.25rem;
-                padding: 0.25rem 0;
-                border-radius: 0.125rem;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-
-                &:hover {
-                    cursor: pointer;
-                }
-            }
+        svg {
+          height: 100%;
+          margin-right: 3px;
         }
 
         &-definition {
-            border-color: $c-category-definition;
-
-            .sidebar-annotation-control-comments:hover {
-                color: $c-category-definition;
+          &-active, &:hover {
+            svg {
+              fill: $c-category-definition;
             }
-            .sidebar-annotation-comment {
-                border-color: $c-category-definition;
-            }
+          }
         }
 
         &-explosion {
-            border-color: $c-category-explosion;
-
-            .sidebar-annotation-control-comments:hover {
-                color: $c-category-explosion;
+          &-active, &:hover {
+            svg {
+              fill: $c-category-explosion;
             }
-            .sidebar-annotation-comment {
-                border-color: $c-category-explosion;
-            }
+          }
         }
 
         &-deletion {
-            border-color: $c-category-deletion;
-
-            .sidebar-annotation-control-comments:hover {
-                color: $c-category-deletion;
+          &-active, &:hover {
+            svg {
+              fill: $c-category-deletion;
             }
-            .sidebar-annotation-comment {
-                border-color: $c-category-deletion;
-            }
+          }
         }
 
         &-correction {
-            border-color: $c-category-correction;
-
-            .sidebar-annotation-control-comments:hover {
-                color: $c-category-correction;
+          &-active, &:hover {
+            svg {
+              fill: $c-category-correction;
             }
-            .sidebar-annotation-comment {
-                border-color: $c-category-correction;
-            }
+          }
         }
 
         &-speculation {
-            border-color: $c-category-speculation;
-
-            .sidebar-annotation-control-comments:hover {
-                color: $c-category-speculation;
+          &-active, &:hover {
+            svg {
+              fill: $c-category-speculation;
             }
-            .sidebar-annotation-comment {
-                border-color: $c-category-speculation;
-            }
+          }
         }
 
         &-addition {
-            border-color: $c-category-addition;
-
-            .sidebar-annotation-control-comments:hover {
-                color: $c-category-addition;
+          &-active, &:hover {
+            svg {
+              fill: $c-category-addition;
             }
-            .sidebar-annotation-comment {
-                border-color: $c-category-addition;
-            }
+          }
         }
+      }
     }
-}
 
-.item {
-    &-definition {
-        color: $c-category-definition;
-        &:hover {
-            color: $c-light-primary;
-            background-color: $c-category-definition;
+    &-comment {
+      position: relative;
+      font-size: 0.9rem;
+      padding: 0.5rem;
+      margin-top: 0.5rem;
+
+      &:last-of-type {
+        padding-bottom: 0;
+      }
+
+      &-header {
+        display: flex;
+        margin-left: 5px;
+        justify-content: space-between;
+        align-items: center;
+        height: 1.25rem;
+        width: 100%;
+
+        &-arrow::before {
+          content: "↪";
+          position: absolute;
+          top: 9px;
+          align-items: center;
+          justify-content: center;
+          font-size: 1rem;
+          font-weight: 400;
+          left: 12px;
         }
+
+        &-user {
+          font-weight: 500;
+          font-size: 11px;
+          margin-left: 20px;
+          color: rgba(0, 0, 0, 0.4);
+          letter-spacing: 0.15px;
+          font-family: "Source Code Pro", monospace, system-ui;
+        }
+
+        &-options {
+          margin-left: auto;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+
+          svg {
+            width: 20px;
+            height: 20px;
+          }
+
+          &:hover svg {
+            fill: $c-light-secondary;
+          }
+
+          &-definition svg {
+            fill: $c-category-definition;
+          }
+
+          &-explosion svg {
+            fill: $c-category-explosion;
+          }
+
+          &-deletion svg {
+            fill: $c-category-deletion;
+          }
+
+          &-correction svg {
+            fill: $c-category-correction;
+          }
+
+          &-speculation svg {
+            fill: $c-category-speculation;
+          }
+
+          &-addition svg {
+            fill: $c-category-addition;
+          }
+        }
+      }
+
+      &-edit {
+
+      }
+
+      &-input {
+        margin-top: 12px;
+        display: flex;
+        height: 1.75rem;
+        width: 100%;
+        justify-content: space-between;
+
+        &-hidden {
+          display: none;
+        }
+
+        input {
+          font-size: 12px;
+          margin-left: 9px;
+          width: calc(100% - 6rem);
+          border: none;
+          border-bottom: 1px solid rgb(160, 160, 160);
+          border-radius: 0.125rem;
+          font-family: "Source Code Pro", monospace, system-ui;
+        }
+
+        &-send {
+          font-size: 0.75rem;
+          height: 1.25rem;
+          width: 4rem;
+          padding: 0.25rem 0.5rem;
+          background-color: #6979F8;
+          color: white;
+          border-radius: 0.125rem;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          &:hover {
+            background-color: #6271e8;
+            cursor: pointer;
+          }
+        }
+      }
+
+      &-wrapper {
+        &-hidden {
+          display: none;
+        }
+      }
+    }
+
+    &-cat {
+      padding: 0.5em 0.6em;
+      border-radius: 0.5em;
+      margin-left: -5px;
+      background-color: transparent;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.035em;
+      cursor: pointer;
+      position: relative;
+      border: 1px solid;
+      font-size: 11px;
+    }
+
+    &-control {
+
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+
+      &-input {
+        font-size: 0.75rem;
+        color: rgba(255, 255, 255, 0.86);
+        height: 16px;
+        box-shadow: 0 0 0.5em rgba(0, 0, 0, 0.2);
+        width: 60px;
+        margin-left: 9rem;
+        padding: 0.25rem 0.5rem;
+        background-color: $c-light-primary;
+        border-radius: 6px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        &:hover {
+          background-color: $c-light-tertiary;
+          cursor: pointer;
+        }
+      }
+
+      &-comments {
+        font-size: 0.65rem;
+        height: 1.25rem;
+        padding: 0.25rem 0;
+        border-radius: 0.125rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 5px;
+        margin-left: 11px;
+
+        &:hover {
+          cursor: pointer;
+        }
+      }
+    }
+
+    &-definition {
+      &:hover {
+        background-color: $c-category-definition-light;
+
+        .sidebar-option-change::before {
+          color: $c-category-definition;
+          left: 8px !important;
+          background-color: $c-category-definition-light;
+        }
+      }
+
+      .sidebar-annotation-comment-header-arrow {
+        color: $c-category-definition;
+      }
+
+      .sidebar-annotation-control-input {
+        background-color: $c-category-definition;
+      }
+
+      .sidebar-annotation-cat {
+        border-color: $c-category-definition;
+        color: $c-category-definition;
+      }
+
+      .sidebar-annotation-control-comments:hover {
+        color: $c-category-definition;
+      }
     }
 
     &-explosion {
-        color: $c-category-explosion;
-        &:hover {
-            color: $c-light-primary;
-            background-color: $c-category-explosion;
+
+      &:hover {
+        background-color: $c-category-explosion-light;
+
+        .sidebar-option-change::before {
+          color: $c-category-explosion;
+          background-color: $c-category-explosion-light;
+          left: 9px !important;
         }
+      }
+
+      .sidebar-annotation-comment-header-arrow {
+        color: $c-category-explosion;
+      }
+
+      .sidebar-annotation-cat {
+        border-color: $c-category-explosion;
+        color: $c-category-explosion;
+      }
+
+      .sidebar-annotation-control-input {
+        background-color: $c-category-explosion;
+      }
+
+      .sidebar-annotation-control-comments:hover {
+        color: $c-category-explosion;
+      }
     }
 
     &-deletion {
-        color: $c-category-deletion;
-        &:hover {
-            color: $c-light-primary;
-            background-color: $c-category-deletion;
+      &:hover {
+        background-color: $c-category-deletion-light;
+
+        .sidebar-option-change::before {
+          color: $c-category-deletion;
+          left: 11px !important;
+          background-color: $c-category-deletion-light;
         }
+      }
+
+      .sidebar-annotation-comment-header-arrow {
+        color: $c-category-deletion;
+      }
+
+      .sidebar-annotation-cat {
+        border-color: $c-category-deletion;
+        color: $c-category-deletion;
+      }
+
+      .sidebar-annotation-control-input {
+        background-color: $c-category-deletion;
+      }
+
+      .sidebar-annotation-control-comments:hover {
+        color: $c-category-deletion;
+      }
     }
 
     &-correction {
-        color: $c-category-correction;
-        &:hover {
-            color: $c-light-primary;
-            background-color: $c-category-correction;
+      &:hover {
+        background-color: $c-category-correction-light;
+
+        .sidebar-option-change::before {
+          color: $c-category-correction;
+          left: 9px !important;;
+          background-color: $c-category-correction-light;
         }
+      }
+
+      .sidebar-annotation-comment-header-arrow {
+        color: $c-category-correction;
+      }
+
+      .sidebar-annotation-cat {
+        border-color: $c-category-correction;
+        color: $c-category-correction;
+      }
+
+      .sidebar-annotation-control-input {
+        background-color: $c-category-correction;
+      }
+
+      .sidebar-annotation-control-comments:hover {
+        color: $c-category-correction;
+      }
     }
 
     &-speculation {
-        color: $c-category-speculation;
-        &:hover {
-            color: $c-light-primary;
-            background-color: $c-category-speculation;
+      &:hover {
+        background-color: $c-category-speculation-light;
+
+        .sidebar-option-change::before {
+          color: $c-category-speculation;
+          left: 6px !important;
+          background-color: $c-category-speculation-light;
         }
+      }
+
+      .sidebar-annotation-comment-header-arrow {
+        color: $c-category-speculation;
+      }
+
+      .sidebar-annotation-cat {
+        border-color: $c-category-speculation;
+        color: $c-category-speculation;
+      }
+
+      .sidebar-annotation-control-input {
+        background-color: $c-category-speculation;
+      }
+
+      .sidebar-annotation-control-comments:hover {
+        color: $c-category-speculation;
+      }
     }
 
     &-addition {
-        color: $c-category-addition;
-        &:hover {
-            color: $c-light-primary;
-            background-color: $c-category-addition;
+      &:hover {
+        background-color: $c-category-addition-light;
+
+        .sidebar-option-change::before {
+          color: $c-category-addition;
+          left: 12px !important;
+          background-color: $c-category-addition-light;
         }
+      }
+
+      .sidebar-annotation-comment-header-arrow {
+        color: $c-category-addition;
+      }
+
+      .sidebar-annotation-cat {
+        border-color: $c-category-addition;
+        color: $c-category-addition;
+      }
+
+      .sidebar-annotation-control-input {
+        background-color: $c-category-addition;
+      }
+
+      .sidebar-annotation-control-comments:hover {
+        color: $c-category-addition;
+      }
     }
+  }
 }
 
-.selected-annotation-sidebar {
-    box-shadow: black 1px 2px;
+.item {
+  &-definition {
+    color: $c-category-definition;
+
+    &:hover {
+      color: $c-light-primary;
+      background-color: $c-category-definition;
+    }
+  }
+
+  &-explosion {
+    color: $c-category-explosion;
+
+    &:hover {
+      color: $c-light-primary;
+      background-color: $c-category-explosion;
+    }
+  }
+
+  &-deletion {
+    color: $c-category-deletion;
+
+    &:hover {
+      color: $c-light-primary;
+      background-color: $c-category-deletion;
+    }
+  }
+
+  &-correction {
+    color: $c-category-correction;
+
+    &:hover {
+      color: $c-light-primary;
+      background-color: $c-category-correction;
+    }
+  }
+
+  &-speculation {
+    color: $c-category-speculation;
+
+    &:hover {
+      color: $c-light-primary;
+      background-color: $c-category-speculation;
+    }
+  }
+
+  &-addition {
+    color: $c-category-addition;
+
+    &:hover {
+      color: $c-light-primary;
+      background-color: $c-category-addition;
+    }
+  }
 }
+
+.sidebar-content-annotation-text {
+  font-size: 14px;
+  color: #666;
+  font-family: "Source Serif 4", serif;
+  padding-top: 13px;
+  margin-left: 10px;
+}
+
+.sidebar-annotation-comment-text {
+  color: #666;
+  font-size: 14px;
+  font-family: "Source Serif 4", serif;
+  padding-top: 8px;
+  margin-left: 26px;
+}
+
+.sidebar-annotation:hover .sidebar-option-change::before {
+  content: "✎";
+  cursor: pointer;
+  position: absolute;
+  left: 8px;
+  top: -2px;
+  font-size: 1.12rem;
+  border-radius: 50%;
+  align-items: center;
+  justify-content: center;
+  transform: translateY(50%);
+  z-index: 100;
+  line-height: 1.2rem;
+}
+
+.sidebar-annotation-optionmenu-cat {
+  z-index: 9999;
+  position: absolute;
+  top: 2rem;
+  right: 12.5rem;
+  border-radius: 0.25rem;
+  overflow: hidden;
+  background-color: rgb(245, 245, 245);
+  box-shadow: 0 5px 15px rgba(37, 40, 43, 0.4);
+  width: 240px;
+}
+

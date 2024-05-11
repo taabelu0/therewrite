@@ -65,8 +65,8 @@ public class DocumentAccessTokenControllerTest {
     @Test
     public void testCreateAccessTokenInvalidDocumentId() {
         Map<String, String> requestBody = Map.of("documentId", "invalid");
-        ResponseEntity<String> response = documentAccessTokenController.createAccessToken(requestBody);
-        Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        ResponseEntity<String> response = documentAccessTokenController.createAccessToken(requestBody, null); // TODO: proper user auth
+        Assertions.assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
         Assertions.assertNull(response.getBody());
     }
 }

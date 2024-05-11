@@ -1,6 +1,7 @@
 package ch.fhnw.therewrite.data;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -19,19 +20,36 @@ public class Document {
     @JsonIgnore
     private List<Guest> guests = new ArrayList<>();
 
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<User> users = new ArrayList<>();
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JsonProperty
+    private User UserCreator;
+
     @OneToMany(mappedBy = "documentId", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JsonIgnore
     private List<DocumentAccessToken> accessTokens = new ArrayList<>();
+
     @jakarta.persistence.Id
     @GeneratedValue(generator = "uuid2")
     @GenericGenerator(name = "uuid2", strategy = "uuid2")
     @Column(name = "id")
     private UUID id;
 
+    @Column(name = "documentName")
     private String documentName;
 
     @JsonIgnore
     private String path;
+
+    @Column(name = "source", columnDefinition="TEXT")
+    private String source;
+
+    @Column(name = "copyRight", columnDefinition="TEXT")
+    private String copyRight;
+
 
     @ManyToOne
     @JoinColumn(name = "userId")
@@ -90,8 +108,40 @@ public class Document {
         annotation.setDocument(this);
     }
 
+    public List<User> getUsers() {
+        return users;
+    }
+
+    public void setUsers(List<User> users) {
+        this.users = users;
+    }
+
     public void removeAnnotation(Annotation annotation) {
         this.annotations.remove(annotation);
         annotation.setDocument(null);
+    }
+
+    public void setSource(String source) {
+        this.source = source;
+    }
+
+    public String getSource() {
+        return source;
+    }
+
+    public void setCopyRight(String copyRight) {
+        this.copyRight = copyRight;
+    }
+
+    public String getCopyRight() {
+        return copyRight;
+    }
+
+    public User getUserCreator() {
+        return UserCreator;
+    }
+
+    public void setUserCreator(User userCreator) {
+        UserCreator = userCreator;
     }
 }

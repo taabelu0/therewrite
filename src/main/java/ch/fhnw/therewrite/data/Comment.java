@@ -23,6 +23,10 @@ public class Comment {
     @JoinColumn(name = "idUser")
     private User userId;
 
+    @ManyToOne
+    @JoinColumn(name = "idGuest")
+    private Guest guestId;
+
     @Column(name = "commentText")
     private String commentText;
 
@@ -51,6 +55,14 @@ public class Comment {
 
     public void setUserId(User userId) {
         this.userId = userId;
+    }
+
+    public Guest getGuestId() {
+        return guestId;
+    }
+
+    public void setGuestId(Guest guestId) {
+        this.guestId = guestId;
     }
 
     public String getCommentText() {

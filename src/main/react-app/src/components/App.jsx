@@ -1,6 +1,8 @@
 import Home from'./Home.jsx';
 import LandingPage from './LandingPage.jsx';
+import Login from './Login.jsx';
 import Demo from './Demo.jsx';
+import Registration from "./Registration";
 import {BrowserRouter as Router, Routes, Route} from 'react-router-dom';
 import Viewer from "./Viewer.jsx";
 import Navigation from "./Navigation";
@@ -16,8 +18,10 @@ function App() {
             {renderNavigation}
             <Routes>
                 <Route path="/" element={<LandingPage/>}/>
-                <Route path="/demo/:pdfName" element={<Demo/>}/>
                 <Route path="/home" element={<Home/>}/>
+                <Route path="/login" element={<Login/>}/>
+                <Route path="/demo/:pdfName" element={<Demo/>}/>
+                <Route path="/registration" element={<Registration/>}/>
                 <Route path="/view/:pdfName" element={<Viewer/>} />
                 <Route path="*" element={<NotFound/>} />
             </Routes>

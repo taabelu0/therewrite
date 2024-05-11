@@ -1,7 +1,5 @@
 package ch.fhnw.therewrite.data;
 
-import org.springframework.boot.test.context.SpringBootTest;
-import ch.fhnw.therewrite.data.User;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

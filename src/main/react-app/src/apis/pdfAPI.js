@@ -17,5 +17,22 @@ export const pdfAPI = {
     },
     getUrl(pdfName) {
         return `${baseURL}/api/document/${pdfName}`;
-    }
+    },
+    updateDocument: async function (documentId, source, copyRight) {
+        return api.request({
+            url: `/api/document/${documentId}`,
+            method: "PATCH",
+            data: {
+                source,
+                copyRight
+            }
+        });
+    },
+    getDocument: async function (documentId) {
+        const response = await api.request({
+            url: `/api/document/get/${documentId}`,
+            method: "GET",
+        })
+        return response.data
+    },
 }
