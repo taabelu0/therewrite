@@ -18,13 +18,19 @@ const ShareIcon = () => {
             accesstoken = await accessTokenAPI.create(segments.pop());
             param = '?documentAccessToken=' + accesstoken;
         }
+
+        /** this is for production
         navigator.clipboard.writeText(window.location.href + param)
             .then(() => {
                 setShowToast(true); // Show toast notification
             }, (err) => {
                 console.error('Failed to copy text: ', err);
             });
-    };
+            **/
+
+        const urlToCopy = window.location.href + param;
+        window.prompt("Press Ctrl+C to copy the link, then press Enter", urlToCopy);
+        };
 
     return (
         <>
