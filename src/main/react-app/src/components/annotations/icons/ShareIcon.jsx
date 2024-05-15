@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import Notify from "../../notification/Notify";
 import {accessTokenAPI} from "../../../apis/accessTokenAPI";
 
@@ -12,19 +12,18 @@ const ShareIcon = () => {
 
         const path = window.location.pathname;
         const segments = path.split('/').filter(Boolean);
-
+        let param = '';
         if (!accesstoken) {
             accesstoken = await accessTokenAPI.create(segments.pop());
-            console.log('accesstoken', accesstoken);
+            param = '?documentAccessToken=' + accesstoken;
         }
-            navigator.clipboard.writeText(window.location.href + '?documentAccessToken=' + accesstoken)
-                .then(() => {
-                    setShowToast(true); // Show toast notification
-                }, (err) => {
-                    console.error('Failed to copy text: ', err);
-                });
-        }
-        ;
+        navigator.clipboard.writeText(window.location.href + param)
+            .then(() => {
+                setShowToast(true); // Show toast notification
+            }, (err) => {
+                console.error('Failed to copy text: ', err);
+            });
+    };
 
     return (
         <>
@@ -39,7 +38,7 @@ const ShareIcon = () => {
                  strokeLinecap="round"
                  strokeLinejoin="round"
                  className="feather feather-share"
-                 style={{ cursor: 'pointer' }}>
+                 style={{cursor: 'pointer'}}>
                 <path d="M4 12V16a4 4 0 0 0 4 4h12"></path>
                 <polyline points="16 6 12 2 8 6"></polyline>
                 <line x1="12" y1="2" x2="12" y2="15"></line>

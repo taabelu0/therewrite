@@ -51,7 +51,6 @@ public class GuestFilter extends OncePerRequestFilter {
     }
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        HttpSession session = request.getSession(false);
         String token = request.getParameter("documentAccessToken");
         String username = request.getParameter("username");
         UserDetails user = null;
@@ -61,6 +60,7 @@ public class GuestFilter extends OncePerRequestFilter {
             if(document != null) {
                 GuestController gC = new GuestController(guestRepository, documentRepository);
                 Guest guest = gC.createGuest(document);
+                HttpSession session = request.getSession(true);
                 session.setAttribute("guestId", guest.getId());
                 List<SimpleGrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_GUEST"));
                 Authentication newAuth = new UsernamePasswordAuthenticationToken("guest", null, authorities);
