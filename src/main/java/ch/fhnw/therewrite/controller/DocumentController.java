@@ -74,7 +74,6 @@ public class DocumentController {
         return new ResponseEntity(HttpStatus.EXPECTATION_FAILED);
     }
 
-
     @GetMapping("/all")
     public List<Document> getDocumentList() {
         return documentRepository.findAll();
@@ -92,6 +91,16 @@ public class DocumentController {
         }
         return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(null);*/
         return null;
+    }
+
+    @GetMapping("/get/{documentId}")
+    public ResponseEntity<Document> getDocumentById(@PathVariable String documentId) {
+        UUID dId = UUID.fromString(documentId);
+        Optional<Document> optionalDocument = documentRepository.findById(dId);
+        if(optionalDocument.isPresent()) {
+            return ResponseEntity.status(HttpStatus.OK).body(optionalDocument.get());
+        }
+        return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(null);
     }
 
     @PreAuthorize("hasRole('ROLE_USER')") // TODO: change to role admin
@@ -130,6 +139,17 @@ public class DocumentController {
             return ResponseEntity.status(HttpStatus.OK).body(resp);
         }
     }
+
+    @PatchMapping("/{documentId}")
+    public ResponseEntity<Document> updateDocument(@PathVariable UUID documentId, @RequestBody Document updateDetails) {
+        return documentRepository.findById(documentId).map(document -> {
+            document.setSource(updateDetails.getSource());
+            document.setCopyRight(updateDetails.getCopyRight());
+            documentRepository.save(document);
+            return ResponseEntity.ok(document);
+        }).orElse(ResponseEntity.notFound().build());
+    }
+
 
 
     @PreAuthorize("hasRole('ROLE_USER')") // TODO: change to admin

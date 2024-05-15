@@ -7,20 +7,20 @@ import {csrfInterceptor} from "../apis/config/axiosConfig";
 import {baseURL} from "../apis/config/axiosConfig";
 import { Dropzone } from "dropzone";
 import {accessTokenAPI} from "../apis/accessTokenAPI";
-
+import {SourcePopUp} from './SourcePopUp';
 
 function Home() {
-
     const [pdfs, setPdfs] = useState([["", ""]]);
+    const [showDetailsPopUp, setShowDetailsPopUp] = useState(false);
+    const [currentPdf, setCurrentPdf] = useState(null);
+
     useEffect(() => {
         async function fetchData() {
-            const resp = await pdfAPI.getList().catch(e => { setPdfs( [])});
-            if(resp) setPdfs(resp);
+            const resp = await pdfAPI.getList().catch(e => { setPdfs([]) });
+            if (resp) setPdfs(resp);
         }
-
         fetchData().finally();
     }, []);
-
 
     const loaded = useRef(false);
     useEffect(() => {
@@ -31,7 +31,7 @@ function Home() {
     }, []);
 
     const dropzoneInterceptor = (obj, xhr) => {
-        let csrfObj = csrfInterceptor({headers: {}}).headers;
+        let csrfObj = csrfInterceptor({ headers: {} }).headers;
         xhr.setRequestHeader('X-XSRF-TOKEN', csrfObj['X-XSRF-TOKEN']);
     };
 
@@ -44,22 +44,27 @@ function Home() {
             sending: dropzoneInterceptor,
             sendingmultiple: dropzoneInterceptor
         });
+
         myDropzone.on("success", function (file, response) {
-            setTimeout(() => {
-                myDropzone.removeAllFiles();
-                let pdf = response;
-                setPdfs(prevState => [...prevState, pdf]);
-                displayInviteLink(pdf);
-            }, 1200);
+            let pdf = response;
+            setPdfs(prevPdfs => [...prevPdfs, pdf]);
+            setCurrentPdf(pdf);
+            setShowDetailsPopUp(true);
         });
     }
 
-    function displayInviteLink(pdf) {
-        accessTokenAPI.create(pdf.id).then(token => {
-            let url = window.location.origin + "/view/" + pdf.id + "?documentAccessToken=" + token;
-            //alert(url);
-            window.location.href = url;
-        });
+    function handleDetailsSubmission(source, copyRight) {
+        console.log(source, copyRight);
+        setShowDetailsPopUp(false);
+
+        pdfAPI.updateDocument(currentPdf.id, source, copyRight)
+            .then(() => {
+                window.location.href =  window.location.origin + "/view/" + currentPdf.id;
+            })
+            .catch(error => {
+                console.error('Error updating document:', error);
+            });
+
     }
 
     return (
@@ -67,18 +72,20 @@ function Home() {
             <div className="App">
                 <form id="fileUpload" className="dropzone-custom">Drag & Drop your file here</form>
                 <div className="list-container" id="list-of-pdf">
-                    {pdfs.map(PDF)}
+                    {pdfs.map((pdf, index) => <PDF key={index} pdf={pdf} />)}
                 </div>
+                {showDetailsPopUp && <SourcePopUp currentPdf={currentPdf} onClose={handleDetailsSubmission} />}
             </div>
         </section>
     );
 }
 
-function PDF(pdf, index) {
-    return(
-    <a key={index} href={"/view/" + pdf['id']} className="list-item">
-        {pdf['documentName']}
-    </a>);
+function PDF({ pdf }) {
+    return (
+        <a href={"/view/" + pdf.id} className="list-item">
+            {pdf.documentName}
+        </a>
+    );
 }
 
 export default Home;

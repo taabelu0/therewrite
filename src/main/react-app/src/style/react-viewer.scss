@@ -3,14 +3,15 @@
 body {
   width: 100%;
   height: calc(100vh - max($s-nav-min-height, $s-nav-height));
+  overflow-x: hidden;
 }
 
 .PdfHighlighter {
   position: absolute;
-  display: flex;
-  margin-top: 250px;
+  margin-left: 10rem;
+  margin-top: $s-nav-height + $s-header-nav-height + 23vh;
   justify-content: center;
-  width: $s-workspace-width;
+  width: 100%;
   min-height: 100vh;
   transform-origin: top left; /* Only needed for transform: scale */
   background-color: white;
@@ -19,10 +20,11 @@ body {
 
 .pdfViewer {
 
-  background-color: $c-light-secondary;
+  background-color: $c-light-primary;
   padding: 2rem;
 }
 
 .pdfViewer.removePageBorders .page {
   margin: 0 0 2rem 0;
+  border: 1px solid $c-light-secondary;
 }

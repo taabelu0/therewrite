@@ -6,8 +6,9 @@ const ShareIcon = () => {
     const [showToast, setShowToast] = useState(false);
 
 
-    const copyToClipboard = async () => {
-
+    const copyToClipboard = async (event) => {
+        event.stopPropagation();
+        event.preventDefault();
         let accesstoken = localStorage.getItem('documentAccessToken');
 
         const path = window.location.pathname;
