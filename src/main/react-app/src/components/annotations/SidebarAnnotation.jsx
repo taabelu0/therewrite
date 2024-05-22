@@ -176,8 +176,7 @@ function SidebarAnnotation({
         updateAnnoCategory(annotation.id, "Addition");
     }
 
-    if (annotation.timeCreated) {
-        let date = new Date(annotation.timeCreated)
+    if (annotation.id) {
         return (
             <div onClick={(event) => onSelection(event, annotation.id)} id={'sidebar-' + annotation.id}
                  className={`sidebar-annotation sidebar-annotation-${annotation.category.toLowerCase()}`}>
