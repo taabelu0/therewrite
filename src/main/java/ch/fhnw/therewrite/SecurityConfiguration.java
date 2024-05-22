@@ -3,6 +3,7 @@ package ch.fhnw.therewrite;
 import ch.fhnw.therewrite.repository.DocumentAccessTokenRepository;
 import ch.fhnw.therewrite.repository.DocumentRepository;
 import ch.fhnw.therewrite.repository.GuestRepository;
+import ch.fhnw.therewrite.security.CustomUsernamePasswordAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -56,6 +57,8 @@ public class SecurityConfiguration {
                 .addFilterBefore(
                         new GuestFilter(guestRepository, documentRepository, documentAccessTokenRepository, cuds),
                         UsernamePasswordAuthenticationFilter.class)
+                .addFilterAt(customUsernamePasswordAuthenticationFilter(),
+                        UsernamePasswordAuthenticationFilter.class)
                 .formLogin(form -> form
                         .loginPage("/login")
                         .loginProcessingUrl("/api/user/login")
@@ -72,6 +75,12 @@ public class SecurityConfiguration {
                         appConfig.corsConfigurationSource(),
                         GuestFilter.class);
         return http.build();
+    }
+
+    @Bean
+    public CustomUsernamePasswordAuthenticationFilter customUsernamePasswordAuthenticationFilter() throws Exception {
+        CustomUsernamePasswordAuthenticationFilter filter = new CustomUsernamePasswordAuthenticationFilter(authenticationManager());
+        return filter;
     }
     @Bean
     public PasswordEncoder passwordEncoder() {
