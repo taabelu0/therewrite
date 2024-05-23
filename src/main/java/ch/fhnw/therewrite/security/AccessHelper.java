@@ -29,7 +29,7 @@ public class AccessHelper {
             dId = UUID.fromString(documentId);
             document = documentRepository.findById(dId).orElseThrow();
         }
-        catch(IllegalArgumentException | NoSuchElementException exception) {
+        catch(IllegalArgumentException | NoSuchElementException | NullPointerException exception) {
             // TODO: log exception
             return false;
         }

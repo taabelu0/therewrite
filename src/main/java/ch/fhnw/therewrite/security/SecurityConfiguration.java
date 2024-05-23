@@ -5,6 +5,7 @@ import ch.fhnw.therewrite.CustomUserDetailsService;
 import ch.fhnw.therewrite.repository.DocumentAccessTokenRepository;
 import ch.fhnw.therewrite.repository.DocumentRepository;
 import ch.fhnw.therewrite.repository.GuestRepository;
+import ch.fhnw.therewrite.repository.UserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -23,22 +24,23 @@ import java.util.List;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfiguration {
+    private final UserRepository userRepository;
     private final GuestRepository guestRepository;
     private final DocumentRepository documentRepository;
     private final DocumentAccessTokenRepository documentAccessTokenRepository;
     private final AppConfigProperties appConfig;
     private final CustomUserDetailsService cuds;
     public static final List<String> permitAllMatchers = List.of(
-            "/api/userIsAuth",
-            "/api/userIsAuth/login",
+            "/api/user",
+            "/api/user/login",
             "/",
             "/login",
             "/registration",
-            "/home",
             "/static/**"
     );
 
-    public SecurityConfiguration(GuestRepository guestRepository, DocumentRepository documentRepository, DocumentAccessTokenRepository documentAccessTokenRepository, AppConfigProperties appConfig, CustomUserDetailsService cuds) {
+    public SecurityConfiguration(UserRepository userRepository, GuestRepository guestRepository, DocumentRepository documentRepository, DocumentAccessTokenRepository documentAccessTokenRepository, AppConfigProperties appConfig, CustomUserDetailsService cuds) {
+        this.userRepository = userRepository;
         this.guestRepository = guestRepository;
         this.documentRepository = documentRepository;
         this.documentAccessTokenRepository = documentAccessTokenRepository;
@@ -55,13 +57,13 @@ public class SecurityConfiguration {
                     auth.anyRequest().authenticated();
                 })
                 .addFilterBefore(
-                        new GuestFilter(guestRepository, documentRepository, documentAccessTokenRepository, cuds),
+                        new GuestFilter(guestRepository, userRepository, documentRepository, documentAccessTokenRepository, cuds),
                         UsernamePasswordAuthenticationFilter.class)
                 .addFilterAt(customUsernamePasswordAuthenticationFilter(),
                         UsernamePasswordAuthenticationFilter.class)
                 .formLogin(form -> form
                         .loginPage("/login")
-                        .loginProcessingUrl("/api/userIsAuth/login")
+                        .loginProcessingUrl("/api/user/login")
                         .failureUrl("/login?error=true")
                         .successHandler(appAuthenticationSuccessHandler())
                         .permitAll()

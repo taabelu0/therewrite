@@ -8,6 +8,7 @@ import ch.fhnw.therewrite.data.User;
 import ch.fhnw.therewrite.repository.DocumentAccessTokenRepository;
 import ch.fhnw.therewrite.repository.DocumentRepository;
 import ch.fhnw.therewrite.repository.GuestRepository;
+import ch.fhnw.therewrite.repository.UserRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -29,11 +30,13 @@ import java.util.UUID;
 @Component
 public class GuestFilter extends OncePerRequestFilter {
     private final GuestRepository guestRepository;
+    private final UserRepository userRepository;
     private final DocumentRepository documentRepository;
     private final DocumentAccessTokenRepository documentAccessTokenRepository;
     private final CustomUserDetailsService customUserDetailsService;
-    public GuestFilter(GuestRepository guestRepository, DocumentRepository documentRepository, DocumentAccessTokenRepository documentAccessTokenRepository, CustomUserDetailsService customUserDetailsService) {
+    public GuestFilter(GuestRepository guestRepository, UserRepository userRepository, DocumentRepository documentRepository, DocumentAccessTokenRepository documentAccessTokenRepository, CustomUserDetailsService customUserDetailsService) {
         this.guestRepository = guestRepository;
+        this.userRepository = userRepository;
         this.documentRepository = documentRepository;
         this.documentAccessTokenRepository = documentAccessTokenRepository;
         this.customUserDetailsService = customUserDetailsService;
@@ -71,6 +74,6 @@ public class GuestFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(newAuth);
             }
         }
-        filterChain.doFilter(request, response);
+        if (!response.isCommitted()) filterChain.doFilter(request, response);
     }
 }

@@ -8,13 +8,11 @@ import ch.fhnw.therewrite.data.User;
 import ch.fhnw.therewrite.repository.*;
 import ch.fhnw.therewrite.security.AuthTuple;
 import jakarta.servlet.http.HttpSession;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.parameters.P;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,23 +24,21 @@ import java.util.UUID;
 @RequestMapping("/api/comment")
 public class CommentController {
 
-    @Autowired
-    private CommentRepository commentRepository;
 
-    @Autowired
-    private AnnotationRepository annotationRepository;
-
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private GuestRepository guestRepository;
-
-    @Autowired
-    private DocumentRepository documentRepository;
+    private final CommentRepository commentRepository;
+    private final AnnotationRepository annotationRepository;
+    private final UserRepository userRepository;
+    private final GuestRepository guestRepository;
+    private final DocumentRepository documentRepository;
     private final AccessHelper accessHelper;
 
-    public CommentController(AccessHelper accessHelper) {
-        this.accessHelper = new AccessHelper(documentRepository, guestRepository);
+    public CommentController(CommentRepository commentRepository, AnnotationRepository annotationRepository, UserRepository userRepository, GuestRepository guestRepository, DocumentRepository documentRepository) {
+        this.commentRepository = commentRepository;
+        this.annotationRepository = annotationRepository;
+        this.userRepository = userRepository;
+        this.guestRepository = guestRepository;
+        this.documentRepository = documentRepository;
+        this.accessHelper = new AccessHelper(this.documentRepository, this.guestRepository);
     }
 
 
