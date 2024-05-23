@@ -75,7 +75,7 @@ public class DocumentAccessTokenController {
     public UUID getDocumentUUIDAuthorized(String documentId, UserDetails currentUser) throws IllegalAccessException, IllegalArgumentException {
         if(documentId == null) throw new IllegalArgumentException();
         boolean isAdmin = AccessHelper.isAdmin(currentUser);
-        if(!accessHelper.verifyUserRights(currentUser.getUsername(), documentId) && !isAdmin) {
+        if((currentUser.getUsername() == null || !accessHelper.verifyUserRights(currentUser.getUsername(), documentId)) && !isAdmin) {
             throw new IllegalAccessException();
         }
         return UUID.fromString(documentId);
