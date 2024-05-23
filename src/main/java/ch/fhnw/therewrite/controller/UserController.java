@@ -1,11 +1,6 @@
 package ch.fhnw.therewrite.controller;
 
-import ch.fhnw.therewrite.SecurityConfiguration;
-import ch.fhnw.therewrite.data.Annotation;
-import ch.fhnw.therewrite.data.Document;
-import ch.fhnw.therewrite.data.Guest;
 import ch.fhnw.therewrite.data.User;
-import ch.fhnw.therewrite.repository.GuestRepository;
 import ch.fhnw.therewrite.repository.UserRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,11 +8,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 

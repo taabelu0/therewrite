@@ -1,9 +1,10 @@
-package ch.fhnw.therewrite;
+package ch.fhnw.therewrite.security;
 
+import ch.fhnw.therewrite.AppConfigProperties;
+import ch.fhnw.therewrite.CustomUserDetailsService;
 import ch.fhnw.therewrite.repository.DocumentAccessTokenRepository;
 import ch.fhnw.therewrite.repository.DocumentRepository;
 import ch.fhnw.therewrite.repository.GuestRepository;
-import ch.fhnw.therewrite.security.CustomUsernamePasswordAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -15,7 +16,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.DefaultSecurityFilterChain;
-import org.springframework.security.web.access.ExceptionTranslationFilter;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.util.List;
@@ -29,8 +29,8 @@ public class SecurityConfiguration {
     private final AppConfigProperties appConfig;
     private final CustomUserDetailsService cuds;
     public static final List<String> permitAllMatchers = List.of(
-            "/api/user",
-            "/api/user/login",
+            "/api/userIsAuth",
+            "/api/userIsAuth/login",
             "/",
             "/login",
             "/registration",
@@ -61,7 +61,7 @@ public class SecurityConfiguration {
                         UsernamePasswordAuthenticationFilter.class)
                 .formLogin(form -> form
                         .loginPage("/login")
-                        .loginProcessingUrl("/api/user/login")
+                        .loginProcessingUrl("/api/userIsAuth/login")
                         .failureUrl("/login?error=true")
                         .successHandler(appAuthenticationSuccessHandler())
                         .permitAll()

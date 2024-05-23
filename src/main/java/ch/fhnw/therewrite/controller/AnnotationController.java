@@ -1,6 +1,7 @@
 package ch.fhnw.therewrite.controller;
 
-import ch.fhnw.therewrite.AccessHelper;
+import ch.fhnw.therewrite.security.AuthTuple;
+import ch.fhnw.therewrite.security.AccessHelper;
 import ch.fhnw.therewrite.data.Annotation;
 import ch.fhnw.therewrite.data.Document;
 import ch.fhnw.therewrite.data.Guest;
@@ -31,6 +32,7 @@ public class AnnotationController {
     private final DocumentRepository documentRepository;
     private final UserRepository userRepository;
     private final GuestRepository guestRepository;
+    private final AccessHelper accessHelper;
 
     @Autowired
     public AnnotationController(AnnotationRepository annotationRepository, DocumentRepository documentRepository, UserRepository userRepository, GuestRepository guestRepository) {
@@ -38,14 +40,13 @@ public class AnnotationController {
         this.documentRepository = documentRepository;
         this.userRepository = userRepository;
         this.guestRepository = guestRepository;
+        this.accessHelper = new AccessHelper(documentRepository, guestRepository);
     }
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_GUEST')")
     @GetMapping("/all/{documentId}")
     public ResponseEntity<List<Annotation>> getAnnotationsByDocumentId(@PathVariable String documentId, @AuthenticationPrincipal UserDetails currentUser, HttpSession session) {
         UUID guestId = (UUID) session.getAttribute("guestId");
-        boolean unauthUser = currentUser == null || !AccessHelper.verifyUserRights(currentUser.getUsername(), documentId, documentRepository);
-        boolean unauthGuest = guestId == null || !AccessHelper.verifyGuest(guestId.toString(), documentId, documentRepository, guestRepository);
-        if(unauthUser && unauthGuest) {
+        if(accessHelper.isUnauthorized(documentId, currentUser, guestId)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
         }
         UUID dId = UUID.fromString(documentId);
@@ -61,17 +62,15 @@ public class AnnotationController {
     public Annotation saveAnnotation(@RequestBody Annotation annotation, @AuthenticationPrincipal UserDetails currentUser, HttpSession session) {
         UUID guestId = (UUID) session.getAttribute("guestId");
         String documentId = annotation.getDocument().getId().toString();
-        boolean unauthUser = currentUser == null || !AccessHelper.verifyUserRights(currentUser.getUsername(), documentId, documentRepository);
-        boolean unauthGuest = guestId == null || !AccessHelper.verifyGuest(guestId.toString(), documentId, documentRepository, guestRepository);
-        if(unauthUser && unauthGuest) {
-            return null;
-        }
-        if(currentUser != null) {
+        AuthTuple<Boolean, Boolean> authTuple = accessHelper.getIsAuthorized(documentId, currentUser, guestId);
+        if(authTuple.userIsAuth()) {
             User user = userRepository.findByUsername(currentUser.getUsername());
             annotation.setUserCreator(user);
-        } else if(guestId != null) {
+        } else if(authTuple.guestIsAuth()) {
             Guest guest = guestRepository.getReferenceById(guestId);
             annotation.setGuestCreator(guest);
+        } else {
+            return null;
         }
         return annotationRepository.save(annotation);
     }
@@ -84,20 +83,34 @@ public class AnnotationController {
         Optional<Annotation> optionalAnno = annotationRepository.findById(update.getIdAnnotation());
         if(optionalAnno.isPresent()) {
             String documentId =  optionalAnno.get().getDocument().getId().toString();
-            boolean unauthUser = currentUser == null || !AccessHelper.verifyUserRights(currentUser.getUsername(), documentId, documentRepository);
-            boolean unauthGuest = guestId == null || !AccessHelper.verifyGuest(guestId.toString(), documentId, documentRepository, guestRepository);
-            if((unauthUser && unauthGuest)) {
+            AuthTuple<Boolean, Boolean> authTuple = accessHelper.getIsAuthorized(documentId, currentUser, guestId);
+            if(!authTuple.userIsAuth() && !authTuple.guestIsAuth()) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
             }
+
             Annotation anno = optionalAnno.get();
-            if(!unauthGuest && (anno.getGuestCreator() == null || !guestId.equals(anno.getGuestCreator().getId()))) {
+            if (AccessHelper.isAdmin(currentUser)) {
+                return performPatch(anno, update);
+            }
+
+            if (authTuple.userIsAuth()) {
+                UUID userId = userRepository.findByUsername(currentUser.getUsername()).getId();
+                boolean userIsOwner = anno.getUserCreator() != null && !userId.equals(anno.getGuestCreator().getId());
+                if(!userIsOwner && anno.getGuestCreator() == null) { // Any user can edit any annotation that is created by a guest
+                    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+                }
+            } else if(anno.getGuestCreator() == null || !guestId.equals(anno.getGuestCreator().getId())) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
             }
-            anno.patch(update);
-            Annotation resp = annotationRepository.save(anno);
-            return ResponseEntity.status(HttpStatus.OK).body(resp);
+            return performPatch(anno, update);
         }
         return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(null);
+    }
+
+    public ResponseEntity<Annotation> performPatch(Annotation annotation, Annotation update) {
+        annotation.patch(update);
+        Annotation resp = annotationRepository.save(annotation);
+        return ResponseEntity.status(HttpStatus.OK).body(resp);
     }
 
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_GUEST')")
@@ -108,18 +121,32 @@ public class AnnotationController {
         Optional<Annotation> a = annotationRepository.findById(aId);
         if(a.isPresent()) {
             String documentId = a.get().getDocument().getId().toString();
-            boolean unauthUser = currentUser == null || !AccessHelper.verifyUserRights(currentUser.getUsername(), documentId, documentRepository);
-            boolean unauthGuest = guestId == null || !AccessHelper.verifyGuest(guestId.toString(), documentId, documentRepository, guestRepository);
-            if((unauthUser && unauthGuest)) {
+            AuthTuple<Boolean, Boolean> authTuple = accessHelper.getIsAuthorized(documentId, currentUser, guestId);
+            if(!authTuple.userIsAuth() && !authTuple.guestIsAuth()) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
             }
+
             Annotation oldAnno = a.get();
-            if(!unauthGuest && (oldAnno.getGuestCreator() == null || !guestId.equals(oldAnno.getGuestCreator().getId()))) {
+            if (AccessHelper.isAdmin(currentUser)) {
+                return performDeletion(oldAnno);
+            }
+
+            if (authTuple.userIsAuth()) {
+                UUID userId = userRepository.findByUsername(currentUser.getUsername()).getId();
+                boolean userIsOwner = oldAnno.getUserCreator() != null && !userId.equals(oldAnno.getGuestCreator().getId());
+                if(!userIsOwner && oldAnno.getGuestCreator() == null) { // Any user can delete any annotation that is created by a guest
+                    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+                }
+            } else if(oldAnno.getGuestCreator() == null || !guestId.equals(oldAnno.getGuestCreator().getId())) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
             }
-            annotationRepository.delete(oldAnno);
-            return ResponseEntity.status(HttpStatus.OK).body(oldAnno);
+            return performDeletion(oldAnno);
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+    }
+
+    private ResponseEntity<Annotation> performDeletion(Annotation annotation) {
+        annotationRepository.delete(annotation);
+        return ResponseEntity.status(HttpStatus.OK).body(annotation);
     }
 }

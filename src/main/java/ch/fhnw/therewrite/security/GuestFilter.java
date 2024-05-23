@@ -1,4 +1,5 @@
-package ch.fhnw.therewrite;
+package ch.fhnw.therewrite.security;
+import ch.fhnw.therewrite.CustomUserDetailsService;
 import ch.fhnw.therewrite.controller.GuestController;
 import ch.fhnw.therewrite.data.Document;
 import ch.fhnw.therewrite.data.DocumentAccessToken;
@@ -17,6 +18,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
@@ -54,7 +56,9 @@ public class GuestFilter extends OncePerRequestFilter {
         String token = request.getParameter("documentAccessToken");
         String username = request.getParameter("username");
         UserDetails user = null;
-        if(username != null) user = customUserDetailsService.loadUserByUsername(username);
+        try {
+            if (username != null) user = customUserDetailsService.loadUserByUsername(username);
+        } catch(UsernameNotFoundException ignored) {}
         if(token != null &&  user == null) {
             Document document = verifyToken(token);
             if(document != null) {
