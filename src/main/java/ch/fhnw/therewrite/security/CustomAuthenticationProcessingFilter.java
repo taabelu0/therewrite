@@ -46,7 +46,7 @@ public abstract class CustomAuthenticationProcessingFilter extends GenericFilter
     private boolean continueChainBeforeSuccessfulAuthentication = false;
     private SessionAuthenticationStrategy sessionStrategy = new NullAuthenticatedSessionStrategy();
     private boolean allowSessionCreation = true;
-    private AuthenticationSuccessHandler successHandler = new SavedRequestAwareAuthenticationSuccessHandler();
+    private SimpleUrlAuthenticationSuccessHandler successHandler = new SavedRequestAwareAuthenticationSuccessHandler();
     private AuthenticationFailureHandler failureHandler = new SimpleUrlAuthenticationFailureHandler();
     private SecurityContextRepository securityContextRepository = new RequestAttributeSecurityContextRepository();
 
@@ -223,7 +223,7 @@ public abstract class CustomAuthenticationProcessingFilter extends GenericFilter
         this.securityContextHolderStrategy = securityContextHolderStrategy;
     }
 
-    protected AuthenticationSuccessHandler getSuccessHandler() {
+    protected SimpleUrlAuthenticationSuccessHandler getSuccessHandler() {
         return this.successHandler;
     }
 

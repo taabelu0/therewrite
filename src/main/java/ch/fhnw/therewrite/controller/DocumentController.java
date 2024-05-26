@@ -1,11 +1,12 @@
 package ch.fhnw.therewrite.controller;
 
-import ch.fhnw.therewrite.AccessHelper;
+import ch.fhnw.therewrite.security.AccessHelper;
 import ch.fhnw.therewrite.data.Document;
 import ch.fhnw.therewrite.data.User;
 import ch.fhnw.therewrite.repository.DocumentRepository;
 import ch.fhnw.therewrite.repository.GuestRepository;
 import ch.fhnw.therewrite.repository.UserRepository;
+import ch.fhnw.therewrite.security.AuthTuple;
 import ch.fhnw.therewrite.storage.StorageFileNotFoundException;
 import ch.fhnw.therewrite.storage.StorageService;
 import jakarta.servlet.http.HttpSession;
@@ -38,12 +39,14 @@ public class DocumentController {
     private final StorageService storageService;
     private final UserRepository userRepository;
     private final GuestRepository guestRepository;
+    private final AccessHelper accessHelper;
     @Autowired
     public DocumentController(DocumentRepository documentRepository, StorageService storageService, UserRepository userRepository, GuestRepository guestRepository) {
         this.documentRepository = documentRepository;
         this.storageService = storageService;
         this.userRepository = userRepository;
         this.guestRepository = guestRepository;
+        this.accessHelper = new AccessHelper(documentRepository, guestRepository);
     }
 
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_GUEST')")
@@ -53,9 +56,8 @@ public class DocumentController {
     )
     public ResponseEntity<byte[]> getDocument(@PathVariable String documentId, @AuthenticationPrincipal UserDetails currentUser, HttpSession session) {
         UUID guestId = (UUID) session.getAttribute("guestId");
-        boolean unauthUser = currentUser == null || !AccessHelper.verifyUserRights(currentUser.getUsername(), documentId, documentRepository);
-        boolean unauthGuest = guestId == null || !AccessHelper.verifyGuest(guestId.toString(), documentId, documentRepository, guestRepository);
-        if(unauthUser && unauthGuest) {
+        AuthTuple<Boolean, Boolean> authTuple = accessHelper.getIsAuthorized(documentId, currentUser, guestId);
+        if(!authTuple.userIsAuth() && !authTuple.guestIsAuth()) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
         }
         UUID dId = UUID.fromString(documentId);
@@ -93,17 +95,26 @@ public class DocumentController {
         return null;
     }
 
+    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_GUEST')")
     @GetMapping("/get/{documentId}")
-    public ResponseEntity<Document> getDocumentById(@PathVariable String documentId) {
+    public ResponseEntity<Document> getDocumentById(@PathVariable String documentId, @AuthenticationPrincipal UserDetails currentUser, HttpSession session) {
         UUID dId = UUID.fromString(documentId);
+        UUID guestId = (UUID) session.getAttribute("guestId");
+        AuthTuple<Boolean, Boolean> authTuple = accessHelper.getIsAuthorized(documentId, currentUser, guestId);
+        if(!authTuple.userIsAuth() && !authTuple.guestIsAuth()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
         Optional<Document> optionalDocument = documentRepository.findById(dId);
         if(optionalDocument.isPresent()) {
-            return ResponseEntity.status(HttpStatus.OK).body(optionalDocument.get());
+            Document document = optionalDocument.get();
+            return ResponseEntity.status(HttpStatus.OK).body(document);
         }
         return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(null);
     }
 
-    @PreAuthorize("hasRole('ROLE_USER')") // TODO: change to role admin
+
+
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping("")
     public ResponseEntity<Document> saveDocument(@RequestParam("file") MultipartFile file, @AuthenticationPrincipal UserDetails currentUser) {
         String extension = FilenameUtils.getExtension(file.getOriginalFilename());
@@ -152,7 +163,7 @@ public class DocumentController {
 
 
 
-    @PreAuthorize("hasRole('ROLE_USER')") // TODO: change to admin
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @DeleteMapping("/{documentId}")
     public void deleteDocument(@PathVariable(value="documentId") String documentId, @AuthenticationPrincipal UserDetails currentUser) {
         if(currentUser == null) {

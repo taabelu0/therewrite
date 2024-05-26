@@ -5,7 +5,8 @@ services:
       restart: always
       ports:
           - "80:8080"
-          #- "443:8443"
+      volumes:
+        - /var/lib/docker/volumes/spring-volume/_config:/
       networks:
         - therewrite
   database:
@@ -16,7 +17,7 @@ services:
         POSTGRES_PASSWORD: i9SigIpctSQbIzmWTmavxrCVa0Y18h9RWDPmH7mys9ENPlaUM3
         POSTGRES_DB: TheRewrite
       volumes:
-        - /var/lib/docker/volumes/postgres-volume/_data
+        - /var/lib/docker/volumes/postgres-volume/_data:/var/lib/postgresql
       ports:
         - '5432:5432'
       expose:

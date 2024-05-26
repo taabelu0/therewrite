@@ -1,6 +1,7 @@
 package ch.fhnw.therewrite.data;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import org.hibernate.annotations.GenericGenerator;
@@ -11,12 +12,13 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "Document")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"}) // needs to be here
 public class Document {
-    @OneToMany(mappedBy = "documentId", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "documentId", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Annotation> annotations = new ArrayList<>();
 
-    @OneToMany(mappedBy = "documentId", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "documentId", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Guest> guests = new ArrayList<>();
 
@@ -28,7 +30,7 @@ public class Document {
     @JsonProperty
     private User UserCreator;
 
-    @OneToMany(mappedBy = "documentId", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "documentId", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JsonIgnore
     private List<DocumentAccessToken> accessTokens = new ArrayList<>();
 
