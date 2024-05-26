@@ -6,7 +6,7 @@ services:
       ports:
           - "80:8080"
       volumes:
-        - /var/lib/docker/volumes/spring-volume/_config:/
+        - /var/lib/docker/volumes/spring-volume/_config:/config
       networks:
         - therewrite
   database:
