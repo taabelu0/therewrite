@@ -34,11 +34,11 @@ public class SetupDataLoader implements
     @Override
     @Transactional
     public void onApplicationEvent(ContextRefreshedEvent event) {
+        createRoleIfNotFound("ROLE_ADMIN");
+        createRoleIfNotFound("ROLE_USER");
         if(!Arrays.stream(env.getActiveProfiles()).anyMatch(p -> p.equals("dev")) || alreadySetup) {
             return;
         }
-        createRoleIfNotFound("ROLE_ADMIN");
-        createRoleIfNotFound("ROLE_USER");
         Role adminRole = roleRepository.findByName("ROLE_ADMIN");
         Role userRole = roleRepository.findByName("ROLE_USER");
         User user = new User();
