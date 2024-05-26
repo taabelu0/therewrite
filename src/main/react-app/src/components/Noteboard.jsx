@@ -440,6 +440,10 @@ function Noteboard({pdfID}) {
         });
     }
 
+    function scrollToSidebarAnnotation(element) {
+        if (element) element.scrollIntoView({behavior: "smooth", block: "nearest"}); // scroll on sidebar
+    }
+
     function isRangeExisting(selection) {
         return selection.rangeCount > 0 && !selection.isCollapsed && getPagesFromRange(selection.getRangeAt(0)).length > 0;
     }
@@ -465,7 +469,8 @@ function Noteboard({pdfID}) {
         if (annotationElements.length > 0) {
             setSelectedAnnotations(getCurAnnotationSetter(annotationElements));
             let sidebarElement = document.getElementById('sidebar-' + selectedAnnotationRef.current?.id);
-            if (sidebarElement) sidebarElement.scrollIntoView({behavior: "smooth"}); // scroll on sidebar
+            console.log(sidebarElement, 'HELLO')
+            scrollToSidebarAnnotation(sidebarElement);
         }
         attachAnnotationSelectListener();
     }

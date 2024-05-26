@@ -3,7 +3,6 @@ package ch.fhnw.therewrite.controller;
 import ch.fhnw.therewrite.repository.GuestRepository;
 import ch.fhnw.therewrite.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 
 import ch.fhnw.therewrite.data.Document;
 import ch.fhnw.therewrite.repository.AnnotationRepository;

@@ -1,4 +1,4 @@
-package ch.fhnw.therewrite;
+package ch.fhnw.therewrite.security;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
