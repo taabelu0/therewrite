@@ -395,6 +395,7 @@ function Noteboard({pdfID}) {
         return (data) => {
             annotationObj.id = data.idAnnotation;
             annotationObj.text = data.annotationText
+            annotationObj.creator = data.userCreator ? data.userCreator : data.guestCreator;
             setAnnotations(prevAnnotations => {
                 return {...prevAnnotations, [annotationObj['id']]: annotationObj}
             });
