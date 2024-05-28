@@ -22,20 +22,23 @@ The application.properties (src/main/resources/application.properties) file need
 - The app.access does not need any adaptation.
 - Our development default for spring.datasource.url is "jdbc:postgresql://localhost:5432/TheRewrite", you can change this depending on your database setup.
 - Set the appropriate username and password for your postgresql setup.
-- On first initialization set the spring.jpa.hibernate.ddl-auto to "create" (without ").
+- On first initialization set the spring.jpa.hibernate.ddl-auto to "create-drop" (without ").
 - For the database to persist change to "update" (without ") on consecutive application-startups.
 ```properties
 spring.servlet.multipart.max-file-size=10MB
 spring.servlet.multipart.max-request-size=10MB
+spring.mvc.throw-exception-if-no-handler-found=true
+spring.web.resources.add-mappings=false
 # node app url:
 app.url=<frontend-localhost>
-app.access=/api/**
+app.access=/api/**,/view/*,/ws,/**
 # database connection:
 spring.datasource.url=jdbc:postgresql://<database-url>
 spring.datasource.username=<postgres-username>
 spring.datasource.password=<postgres-password>
 
-spring.jpa.hibernate.ddl-auto=<create/update(see description)>
+spring.jpa.hibernate.ddl-auto=<create-drop/update(see description)>
+# spring.profiles.active=dev #For Development only
 ```
 
 3.**Run the Spring Boot Application**
@@ -48,12 +51,19 @@ Start the Spring Boot server with maven:
 4.**Access the Application**
 Available at `http://localhost:8080/`.
 
-### React Development
+### Development
 
-Local react development currently not supported: CORS errors due to Spring Security -> go through step 1 and 2 then proceed with the full application setup and run the file "devBuild.sh" instead of "build.sh"
+Local react development is currently not supported due to authentication issues -> complete the first (Navigation) and second (Dependency installation) step then proceed with the full application setup and run the file "devBuild.sh" instead of "build.sh"
+
+An administrator user will be automatically created if the following configuration is present in the application.properties:
+```properties
+spring.profiles.active=dev
+```
+You can find the user details in "src/main/java/ch/fhnw/therewrite/SetupDataLoader".
+
 
 Node or React are not requirements and only used for front-end development.
-The Spring-Boot application uses the build (build.sh) of the React App. 
+The Spring-Boot application uses the build (product of build.sh) of the React App. 
 Development with React:
 
 1. **Navigate to the React Directory**
@@ -72,8 +82,9 @@ Development with React:
    ```
    This starts the development server, accessible at `http://localhost:3000`. The front-end can be developed independently of the Spring Boot backend in this mode.
 
+
 4. **Build Changes**
-   To apply the changes made in the react-app navigate to `src/main/react-app` (step 1) and execute the bash script `build.sh`:
+   To apply the changes made in the react-app to the spring-application: navigate to `src/main/react-app` (step 1) and execute the bash script `build.sh`:
    ```bash
    sh build.sh
    ```
