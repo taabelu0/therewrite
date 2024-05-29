@@ -26,6 +26,7 @@ function SidebarAnnotation({
     const [editingCommentId, setEditingCommentId] = useState(null);
     const [editedCommentText, setEditedCommentText] = useState('');
     const [shownCommentOptionsMenuId, setShownCommentOptionsMenuId] = useState(null);
+    const [username, setUsername] = useState(annotation.creator?.username);
 
     const optionMenuRef = useRef(null);
     const commentOptionMenuRef = useRef(null);
@@ -207,7 +208,7 @@ function SidebarAnnotation({
                     )}
                     <div className="sidebar-annotation-cat">{annotation.category.toLowerCase()}</div>
                     <div className="sidebar-annotation-header-info">
-                        <div className="sidebar-annotation-header-info-user">ExampleUser</div>
+                        <div className="sidebar-annotation-header-info-user">{username}</div>
                     </div>
                     <div className="sidebar-annotation-control-input"
                          onClick={switchShowInput}>{showInput ? "Cancel" : "Add note"}</div>
