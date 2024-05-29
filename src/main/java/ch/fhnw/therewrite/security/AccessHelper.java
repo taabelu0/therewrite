@@ -1,10 +1,12 @@
 package ch.fhnw.therewrite.security;
 
 import ch.fhnw.therewrite.data.Document;
+import ch.fhnw.therewrite.data.DocumentAccessToken;
 import ch.fhnw.therewrite.data.Guest;
 import ch.fhnw.therewrite.data.User;
 import ch.fhnw.therewrite.repository.DocumentRepository;
 import ch.fhnw.therewrite.repository.GuestRepository;
+import ch.fhnw.therewrite.repository.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
@@ -21,6 +23,7 @@ public class AccessHelper {
         this.documentRepository = documentRepository;
         this.guestRepository = guestRepository;
     }
+
     public boolean verifyUserRights(String username, String documentId) {
         if(username == null || documentId == null) return false;
         UUID dId;
