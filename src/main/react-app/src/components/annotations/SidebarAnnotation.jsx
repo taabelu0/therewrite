@@ -182,36 +182,39 @@ function SidebarAnnotation({
             <div onClick={(event) => onSelection(event, annotation.id)} id={'sidebar-' + annotation.id}
                  className={`sidebar-annotation sidebar-annotation-${annotation.category.toLowerCase()}`}>
                 <div className="sidebar-annotation-header">
-                    <div className="sidebar-annotation-header-left">
-                        <div className="sidebar-option-change"></div>
-                        <div className="sidebar-annotation-cat" onClick={switchShowCategories}>{annotation.category.toLowerCase()}</div>
-                        {showCategories && (
-                            <div className="sidebar-annotation-optionmenu-cat"
-                                 style={{display: `${showCategories ? "block" : "none"}`}}>
-                                <div className="sidebar-annotation-optionmenu-item item-definition"
-                                     onClick={setAnnoCatDefinition}>Definition
+                    <div style={{ display: 'flex', alignItems: 'center'}}>
+                        <div className="sidebar-annotation-header-left">
+                            <div className="sidebar-option-change"></div>
+                            <div className="sidebar-annotation-cat"
+                                 onClick={switchShowCategories}>{annotation.category.toLowerCase()}</div>
+                            {showCategories && (
+                                <div className="sidebar-annotation-optionmenu-cat"
+                                     style={{display: `${showCategories ? "block" : "none"}`}}>
+                                    <div className="sidebar-annotation-optionmenu-item item-definition"
+                                         onClick={setAnnoCatDefinition}>Definition
+                                    </div>
+                                    <div className="sidebar-annotation-optionmenu-item item-explosion"
+                                         onClick={setAnnoCatExplosion}>Explosion
+                                    </div>
+                                    <div className="sidebar-annotation-optionmenu-item item-deletion"
+                                         onClick={setAnnoCatDeletion}>Deletion
+                                    </div>
+                                    <div className="sidebar-annotation-optionmenu-item item-correction"
+                                         onClick={setAnnoCatCorrection}>Correction
+                                    </div>
+                                    <div className="sidebar-annotation-optionmenu-item item-speculation"
+                                         onClick={setAnnoCatSpeculation}>Speculation
+                                    </div>
+                                    <div className="sidebar-annotation-optionmenu-item item-addition"
+                                         onClick={setAnnoCatAddition}>Addition
+                                    </div>
                                 </div>
-                                <div className="sidebar-annotation-optionmenu-item item-explosion"
-                                     onClick={setAnnoCatExplosion}>Explosion
-                                </div>
-                                <div className="sidebar-annotation-optionmenu-item item-deletion"
-                                     onClick={setAnnoCatDeletion}>Deletion
-                                </div>
-                                <div className="sidebar-annotation-optionmenu-item item-correction"
-                                     onClick={setAnnoCatCorrection}>Correction
-                                </div>
-                                <div className="sidebar-annotation-optionmenu-item item-speculation"
-                                     onClick={setAnnoCatSpeculation}>Speculation
-                                </div>
-                                <div className="sidebar-annotation-optionmenu-item item-addition"
-                                     onClick={setAnnoCatAddition}>Addition
-                                </div>
+                            )}
+                        </div>
+                        <div className="sidebar-annotation-header-mid">
+                            <div className="sidebar-annotation-header-info">
+                                <div className="sidebar-annotation-header-info-user">{username}</div>
                             </div>
-                        )}
-                    </div>
-                    <div className="sidebar-annotation-header-mid">
-                        <div className="sidebar-annotation-header-info">
-                            <div className="sidebar-annotation-header-info-user">ExampleUser</div>
                         </div>
                     </div>
                     <div className="sidebar-annotation-header-right">

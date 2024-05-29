@@ -2,14 +2,14 @@
 @import url('https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,200..900;1,200..900&display=swap');
 
 .sidebar {
-    position: sticky;
-    left: 100%;
-    top: calc(max(calc($s-nav-min-height), calc($s-nav-height + 130px)));
-    height: calc(100% - $s-nav-height - 130px);
-    width: 480px;
-    z-index: 9997;
-    display: flex;
-    background-color: white;
+  position: sticky;
+  left: 100%;
+  top: calc(max(calc($s-nav-min-height), calc($s-nav-height + 130px)));
+  height: calc(100% - $s-nav-height - 130px);
+  width: 480px;
+  z-index: 9997;
+  display: flex;
+  background-color: white;
 
   &-deactivated {
     width: 2rem;
@@ -43,7 +43,7 @@
       }
     }
 
-    &-change{
+    &-change {
       position: relative;
     }
 
@@ -178,7 +178,7 @@
       }
 
       &-mid {
-        margin-left: 1rem;
+        padding: 0 0 0 1rem;
       }
 
       &-right {
@@ -379,6 +379,7 @@
           display: flex;
           justify-content: center;
           align-items: center;
+
           &:hover {
             background-color: #6271e8;
             cursor: pointer;
@@ -420,7 +421,7 @@
         height: 16px;
         box-shadow: 0 0 0.5em rgba(0, 0, 0, 0.2);
         width: 60px;
-        margin-left: 9rem;
+        margin-left: 0.5rem;
         padding: 0.25rem 0.5rem;
         background-color: $c-light-primary;
         border-radius: 6px;
