@@ -1,4 +1,5 @@
 @import "variables";
+@import url('https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,200..900;1,200..900&display=swap');
 
 .sidebar {
     position: sticky;
@@ -40,6 +41,10 @@
         background-color: $c-color-primary !important;
         color: $c-light-primary;
       }
+    }
+
+    &-change{
+      position: relative;
     }
 
     &-edit {
@@ -389,7 +394,7 @@
     }
 
     &-cat {
-      padding: 0.5em 0.6em;
+      padding: 0.2rem 0.6rem;
       border-radius: 0.5em;
       margin-left: 1rem;
       background-color: transparent;
@@ -400,6 +405,7 @@
       position: relative;
       border: 1px solid;
       font-size: 11px;
+      height: 0.75rem;
     }
 
     &-control {
@@ -449,7 +455,7 @@
       &:hover {
         background-color: $c-category-definition-light;
 
-        .sidebar-option-change::before {
+        .sidebar-annotation-cat::before {
           color: $c-category-definition;
           left: 0.75rem !important;
           background-color: $c-category-definition-light;
@@ -479,7 +485,7 @@
       &:hover {
         background-color: $c-category-explosion-light;
 
-        .sidebar-option-change::before {
+        .sidebar-annotation-cat::before {
           color: $c-category-explosion;
           background-color: $c-category-explosion-light;
           left: 0.75rem !important;
@@ -508,7 +514,7 @@
       &:hover {
         background-color: $c-category-deletion-light;
 
-        .sidebar-option-change::before {
+        .sidebar-annotation-cat::before {
           color: $c-category-deletion;
           left: 0.75rem !important;
           background-color: $c-category-deletion-light;
@@ -537,7 +543,7 @@
       &:hover {
         background-color: $c-category-correction-light;
 
-        .sidebar-option-change::before {
+        .sidebar-annotation-cat::before {
           color: $c-category-correction;
           left: 0.75rem !important;;
           background-color: $c-category-correction-light;
@@ -566,7 +572,7 @@
       &:hover {
         background-color: $c-category-speculation-light;
 
-        .sidebar-option-change::before {
+        .sidebar-annotation-cat::before {
           color: $c-category-speculation;
           left: 0.75rem !important;
           background-color: $c-category-speculation-light;
@@ -595,7 +601,7 @@
       &:hover {
         background-color: $c-category-addition-light;
 
-        .sidebar-option-change::before {
+        .sidebar-annotation-cat::before {
           color: $c-category-addition;
           left: 0.75rem !important;
           background-color: $c-category-addition-light;
@@ -694,19 +700,18 @@
   margin-left: 26px;
 }
 
-.sidebar-annotation:hover .sidebar-option-change::before {
+.sidebar-annotation:hover .sidebar-annotation-cat::before {
   content: "✎";
   cursor: pointer;
   position: absolute;
-  left: 8px;
-  top: -2px;
-  font-size: 1.12rem;
+  transform: translateX(calc(-50% - 0.6rem));
+  font-size: 0.85rem;
   border-radius: 50%;
   align-items: center;
   justify-content: center;
-  transform: translateY(50%);
   z-index: 100;
-  line-height: 1.2rem;
+  line-height: .75rem;
+  height: 0.75rem;
 }
 
 .sidebar-annotation-optionmenu-cat {

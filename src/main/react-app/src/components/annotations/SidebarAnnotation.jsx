@@ -184,6 +184,7 @@ function SidebarAnnotation({
                 <div className="sidebar-annotation-header">
                     <div className="sidebar-annotation-header-left">
                         <div className="sidebar-option-change"></div>
+                        <div className="sidebar-annotation-cat" onClick={switchShowCategories}>{annotation.category.toLowerCase()}</div>
                         {showCategories && (
                             <div className="sidebar-annotation-optionmenu-cat"
                                  style={{display: `${showCategories ? "block" : "none"}`}}>
@@ -207,12 +208,10 @@ function SidebarAnnotation({
                                 </div>
                             </div>
                         )}
-                        <div className="sidebar-annotation-cat"
-                             onClick={switchShowCategories}>{annotation.category.toLowerCase()}</div>
                     </div>
                     <div className="sidebar-annotation-header-mid">
                         <div className="sidebar-annotation-header-info">
-                            <div className="sidebar-annotation-header-info-user">{username}</div>
+                            <div className="sidebar-annotation-header-info-user">ExampleUser</div>
                         </div>
                     </div>
                     <div className="sidebar-annotation-header-right">
