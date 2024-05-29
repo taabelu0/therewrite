@@ -226,6 +226,7 @@ function Noteboard({pdfID}) {
             obj.id = a['idAnnotation'];
             obj.text = a['annotationText'];
             obj.timeCreated = a['timeCreated'];
+            obj.creator = a.userCreator ? a.userCreator : a.guestCreator;
             newAnnotationsObj[a['idAnnotation']] = obj;
         });
         setAnnotations(newAnnotationsObj);
