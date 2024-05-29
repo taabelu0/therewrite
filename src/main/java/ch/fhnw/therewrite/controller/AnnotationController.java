@@ -119,6 +119,7 @@ public class AnnotationController {
         UUID guestId = (UUID) session.getAttribute("guestId");
         UUID aId = UUID.fromString(annoId);
         Optional<Annotation> a = annotationRepository.findById(aId);
+        System.out.println(AccessHelper.isAdmin(currentUser));
         if(a.isPresent()) {
             String documentId = a.get().getDocument().getId().toString();
             AuthTuple<Boolean, Boolean> authTuple = accessHelper.getIsAuthorized(documentId, currentUser, guestId);
@@ -127,6 +128,9 @@ public class AnnotationController {
             }
 
             Annotation oldAnno = a.get();
+            System.out.println("ADMIN?");
+            System.out.println(AccessHelper.isAdmin(currentUser));
+            System.out.println("--");
             if (AccessHelper.isAdmin(currentUser)) {
                 return performDeletion(oldAnno);
             }

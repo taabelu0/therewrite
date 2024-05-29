@@ -68,6 +68,8 @@ public class GuestFilter extends OncePerRequestFilter {
                 Guest guest = gC.createGuest(document);
                 HttpSession session = request.getSession(true);
                 session.setAttribute("guestId", guest.getId());
+                filterChain.doFilter(request, response);
+                return;
             }
         }
         if (!response.isCommitted()) filterChain.doFilter(request, response);

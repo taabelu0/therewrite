@@ -11,6 +11,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.configuration.EnableGlobalAuthentication;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -23,7 +25,7 @@ import java.util.List;
 
 @Configuration
 @EnableWebSecurity
-public class SecurityConfiguration {
+public class SecurityConfiguration{
     private final UserRepository userRepository;
     private final GuestRepository guestRepository;
     private final DocumentRepository documentRepository;
@@ -59,6 +61,9 @@ public class SecurityConfiguration {
                 .addFilterBefore(
                         new GuestFilter(guestRepository, userRepository, documentRepository, documentAccessTokenRepository, cuds),
                         UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(
+                        appConfig.corsConfigurationSource(),
+                        GuestFilter.class)
                 .addFilterAt(customUsernamePasswordAuthenticationFilter(),
                         UsernamePasswordAuthenticationFilter.class)
                 .formLogin(form -> form
@@ -72,16 +77,14 @@ public class SecurityConfiguration {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement((session) -> session
                         .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
-                )
-                .addFilterBefore(
-                        appConfig.corsConfigurationSource(),
-                        GuestFilter.class);
+                );
         return http.build();
     }
 
     @Bean
     public CustomUsernamePasswordAuthenticationFilter customUsernamePasswordAuthenticationFilter() throws Exception {
         CustomUsernamePasswordAuthenticationFilter filter = new CustomUsernamePasswordAuthenticationFilter(authenticationManager());
+        filter.setAuthenticationManager(authenticationManager());
         return filter;
     }
     @Bean

@@ -9,7 +9,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.util.Assert;
@@ -54,16 +53,9 @@ public class CustomUsernamePasswordAuthenticationFilter extends CustomAuthentica
             }
             if(guestId != null) {
                 List<SimpleGrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_GUEST"));
-                Authentication newAuth = new UsernamePasswordAuthenticationToken("guest", null, authorities);
-                authentication = newAuth;
+                authentication = new UsernamePasswordAuthenticationToken("guest", null, authorities);
             }
-            try {
-                SecurityContext ctx = SecurityContextHolder.createEmptyContext();
-                SecurityContextHolder.setContext(ctx);
-                ctx.setAuthentication(authentication);
-            } finally {
-                SecurityContextHolder.clearContext();
-            }
+            SecurityContextHolder.getContext().setAuthentication(authentication);
             return authentication;
         }
     }
