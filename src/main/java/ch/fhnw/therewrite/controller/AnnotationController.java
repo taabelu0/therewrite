@@ -95,7 +95,7 @@ public class AnnotationController {
 
             if (authTuple.userIsAuth()) {
                 UUID userId = userRepository.findByUsername(currentUser.getUsername()).getId();
-                boolean userIsOwner = anno.getUserCreator() != null && !userId.equals(anno.getGuestCreator().getId());
+                boolean userIsOwner = anno.getUserCreator() != null && userId.equals(anno.getUserCreator().getId());
                 if(!userIsOwner && anno.getGuestCreator() == null) { // Any user can edit any annotation that is created by a guest
                     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
                 }
@@ -133,7 +133,7 @@ public class AnnotationController {
 
             if (authTuple.userIsAuth()) {
                 UUID userId = userRepository.findByUsername(currentUser.getUsername()).getId();
-                boolean userIsOwner = oldAnno.getUserCreator() != null && !userId.equals(oldAnno.getGuestCreator().getId());
+                boolean userIsOwner = oldAnno.getUserCreator() != null && userId.equals(oldAnno.getUserCreator().getId());
                 if(!userIsOwner && oldAnno.getGuestCreator() == null) { // Any user can delete any annotation that is created by a guest
                     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
                 }

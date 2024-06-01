@@ -33,7 +33,6 @@ public class AccessHelper {
             document = documentRepository.findById(dId).orElseThrow();
         }
         catch(IllegalArgumentException | NoSuchElementException | NullPointerException exception) {
-            // TODO: log exception
             return false;
         }
         List<User> users = document.getUsers();
@@ -49,7 +48,6 @@ public class AccessHelper {
             gId = UUID.fromString(guestId);
         }
         catch(IllegalArgumentException exception) {
-            // TODO: log exception
             return false;
         }
         Document document = documentRepository.getReferenceById(dId);
