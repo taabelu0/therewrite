@@ -14,7 +14,7 @@ import java.util.UUID;
 @Table(name = "Document")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"}) // needs to be here
 public class Document {
-    @OneToMany(mappedBy = "documentId", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "documentId", fetch = FetchType.EAGER)
     @JsonIgnore
     private List<Annotation> annotations = new ArrayList<>();
 
