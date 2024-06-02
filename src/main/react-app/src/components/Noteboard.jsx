@@ -93,6 +93,15 @@ function Noteboard({pdfID}) {
     }
 
     useEffect(() => {
+        const pdfHighlighter = document.querySelector('.PdfHighlighter');
+        const workspace = document.querySelector('#workspace');
+
+        if (pdfHighlighter && workspace) {
+            workspace.style.height = `${pdfHighlighter.offsetHeight + 300}px`;
+        }
+    });
+
+    useEffect(() => {
         const handleScroll = () => {
             setScrollPosition(window.pageYOffset);
         };
@@ -381,8 +390,9 @@ function Noteboard({pdfID}) {
             .then(saveAnnotationCB(newTinyText));
     }
 
-    async function addPostIt(category, x, y) {
+    async function addPostIt(creator, category, x, y) {
         const newPostIt = {
+            creator: creator,
             category: category,
             dataX: x,
             dataY: y,

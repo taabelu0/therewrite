@@ -202,7 +202,7 @@ export default function PostIt(props) {
                     onChange={valueChange}
                 />
             </div>
-            <div className="post-it-username">username</div>
+            <div className="post-it-username">{props.annotation.creator?.username}</div>
         </div>
     );
 }

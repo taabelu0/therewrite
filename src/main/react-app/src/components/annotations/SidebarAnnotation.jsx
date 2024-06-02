@@ -270,7 +270,7 @@ function SidebarAnnotation({
                             return <div className="sidebar-annotation-comment">
                                 <div className="sidebar-annotation-comment-header">
                                     <div className="sidebar-annotation-comment-header-arrow"></div>
-                                    <div className="sidebar-annotation-comment-header-user">ExampleUserABC</div>
+                                    <div className="sidebar-annotation-comment-header-user">{username}</div>
                                     <div
                                         className={`sidebar-annotation-comment-header-options sidebar-annotation-header-options-${annotation.category.toLowerCase()} ${shownCommentOptionsMenuId === comment[key].idComment ? `sidebar-annotation-header-options-${annotation.category.toLowerCase()}-active` : ""}`}
                                         onClick={() => toggleCommentOptionsMenu(comment[key].idComment)}>
