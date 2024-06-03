@@ -390,9 +390,8 @@ function Noteboard({pdfID}) {
             .then(saveAnnotationCB(newTinyText));
     }
 
-    async function addPostIt(creator, category, x, y) {
+    async function addPostIt(category, x, y) {
         const newPostIt = {
-            creator: creator,
             category: category,
             dataX: x,
             dataY: y,

@@ -14,6 +14,7 @@ export default function PostIt(props) {
     const postitSizeRef = useRef({ width: Number(width) || 200, height: Number(height) || 200 });
     const [postitCategory, setPostitCategory] = useState(props.annotation.category);
     const postitCategoryRef = useRef(props.annotation.category);
+    const [creator, setCreator] = useState(props.annotation.creator);
     const resizeCounter = useRef(0);
 
     useEffect(() => {
@@ -202,7 +203,7 @@ export default function PostIt(props) {
                     onChange={valueChange}
                 />
             </div>
-            <div className="post-it-username">{props.annotation.creator?.username}</div>
+            <div className="post-it-username">{creator.username}</div>
         </div>
     );
 }
