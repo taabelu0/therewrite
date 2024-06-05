@@ -25,7 +25,7 @@ public class GuestController {
     public Guest createGuest(Document document) {
         Guest guest = new Guest();
         guest.setDocumentId(document);
-        guest.setName(generateGuestName());
+        guest.setUsername(generateGuestName());
         return guestRepository.save(guest);
     }
 

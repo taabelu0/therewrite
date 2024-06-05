@@ -46,8 +46,7 @@ public class GuestFilter extends OncePerRequestFilter {
         try {
             token = UUID.fromString(documentAccessToken);
         }
-        catch(IllegalArgumentException exception) {
-            // TODO: log exception
+        catch(IllegalArgumentException ignored) {
             return null;
         }
         Optional<DocumentAccessToken> dat = documentAccessTokenRepository.findByToken(token);
@@ -69,9 +68,8 @@ public class GuestFilter extends OncePerRequestFilter {
                 Guest guest = gC.createGuest(document);
                 HttpSession session = request.getSession(true);
                 session.setAttribute("guestId", guest.getId());
-                List<SimpleGrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_GUEST"));
-                Authentication newAuth = new UsernamePasswordAuthenticationToken("guest", null, authorities);
-                SecurityContextHolder.getContext().setAuthentication(newAuth);
+                filterChain.doFilter(request, response);
+                return;
             }
         }
         if (!response.isCommitted()) filterChain.doFilter(request, response);

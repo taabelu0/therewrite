@@ -20,7 +20,7 @@ public class Guest {
     private Document documentId;
 
     @Column(name = "name")
-    private String name;
+    private String username;
 
     public void setId(UUID id) {
         this.id = id;
@@ -38,7 +38,7 @@ public class Guest {
         this.documentId = documentId;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setUsername(String username) {
+        this.username = username;
     }
 }

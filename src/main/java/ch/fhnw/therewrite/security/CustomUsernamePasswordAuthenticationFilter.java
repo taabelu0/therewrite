@@ -8,8 +8,14 @@ import org.springframework.security.authentication.AuthenticationServiceExceptio
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.util.Assert;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
 
 public class CustomUsernamePasswordAuthenticationFilter extends CustomAuthenticationProcessingFilter{
     public static final String SPRING_SECURITY_FORM_USERNAME_KEY = "username";
@@ -37,7 +43,20 @@ public class CustomUsernamePasswordAuthenticationFilter extends CustomAuthentica
             password = password != null ? password : "";
             UsernamePasswordAuthenticationToken authRequest = UsernamePasswordAuthenticationToken.unauthenticated(username, password);
             this.setDetails(request, authRequest);
-            return this.getAuthenticationManager().authenticate(authRequest);
+            Authentication authentication = this.getAuthenticationManager().authenticate(authRequest);
+            UUID guestId = null;
+            if(authentication.isAuthenticated()) {
+                String token = request.getParameter("documentAccessToken");
+                AccessTokenUserHandler.handleAccessTokenOnUser(token, username);
+            } else {
+                guestId = (UUID) request.getSession().getAttribute("guestId");
+            }
+            if(guestId != null) {
+                List<SimpleGrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_GUEST"));
+                authentication = new UsernamePasswordAuthenticationToken("guest", null, authorities);
+            }
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            return authentication;
         }
     }
 
