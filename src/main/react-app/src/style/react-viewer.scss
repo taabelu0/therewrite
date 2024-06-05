@@ -9,7 +9,7 @@ body {
 .PdfHighlighter {
   position: absolute;
   margin-left: 10rem;
-  margin-top: $s-nav-height + $s-header-nav-height + 23vh;
+  top: $s-nav-height + $s-header-nav-height + $s-toolbar-height;
   justify-content: center;
   width: 100%;
   min-height: 100vh;

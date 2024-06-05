@@ -93,6 +93,15 @@ function Noteboard({pdfID}) {
     }
 
     useEffect(() => {
+        const pdfHighlighter = document.querySelector('.PdfHighlighter');
+        const workspace = document.querySelector('#workspace');
+
+        if (pdfHighlighter && workspace) {
+            workspace.style.height = `${pdfHighlighter.offsetHeight + 300}px`;
+        }
+    });
+
+    useEffect(() => {
         const handleScroll = () => {
             setScrollPosition(window.pageYOffset);
         };
@@ -226,6 +235,7 @@ function Noteboard({pdfID}) {
             obj.id = a['idAnnotation'];
             obj.text = a['annotationText'];
             obj.timeCreated = a['timeCreated'];
+            obj.creator = a.userCreator ? a.userCreator : a.guestCreator;
             newAnnotationsObj[a['idAnnotation']] = obj;
         });
         setAnnotations(newAnnotationsObj);
@@ -395,6 +405,7 @@ function Noteboard({pdfID}) {
         return (data) => {
             annotationObj.id = data.idAnnotation;
             annotationObj.text = data.annotationText
+            annotationObj.creator = data.userCreator ? data.userCreator : data.guestCreator;
             setAnnotations(prevAnnotations => {
                 return {...prevAnnotations, [annotationObj['id']]: annotationObj}
             });

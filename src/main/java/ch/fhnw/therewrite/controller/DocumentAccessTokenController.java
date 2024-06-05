@@ -45,7 +45,11 @@ public class DocumentAccessTokenController {
         Document document = documentRepository.getReferenceById(dId);
         dat.setDocumentId(document);
         documentAccessTokenRepository.save(dat);
-        return ResponseEntity.status(HttpStatus.OK).body(dat.getToken().toString());
+        String strToken = "";
+        try {
+            strToken = dat.getToken().toString();
+        } catch (NullPointerException ignored) {}
+        return ResponseEntity.status(HttpStatus.OK).body(strToken);
     }
 
     @PreAuthorize("hasRole('ROLE_USER')")
@@ -73,7 +77,9 @@ public class DocumentAccessTokenController {
     }
 
     public UUID getDocumentUUIDAuthorized(String documentId, UserDetails currentUser) throws IllegalAccessException, IllegalArgumentException {
-        if(documentId == null || currentUser == null) throw new IllegalArgumentException();
+        if(documentId == null) throw new IllegalArgumentException();
+        if(currentUser == null) throw new IllegalAccessException();
+        if(!UUID.fromString(documentId).toString().equals(documentId)) throw new IllegalArgumentException();
         boolean isAdmin = AccessHelper.isAdmin(currentUser);
         if(!accessHelper.verifyUserRights(currentUser.getUsername(), documentId) && !isAdmin) {
             throw new IllegalAccessException();

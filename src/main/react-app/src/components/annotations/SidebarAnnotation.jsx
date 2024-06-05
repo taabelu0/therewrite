@@ -26,6 +26,7 @@ function SidebarAnnotation({
     const [editingCommentId, setEditingCommentId] = useState(null);
     const [editedCommentText, setEditedCommentText] = useState('');
     const [shownCommentOptionsMenuId, setShownCommentOptionsMenuId] = useState(null);
+    const [username, setUsername] = useState(annotation.creator?.username);
 
     const optionMenuRef = useRef(null);
     const commentOptionMenuRef = useRef(null);
@@ -181,52 +182,62 @@ function SidebarAnnotation({
             <div onClick={(event) => onSelection(event, annotation.id)} id={'sidebar-' + annotation.id}
                  className={`sidebar-annotation sidebar-annotation-${annotation.category.toLowerCase()}`}>
                 <div className="sidebar-annotation-header">
-                    <div className="sidebar-option-change" onClick={switchShowCategories}></div>
-                    {showCategories && (
-                        <div className="sidebar-annotation-optionmenu-cat"
-                             style={{display: `${showCategories ? "block" : "none"}`}}>
-                            <div className="sidebar-annotation-optionmenu-item item-definition"
-                                 onClick={setAnnoCatDefinition}>Definition
+                    <div style={{ display: 'flex', alignItems: 'center'}}>
+                        <div className="sidebar-annotation-header-left">
+                            <div className="sidebar-option-change"></div>
+                            <div className="sidebar-annotation-cat"
+                                 onClick={switchShowCategories}>{annotation.category.toLowerCase()}</div>
+                            {showCategories && (
+                                <div className="sidebar-annotation-optionmenu-cat"
+                                     style={{display: `${showCategories ? "block" : "none"}`}}>
+                                    <div className="sidebar-annotation-optionmenu-item item-definition"
+                                         onClick={setAnnoCatDefinition}>Definition
+                                    </div>
+                                    <div className="sidebar-annotation-optionmenu-item item-explosion"
+                                         onClick={setAnnoCatExplosion}>Explosion
+                                    </div>
+                                    <div className="sidebar-annotation-optionmenu-item item-deletion"
+                                         onClick={setAnnoCatDeletion}>Deletion
+                                    </div>
+                                    <div className="sidebar-annotation-optionmenu-item item-correction"
+                                         onClick={setAnnoCatCorrection}>Correction
+                                    </div>
+                                    <div className="sidebar-annotation-optionmenu-item item-speculation"
+                                         onClick={setAnnoCatSpeculation}>Speculation
+                                    </div>
+                                    <div className="sidebar-annotation-optionmenu-item item-addition"
+                                         onClick={setAnnoCatAddition}>Addition
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                        <div className="sidebar-annotation-header-mid">
+                            <div className="sidebar-annotation-header-info">
+                                <div className="sidebar-annotation-header-info-user">{username}</div>
                             </div>
-                            <div className="sidebar-annotation-optionmenu-item item-explosion"
-                                 onClick={setAnnoCatExplosion}>Explosion
+                        </div>
+                    </div>
+                    <div className="sidebar-annotation-header-right">
+                        <div className="sidebar-annotation-control-input"
+                             onClick={switchShowInput}>{showInput ? "Cancel" : "Add note"}</div>
+                        <div
+                            className={`sidebar-annotation-header-options sidebar-annotation-header-options-${annotation.category.toLowerCase()} ${showOptions ? `sidebar-annotation-header-options-${annotation.category.toLowerCase()}-active` : ""}`}
+                            onClick={switchShowOptions}>
+                            <OptionsIcon/>
+                        </div>
+                    </div>
+                </div>
+                {
+                    showOptions && (
+                        <div className="sidebar-annotation-optionmenu" ref={optionMenuRef}>
+                            <div className="sidebar-annotation-optionmenu-item sidebar-option-edit"
+                                 onClick={startEditing}>Edit Annotation
                             </div>
-                            <div className="sidebar-annotation-optionmenu-item item-deletion"
-                                 onClick={setAnnoCatDeletion}>Deletion
-                            </div>
-                            <div className="sidebar-annotation-optionmenu-item item-correction"
-                                 onClick={setAnnoCatCorrection}>Correction
-                            </div>
-                            <div className="sidebar-annotation-optionmenu-item item-speculation"
-                                 onClick={setAnnoCatSpeculation}>Speculation
-                            </div>
-                            <div className="sidebar-annotation-optionmenu-item item-addition"
-                                 onClick={setAnnoCatAddition}>Addition
+                            <div className="sidebar-annotation-optionmenu-item sidebar-option-delete"
+                                 onClick={deleteAnno}>Delete Annotation
                             </div>
                         </div>
                     )}
-                    <div className="sidebar-annotation-cat">{annotation.category.toLowerCase()}</div>
-                    <div className="sidebar-annotation-header-info">
-                        <div className="sidebar-annotation-header-info-user">ExampleUser</div>
-                    </div>
-                    <div className="sidebar-annotation-control-input"
-                         onClick={switchShowInput}>{showInput ? "Cancel" : "Add note"}</div>
-                    <div
-                        className={`sidebar-annotation-header-options sidebar-annotation-header-options-${annotation.category.toLowerCase()} ${showOptions ? `sidebar-annotation-header-options-${annotation.category.toLowerCase()}-active` : ""}`}
-                        onClick={switchShowOptions}>
-                        <OptionsIcon/>
-                    </div>
-                </div>
-                {showOptions && (
-                    <div className="sidebar-annotation-optionmenu" ref={optionMenuRef}>
-                        <div className="sidebar-annotation-optionmenu-item sidebar-option-edit"
-                             onClick={startEditing}>Edit Annotation
-                        </div>
-                        <div className="sidebar-annotation-optionmenu-item sidebar-option-delete"
-                             onClick={deleteAnno}>Delete Annotation
-                        </div>
-                    </div>
-                )}
                 {isEditing ? (
                     <div className="input-edit-group">
                         <input className="sidebar-annotation-textInput" value={editedText} onChange={handleTextChange}/>
@@ -259,7 +270,7 @@ function SidebarAnnotation({
                             return <div className="sidebar-annotation-comment">
                                 <div className="sidebar-annotation-comment-header">
                                     <div className="sidebar-annotation-comment-header-arrow"></div>
-                                    <div className="sidebar-annotation-comment-header-user">ExampleUserABC</div>
+                                    <div className="sidebar-annotation-comment-header-user">{username}</div>
                                     <div
                                         className={`sidebar-annotation-comment-header-options sidebar-annotation-header-options-${annotation.category.toLowerCase()} ${shownCommentOptionsMenuId === comment[key].idComment ? `sidebar-annotation-header-options-${annotation.category.toLowerCase()}-active` : ""}`}
                                         onClick={() => toggleCommentOptionsMenu(comment[key].idComment)}>
