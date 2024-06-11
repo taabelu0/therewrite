@@ -144,7 +144,7 @@ export default function PostIt(props) {
     }
 
     async function updatePostItDetails(id, x, y, text, category, w, h) {
-        await annotationAPI.updateAnnotation(id, {
+        annotationAPI.updateAnnotation(id, {
             annotationText: text,
             annotationDetail: JSON.stringify({
                 category: postitCategoryRef.current,
@@ -156,7 +156,7 @@ export default function PostIt(props) {
             })
         }).then(postIt => {
             props.onChange(postIt.data);
-        });
+        }).catch(e => console.error(e))
     }
 
     function valueChange(event) {
