@@ -171,18 +171,22 @@ export default function TinyText(props) {
     }
 
     async function updateTinyTextDetails(id, x, y, text, category, w, h) {
-        let tinyText = await annotationAPI.updateAnnotation(id, {
-            annotationText: text,
-            annotationDetail: JSON.stringify({
-                category: category,
-                dataX: x,
-                dataY: y,
-                width: w,
-                height: h,
-                annotation: "TinyText"
-            })
-        });
-        props.onChange(tinyText.data);
+        try {
+            let tinyText = await annotationAPI.updateAnnotation(id, {
+                annotationText: text,
+                annotationDetail: JSON.stringify({
+                    category: category,
+                    dataX: x,
+                    dataY: y,
+                    width: w,
+                    height: h,
+                    annotation: "TinyText"
+                })
+            });
+            props.onChange(tinyText.data);
+        } catch(e) {
+            console.error(e.message);
+        }
     }
 
     function valueChange(event) {
