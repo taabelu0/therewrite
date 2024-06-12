@@ -56,29 +56,35 @@ function SidebarAnnotation({
     }, []);
 
 
-    const startEditing = () => {
+    const startEditing = (event) => {
+        event.stopPropagation();
         setIsEditing(true);
         setShowOptions(false);
     }
 
     const handleTextChange = (event) => {
+        event.stopPropagation();
         setEditedText(event.target.value);
     }
 
-    const saveEditedAnno = () => {
+    const saveEditedAnno = (event) => {
+        event.stopPropagation();
         editAnnotation(annotation.id, editedText);
         setIsEditing(false);
     }
 
-    const cancelEdit = () => {
+    const cancelEdit = (event) => {
+        event.stopPropagation();
         setIsEditing(false);
     }
 
-    const switchShowInput = () => {
+    const switchShowInput = (event) => {
+        event.stopPropagation();
         setShowInput(!showInput);
     }
 
-    const switchShowOptions = () => {
+    const switchShowOptions = (event) => {
+        event.stopPropagation();
         if (shownCommentOptionsMenuId !== null) {
             setShownCommentOptionsMenuId(null);
         }
@@ -90,12 +96,15 @@ function SidebarAnnotation({
         setShowComments(!showComments);
     }
 
-    const switchShowCategories = () => {
+    const switchShowCategories = (event) => {
         //setShowOptions(!showOptions);
+        event.stopPropagation();
+        event.preventDefault();
         setShowCategories(!showCategories);
     }
 
-    const deleteAnno = () => {
+    const deleteAnno = (event) => {
+        event.stopPropagation();
         deleteAnnotation(annotation.id);
     }
 
@@ -126,13 +135,15 @@ function SidebarAnnotation({
         setIsEditingComment(true);
     }
 
-    const saveEditedComment = () => {
+    const saveEditedComment = (event) => {
+        event.stopPropagation();
         console.log("comment id saveEditedComment:", editingCommentId)
         editComment(editingCommentId, editedCommentText);
         setIsEditingComment(false);
     }
 
-    const cancelEditComment = () => {
+    const cancelEditComment = (event) => {
+        event.stopPropagation();
         setEditingCommentId(null);
     }
 
@@ -147,50 +158,46 @@ function SidebarAnnotation({
         setShownCommentOptionsMenuId(prevId => prevId === id ? null : id);
     }
 
-    const setAnnoCatDefinition = () => {
+    const setAnnoCatDefinition = (event) => {
+        event.stopPropagation();
         setShowCategories(false);
         updateAnnoCategory(annotation.id, "Definition");
     }
 
-    const setAnnoCatExplosion = () => {
+    const setAnnoCatExplosion = (event) => {
+        event.stopPropagation();
         setShowCategories(false);
         updateAnnoCategory(annotation.id, "Explosion");
     }
 
-    const setAnnoCatDeletion = () => {
+    const setAnnoCatDeletion = (event) => {
+        event.stopPropagation();
         setShowCategories(false);
         updateAnnoCategory(annotation.id, "Deletion");
     }
 
-    const setAnnoCatCorrection = () => {
+    const setAnnoCatCorrection = (event) => {
+        event.stopPropagation();
         setShowCategories(false);
         updateAnnoCategory(annotation.id, "Correction");
     }
 
-    const setAnnoCatSpeculation = () => {
+    const setAnnoCatSpeculation = (event) => {
+        event.stopPropagation();
         setShowCategories(false);
         updateAnnoCategory(annotation.id, "Speculation");
     }
 
-    const setAnnoCatAddition = () => {
+    const setAnnoCatAddition = (event) => {
+        event.stopPropagation();
         setShowCategories(false);
         updateAnnoCategory(annotation.id, "Addition");
-    }
-
-    const getSidebarY = () => {
-        const container = document.getElementsByClassName('sidebar-content')[0];
-        if(!container) return 0;
-        let annotationY = annotation.dataY ? annotation.dataY : annotation?.bound?.y
-        return annotationY - container.getBoundingClientRect().top - window.scrollY
     }
 
     if (annotation.id) {
         return (
             <div onClick={(event) => onSelection(event, annotation.id)} id={'sidebar-' + annotation.id}
-                 className={`sidebar-annotation sidebar-annotation-${annotation.category.toLowerCase()}`}
-                 style={{
-                     top: getSidebarY(),
-                 }}>
+                 className={`sidebar-annotation sidebar-annotation-${annotation.category.toLowerCase()}`}>
                 <div className="sidebar-annotation-header">
                     <div style={{ display: 'flex', alignItems: 'center'}}>
                         <div className="sidebar-annotation-header-left">
@@ -262,7 +269,7 @@ function SidebarAnnotation({
                     </div>
                 )}
                 <div className="sidebar-annotation-footer">
-                    <div
+                    <div onClick={(event) => event.stopPropagation()}
                         className={`sidebar-annotation-comment-input ${showInput ? "" : "sidebar-annotation-comment-input-hidden"}`}>
                         <input type="text" placeholder="Type here..." value={input} onChange={setCurrentInput}/>
                         <div className="sidebar-annotation-comment-input-send" onClick={handleCreateComment}>Send</div>
@@ -301,7 +308,7 @@ function SidebarAnnotation({
                                     </div>
                                 </div>
                                 {isEditingComment && editingCommentId === comment[key].idComment ? (
-                                    <div className="input-edit-group">
+                                    <div className="input-edit-group" onClick={(event) => event.stopPropagation()}>
                                         <input className="sidebar-annotation-textInput" value={editedCommentText}
                                                onChange={handleCommentTextChange}/>
                                         <div className="button-group">
