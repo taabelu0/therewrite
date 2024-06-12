@@ -141,7 +141,7 @@ function Noteboard({pdfID}) {
                 return {...prevAnnotations, ...{[patchAnnotation.id]: patchAnnotation}};
             });
         } catch(e) {
-            console.error(message);
+            console.error(e.message);
         }
     }
 
@@ -625,6 +625,31 @@ function Noteboard({pdfID}) {
         });
     }
 
+    function resolveSidebarOverlaps() {
+        const container = document.getElementsByClassName('sidebar-content')[0];
+        if(!container) return;
+        let divs = container.children;
+        if(!divs || divs.length <= 0) return;
+        divs = Array.from(divs);
+        divs.sort((a, b) => parseInt(a.style.top) - parseInt(b.style.top));
+        for (let i = 0; i < divs.length; i++) {
+            let div = divs[i];
+            let divTop = parseInt(div.style.top, 10);
+            let divHeight = div.offsetHeight;
+            for (let j = 0; j < i; j++) {
+                let otherDiv = divs[j];
+                let otherTop = parseInt(otherDiv.style.top, 10);
+                let otherHeight = otherDiv.offsetHeight;
+                let otherBottom = otherTop + otherHeight + 1; // Including margin of 1
+                // Check if current div overlaps any previously adjusted div
+                if (divTop < otherBottom) {
+                    divTop = otherBottom; // Move current div below the overlapping div
+                    div.style.top = `${divTop}px`;
+                }
+            }
+        }
+    }
+
 
     return (
         <section
@@ -681,6 +706,7 @@ function Noteboard({pdfID}) {
                                                   editComment={editComment} onChange={onAnnotationChange}
                                                   onSelection={onSidebarSelection}/>
                     })}
+                    {resolveSidebarOverlaps()}
                 </div>
             </section>
         </section>

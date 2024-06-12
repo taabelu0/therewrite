@@ -177,10 +177,20 @@ function SidebarAnnotation({
         updateAnnoCategory(annotation.id, "Addition");
     }
 
+    const getSidebarY = () => {
+        const container = document.getElementsByClassName('sidebar-content')[0];
+        if(!container) return 0;
+        let annotationY = annotation.dataY ? annotation.dataY : annotation?.bound?.y
+        return annotationY - container.getBoundingClientRect().top - window.scrollY
+    }
+
     if (annotation.id) {
         return (
             <div onClick={(event) => onSelection(event, annotation.id)} id={'sidebar-' + annotation.id}
-                 className={`sidebar-annotation sidebar-annotation-${annotation.category.toLowerCase()}`}>
+                 className={`sidebar-annotation sidebar-annotation-${annotation.category.toLowerCase()}`}
+                 style={{
+                     top: getSidebarY(),
+                 }}>
                 <div className="sidebar-annotation-header">
                     <div style={{ display: 'flex', alignItems: 'center'}}>
                         <div className="sidebar-annotation-header-left">
